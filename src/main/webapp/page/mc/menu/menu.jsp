@@ -4,8 +4,15 @@
     Author     : agodino
 --%>
 
+<%@page import="it.refill.domain.User"%>
 <%@page import="it.refill.db.Entity"%>
 <%
+
+    User us1 = (User) session.getAttribute("user");
+    int tipo = 0;
+    if (us1 != null) {
+        tipo = us1.getTipo();
+    }
     String uri = request.getRequestURI();
     String pageName = uri.substring(uri.lastIndexOf("/") + 1);
     String home = "", sa = "", allievi = "", docenti = "", aule = "", progettoformativo = "", cloud = "", faq = "", fad = "", activity = "",
@@ -34,7 +41,7 @@
             progettoformativo = "kt-menu__item--open kt-menu__item--here";
             break;
         case "downloadModelli.jsp":
-        case "downloadModelliFS.jsp":    
+        case "downloadModelliFS.jsp":
             cloud = "kt-menu__item--open kt-menu__item--here";
             break;
         case "saFAQ.jsp":
@@ -83,6 +90,7 @@
         <div class="kt-aside-menu-wrapper kt-grid__item kt-grid__item--fluid" id="kt_aside_menu_wrapper">
             <div id="kt_aside_menu" class="kt-aside-menu " data-ktmenu-vertical="1" data-ktmenu-scroll="1" data-ktmenu-dropdown-timeout="500">
                 <ul class="kt-menu__nav ">
+                    <%if (tipo == 2) {%>
                     <li class="kt-menu__item  <%=home%>" aria-haspopup="true">
                         <a href="indexMicrocredito.jsp" class="kt-menu__link ">
                             <span class="kt-menu__link-icon"><i class="flaticon-home-2"></i></span>
@@ -96,10 +104,8 @@
                     <%@include file="general/ProgettiFormativi.jsp"%>
                     <%@include file="general/Cloud.jsp"%>
                     <%@include file="general/Faq.jsp"%>
-                    <%if (a_cad.equals("1")) {%>
-                    <%@include file="general/Conferenza.jsp"%>
-                    <%@include file="general/Attivita.jsp"%>
-                    <%@include file="general/Cad.jsp"%>
+                    <%} else if (tipo == 5) {%>
+                    <%@include file="general/ProgettiFormativi.jsp"%>
                     <%}%>
                 </ul>
             </div>

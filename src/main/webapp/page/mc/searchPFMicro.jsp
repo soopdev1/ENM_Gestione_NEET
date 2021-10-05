@@ -398,7 +398,7 @@
         <script src="<%=src%>/assets/vendors/general/bootstrap-datepicker/dist/js/bootstrap-datepicker.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/inputmask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/jquery.inputmask.js" type="text/javascript"></script>
-        <script id="searchPFMicro" src="<%=src%>/page/mc/js/searchPFMicro.js<%=no_cache%>" defer data-context="<%=request.getContextPath()%>" type="text/javascript"></script>
+        <script id="searchPFMicro" src="<%=src%>/page/mc/js/searchPFMicro.js<%=no_cache%>" defer data-context="<%=request.getContextPath()%>" data-typeuser="<%=us.getTipo()%>" type="text/javascript"></script>
         <script type="text/javascript">
                                                                         var KTAppOptions = {
                                                                             "colors": {

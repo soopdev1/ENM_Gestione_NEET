@@ -47,7 +47,6 @@ public class Login extends HttpServlet {
                 e.insertTracking(us.getUsername(), "Log In");
                 switch (us.getTipo()) {
                     case 1:
-                    case 3:
                         request.getSession().setAttribute("t_user", "sa");
                         request.getSession().setAttribute("guida", e.getPath("guida_SA"));
                         redirect(request, response, "page/sa/indexSoggettoAttuatore.jsp");
@@ -56,7 +55,11 @@ public class Login extends HttpServlet {
                         request.getSession().setAttribute("guida", e.getPath("guida_MC"));
                         redirect(request, response, "page/mc/indexMicrocredito.jsp");
                         break;
+                    case 5:
+                        redirect(request, response, "page/mc/searchPFMicro.jsp");
+                        break;
                     default:
+                        redirect(request, response, "redirect.jsp?page=login.jsp&esito=KO");
                         break;
                 }
             } else {

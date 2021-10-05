@@ -38,7 +38,6 @@ import it.refill.domain.TipoDoc;
 import it.refill.domain.TipoDoc_Allievi;
 import it.refill.domain.UnitaDidattiche;
 import it.refill.domain.User;
-import it.refill.domain.checklist_finale;
 import it.refill.util.Fadroom;
 import it.refill.util.Utility;
 import static it.refill.util.Utility.writeJsonResponseR;
@@ -729,7 +728,7 @@ public class QueryMicro extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         User us = (User) request.getSession().getAttribute("user");
-        if (us != null && us.getTipo() == 2) {
+        if (us != null && (us.getTipo() == 2 || us.getTipo() == 5)) {
             String type = request.getParameter("type");
             switch (type) {
                 case "verificaassegnazione":

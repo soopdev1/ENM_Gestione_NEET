@@ -95,7 +95,7 @@ import org.json.JSONObject;
 public class Utility {
 
     // TEST //
-    public static boolean test = true;
+    public static boolean test = false;
     public static boolean dbsviluppo = false;
     //////////
 

@@ -280,7 +280,8 @@
         <script src="<%=src%>/assets/app/custom/general/crud/forms/widgets/bootstrap-datepicker.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/bootstrap-datepicker/dist/js/bootstrap-datepicker.js" type="text/javascript"></script>
         <script id="ore_max" data-context="<%=max_ore_day%>" type="text/javascript"></script>
-        <script id="searchProgettiFormativi" src="<%=src%>/page/sa/js/searchProgettiFormativi.js<%=no_cache%>" data-context="<%=request.getContextPath()%>" type="text/javascript"></script>
+        <script id="searchProgettiFormativi" src="<%=src%>/page/sa/js/searchProgettiFormativi.js<%=no_cache%>" 
+        data-context="<%=request.getContextPath()%>" data-typeuser="<%=us.getTipo()%>" type="text/javascript"></script>
         <script type="text/javascript">
                                                                         var KTAppOptions = {
                                                                             "colors": {
