@@ -12,14 +12,16 @@
     <div class="kt-menu__submenu">
         <span class="kt-menu__arrow"></span>
         <ul class="kt-menu__subnav">
+            <%if (tipoR == 2) {%>
             <li class="kt-menu__item <%=pageName.equals("downloadModelli.jsp") ? "kt-menu__item--active" : ""%>" aria-haspopup="true">
                 <a href="downloadModelli.jsp" class="kt-menu__link ">
-                    <i class="kt-menu__link-bullet fa fa-file-download">
+                    <i class="kt-menu__link-bullet fa fa-edit">
                         <span></span>
                     </i>
                     <span class="kt-menu__link-text">Gestisci</span>
                 </a>
             </li>
+            <%}%>
             <li class="kt-menu__item <%=pageName.equals("downloadModelliFS.jsp") ? "kt-menu__item--active" : ""%>" aria-haspopup="true">
                 <a href="downloadModelliFS.jsp" class="kt-menu__link ">
                     <i class="kt-menu__link-bullet fa fa-file-download">

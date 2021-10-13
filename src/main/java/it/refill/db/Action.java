@@ -257,6 +257,12 @@ public class Action {
         db.closeDB();
         return r;
     }
+    public static Map<Long, Long> OreRendicontabiliDocentiFASEA(int pf) {
+        Database db = new Database(false);
+        Map<Long, Long> r = db.OreRendicontabiliDocentiFASEA(pf);
+        db.closeDB();
+        return r;
+    }
 
     //Totale Ore rendicontabili per Maschera Modello 5
     public static Map<Long, Long> OreRendicontabiliAlunni(int pf) {

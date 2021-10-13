@@ -1,4 +1,3 @@
-
 <%@page import="it.refill.domain.Revisori"%>
 <%@page import="it.refill.domain.Docenti"%>
 <%@page import="java.text.DecimalFormat"%>
@@ -46,10 +45,10 @@
             List<Allievi> allievi_totali = e.getAllieviProgettiFormativi(p);
             List<Allievi> allievi_faseA = Utility.allievi_fa(p.getId(), e.getAllieviProgettiFormativi(p));
             List<Allievi> allievi_faseB = Utility.allievi_fb(p.getId(), e.getAllieviProgettiFormativi(p));
-            List<Docenti> docenti_tab = Utility.docenti_ore(p.getId(), p.getDocenti());
+            List<Docenti> docenti_tab = Utility.docenti_ore_A(p.getId(), p.getDocenti());
             Map<Long, Long> oreRendicontabili_faseA = Action.OreRendicontabiliAlunni_faseA((int) (long) p.getId());
             Map<Long, Long> oreRendicontabili_faseB = Action.OreRendicontabiliAlunni_faseB((int) (long) p.getId());
-            Map<Long, Long> oreRendicontabili_docenti = Action.OreRendicontabiliDocenti((int) (long) p.getId());
+            Map<Long, Long> oreRendicontabili_docenti = Action.OreRendicontabiliDocentiFASEA((int) (long) p.getId());
             String coeff_fa = e.getPath("coeff.allievo.fasea");
             String coeff_fb = e.getPath("coeff.allievo.faseb");
             List<Revisori> controllori = e.findAll(Revisori.class);
@@ -461,8 +460,10 @@
                                                                                     </div>    
                                                                                     <div class="col-lg-2 col-md-12 col-sm-12 kt-align-right" style="float: right;">
                                                                                         <a href="<%=request.getContextPath()%>/OperazioniMicro?type=scaricaFileAssenza&idpr=<%=request.getParameter("id")%>" id="scarica_ASSENZA_file" 
-                                                                                           target="_blank" class="btn btn-io btn-md btn-wide kt-font-bold disablelink" data-container="body" data-html="true" 
-                                                                                           data-toggle="kt-tooltip" data-placement="top" title="<h5>Scarica file generato dalla piattaforma</h5>">Scarica Autocertificazione</a>
+                                                                                           target="_blank" class="btn btn-io btn-icon kt-font-bold disablelink" data-container="body" data-html="true" 
+                                                                                           data-toggle="kt-tooltip" data-placement="top" title="<h5>Scarica Autocertificazione generata dalla piattaforma</h5>">
+                                                                                            <i class="fa fa-download"></i>
+                                                                                        </a>
                                                                                     </div>
                                                                                     <div class="col-lg-4 col-md-12 col-sm-12">
                                                                                         <div class="custom-file">
@@ -872,6 +873,8 @@
         <script src="<%=src%>/assets/app/custom/general/crud/forms/widgets/input-mask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/inputmask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/jquery.inputmask.js" type="text/javascript"></script>
+        <script src="<%=src%>/resource/jquery.maskMoney.js" type="text/javascript"></script>
+        
         <script id="compileCL" src="<%=src%>/page/mc/js/compileCL.js<%="?dummy=" + String.valueOf(new Date().getTime())%>" data-context="<%=request.getContextPath()%>" type="text/javascript"></script>
         <script type="text/javascript">
 

@@ -154,9 +154,9 @@
                                                                         <option value="-">Seleziona Stato</option>
                                                                         <%for (StatiPrg i : stati) {
                                                                                 if (istato.equals(i.getTipo())) {%>
-                                                                        <option selected value="<%=i.getTipo()%>"><%=i.getDe_tipo()%></option>
+                                                                        <option selected value="<%=i.getTipo()%>"><%=i.getDescrizione()%></option>
                                                                         <%} else {%>
-                                                                        <option value="<%=i.getTipo()%>"><%=i.getDe_tipo()%></option>
+                                                                        <option value="<%=i.getTipo()%>"><%=i.getDescrizione()%></option>
                                                                         <%}
                                                                             }%>
                                                                     </select>

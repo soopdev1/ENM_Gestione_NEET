@@ -2333,8 +2333,8 @@ public class OperazioniMicro extends HttpServlet {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            e.rollBack();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro checklistFinale: " + ex.getMessage());
+            e.rollBack();
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile procedere con il salvataggio dei dati.");
         } finally {

@@ -1,7 +1,7 @@
 <%-- 
     Document   : rubrica
     Created on : 18-giu-2019, 9.23.22
-    Author     : agodino
+    Author     : rcosco
 --%>
 <li class="kt-menu__item <%=progettoformativo%>" aria-haspopup="true" data-ktmenu-submenu-toggle="hover">
     <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
@@ -20,7 +20,7 @@
                     <span class="kt-menu__link-text">Cerca</span>
                 </a>
             </li>
-            <%if (tipo == 2) {%>
+            
             <li class="kt-menu__item <%=pageName.equals("dUnit.jsp") ? "kt-menu__item--active" : ""%>" aria-haspopup="true">
                 <a href="dUnit.jsp" class="kt-menu__link">
                     <i class="kt-menu__link-bullet fa fa-list-ol">
@@ -29,7 +29,7 @@
                     <span class="kt-menu__link-text">Unità Didattiche</span>
                 </a>
             </li>
-            <%}%>
+            
         </ul>
     </div>
 </li>

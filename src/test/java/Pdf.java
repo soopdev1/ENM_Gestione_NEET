@@ -60,7 +60,8 @@ public class Pdf {
 //
 //    }
     public static void main(String[] args) {
-        String o = checkFirmaQRpdfA("MODELLO1", "", new File("F:\\mnt\\mcn\\test\\ANGELICA.IADEVAIA_RAIA_ELVIRA_010920211421302.M1_pdfA.pdf"), "", "20;0;60;60");
+        
+        String o = checkFirmaQRpdfA("MODELLO2", "", new File("C:\\Users\\raf\\Desktop\\SEGRETERIASISTEMAIMPRESATA121020210858515.M2_pdfA.pdf.p7m"), "", "20;0;60;60");
         System.out.println(o);
     }
 //                    

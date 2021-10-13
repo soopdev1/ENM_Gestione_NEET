@@ -5,7 +5,6 @@
  */
 
 
-
 var context = document.getElementById("schedaUD").getAttribute("data-context");
 
 $.getScript(context + '/page/partialView/partialView.js', function () {});
@@ -22,8 +21,8 @@ function deleteDocUD(id) {
         cancelButtonClass: "btn btn-io-n",
         confirmButtonClass: "btn btn-io",
         customClass: {
-            popup: 'large-swal animated bounceInUp',
-        },
+            popup: 'large-swal animated bounceInUp'
+        }
     }).then((result) => {
         if (result.value) {
             deleteConfirmed(id);
@@ -53,7 +52,6 @@ function deleteConfirmed(id) {
     });
 }
 
-
 function updateDocUD(idud, estensione, mime_type) {
     var ext = estensione.split('"').join("&quot;");
     var swalDoc = getHtml("swalDoc", context).replace("@func", "checkFileExtAndDim(" + ext + ");").replace("@mime", mime_type);
@@ -71,7 +69,7 @@ function updateDocUD(idud, estensione, mime_type) {
         },
         onOpen: function () {
             $('#file').change(function (e) {
-                if (e.target.files.length != 0) {
+                if (e.target.files.length !== 0) {
                     if (e.target.files[0].name.length > 20) {
                         $('#label_doc').html(e.target.files[0].name.substring(0, 20) + "...");
                     } else {
@@ -94,7 +92,7 @@ function updateDocUD(idud, estensione, mime_type) {
             } else {
                 return false;
             }
-        },
+        }
     }).then((result) => {
         if (result.value) {
             showLoad();
@@ -169,7 +167,7 @@ function uploadDocUD(codice, estensione, mime_type) {
             } else {
                 return false;
             }
-        },
+        }
     }).then((result) => {
         if (result.value) {
             showLoad();
@@ -327,7 +325,7 @@ function saveDescription() {
     let desc = $('#descrizione').val();
     if (desc === '') {
         swalWarning("Descrizione Unità didattica", "La descrizione è un campo obbligatorio");
-    } else if (desc == $('#old_desc').val()) {
+    } else if (desc === $('#old_desc').val()) {
         swalWarning("Descrizione Unità didattica", "Inserisci una descrizione diversa da quella già presente");
     } else {
         showLoad();

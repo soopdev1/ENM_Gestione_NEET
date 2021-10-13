@@ -247,7 +247,8 @@ public class QueryMicro extends HttpServlet {
         Entity e = new Entity();
         try {
             ProgettiFormativi p = e.getEm().find(ProgettiFormativi.class, Long.parseLong(request.getParameter("idprogetto")));
-            List<Allievi> list = e.getAllieviProgettiFormativiAll(p);
+            List<Allievi> list = e.getAllieviProgettiFormativi(p);
+//            List<Allievi> list = e.getAllieviProgettiFormativiAll(p);
 //            Long hh36 = new Long(129600000);
             Map<Long, Long> oreRendicontabili_faseA = Action.OreRendicontabiliAlunni_faseA((int) (long) p.getId());
 

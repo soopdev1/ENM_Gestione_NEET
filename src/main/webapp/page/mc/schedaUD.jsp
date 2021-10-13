@@ -1,8 +1,4 @@
-<%-- 
-    Document   : profile
-    Created on : 18-set-2019, 12.31.26
-    Author     : agodino
---%>
+
 <%@page import="java.util.Date"%>
 <%@page import="it.refill.util.Utility"%>
 <%@page import="it.refill.domain.Documenti_UnitaDidattiche"%>
@@ -145,9 +141,11 @@
                                                             <input type="hidden" id="codice" name="codice" value="<%=u.getCodice()%>">
                                                             <input type="hidden" id="old_desc" name="old_desc" value="<%=u.getDescrizione() == null ? "" : u.getDescrizione()%>">
                                                             <input type="text" class="form-control" maxlength="255" onkeypress="counterCharacters()" id="descrizione" name="descrizione" value="<%=u.getDescrizione() == null ? "" : u.getDescrizione()%>">
+                                                            <%if (us.getTipo() == 2) {%>
                                                             <div class="input-group-append">
                                                                 <button class="btn btn-io-n" type="button" onclick="saveDescription()">Salva</button>
                                                             </div>
+                                                            <%}%>
                                                         </div>
                                                         <p style="padding-bottom:10px;">Caratteri: <b><span id="numChar"></span></b> (Massimo 255 caratteri)</p>
                                                     </div>
@@ -181,12 +179,18 @@
                                                                                 </td>
                                                                                 <%if (doc.getTipo().equalsIgnoreCase("PDF")) {%>
                                                                                 <td widht="5%"><a target="_blank" href="<%=request.getContextPath()%>/OperazioniGeneral?type=showDoc&path=<%=doc.getPath()%>" class="btn" data-container="body" data-html="true" data-toggle="kt-tooltip" data-placement="top" title="<h5>Visualizza documento</h5>"><i style="font-size: 15px;" class="fa fa-expand kt-font-io"></i></a> </td>
+                                                                                        <%if (us.getTipo() == 2) {%>
                                                                                 <td widht="5%"><a href="javascript:void(0);" onclick="updateDocUD(<%=doc.getId_docud()%>, '[&quot;pdf&quot;]', 'application/pdf')" class="btn" data-container="body" data-html="true" data-toggle="kt-tooltip" data-placement="top" title="<h5>Modifica documento</h5>"><i style="font-size: 15px;" class="fa fa-pen kt-font-io-n"></i></a></td>
-                                                                                        <%} else {%>
+                                                                                        <%}%>
+                                                                                <%} else {%>
                                                                                 <td widht="5%"><a target="_blank" href="<%=doc.getPath()%>" class="btn" data-container="body" data-html="true" data-toggle="kt-tooltip" data-placement="top" title="<h5>Apri link in un'altra scheda</h5>"><i style="font-size: 15px;" class="fa fa-expand kt-font-io"></i></a> </td>
+                                                                                        <%if (us.getTipo() == 2) {%>
                                                                                 <td widht="5%"><a href="javascript:void(0);" onclick='updateLinkUD(<%=doc.getId_docud()%>, "<%=doc.getPath()%>")' class="btn" data-container="body" data-html="true" data-toggle="kt-tooltip" data-placement="top" title="<h5>Modifica Link</h5>"><i style="font-size: 15px;" class="fa fa-pen kt-font-io-n"></i></a></td>
                                                                                         <%}%>
+                                                                                <%}%>
+                                                                                <%if (us.getTipo() == 2) {%>
                                                                                 <td widht="5%"><a href="javascript:void(0);" onclick="deleteDocUD(<%=doc.getId_docud()%>)" class="btn" data-container="body" data-html="true" data-toggle="kt-tooltip" data-placement="top" title="<h5>Elimina documento</h5>"><i style="font-size: 15px;" class="fa fa-times kt-font-danger"></i></a></td>
+                                                                                <%}%>
                                                                             </tr>
                                                                             <%}%>
                                                                         </table>
@@ -194,6 +198,7 @@
                                                                 </div>
                                                                 <%}%>    
                                                             </div>
+                                                            <%if (us.getTipo() == 2) {%>
                                                             <div class="col-md-3 kt-align-right">
                                                                 <div class="btn-group" role="group">
                                                                     <button id="btnGroupDrop1" type="button" class="btn btn-io font-weight-bold dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -205,6 +210,7 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+                                                            <%}%>
                                                         </div>
                                                     </div>
                                                 </div>
