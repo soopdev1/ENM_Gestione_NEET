@@ -67,9 +67,9 @@
       <!-- SVILUPPO FL
       <property name="javax.persistence.jdbc.url" value="jdbc:mysql://172.31.224.159:3306/enm_gestione_neet" />  -->
       <!-- SVILUPPO AWS
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/enm_gestione_neet"/>   --> 
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/enm_gestione_neet?useSSL=false"/>   --> 
       <!--    PROD   -->
-      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/enm_gestione_neet_prod"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:mysql://clustermicrocredito.cluster-c6m6yfqeypv3.eu-south-1.rds.amazonaws.com:3306/enm_gestione_neet_prod?useSSL=false"/>
       
     </properties>
   </persistence-unit>

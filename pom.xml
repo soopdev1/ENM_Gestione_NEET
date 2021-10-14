@@ -4,10 +4,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>it.refill</groupId>
-    <artifactId>enm.neet</artifactId>
+    <artifactId>ENM_Gestione_NEET</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
-    <name>Enm_NEET</name>
+    <name>ENM_Gestione_NEET</name>
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
