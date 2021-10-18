@@ -13,14 +13,22 @@ function getConversation(idsoggetto) {
         url: context + "/QueryMicro?type=getConversationSA",
         data: {"idsoggetto": idsoggetto},
         success: function (resp) {
-            if (resp != null && resp != "") {
+            if (resp !== null && resp !== "") {
                 var json = JSON.parse(resp);
-                setConversation(json);
+                if (json.length === 0) {
+                    setConversationEMPTY();
+                } else {
+                    setConversation(json);
+                }
             }
         }
     });
 }
 
+
+function setConversationEMPTY() {
+    $("#contentanswers").append("<div class='row col-md-12 alert alert-info textcenter'>NESSUNA CONVERSAZIONE TROVATA.</div>");
+}
 
 function setConversation(json) {
     var mittente = getHtml("mittente", context);//@testo @data
@@ -71,16 +79,13 @@ function ctrlForm() {
     return err;
 }
 
-jQuery(document).ready(function () {
-
-});
-
-
 function showConversation(idsoggetto, resp) {
     var whatsapp = getHtml("whatsapp_micro", context).replace("@func", "sendAnswer(" + idsoggetto + ")");
     swal.fire({
         title: '',
         html: whatsapp,
+        width: '50%',
+        heightAuto: false,
         animation: false,
         showCancelButton: false,
         showConfirmButton: false,
@@ -91,7 +96,8 @@ function showConversation(idsoggetto, resp) {
         },
         onOpen: function () {
 
-            $("#answers").css({"min-height": ($("#kt_content").height() * 0.3) + "px", "max-height": ($("#kt_content").height() * 0.5) + "px"})
+            $("#answers").css({"min-height": "200px", "max-height": "600px"});
+//            $("#answers").css({"min-height": ($("#kt_content").height() * 0.3) + "px", "max-height": ($("#kt_content").height() * 0.5) + "px"})
             getConversation(idsoggetto);
             $('.kt-scroll').each(function () {
                 const ps = new PerfectScrollbar($(this)[0]);
@@ -106,7 +112,7 @@ function showConversation(idsoggetto, resp) {
             if (resp) {
                 location.reload();
             }
-        },
+        }
     });
 }
 

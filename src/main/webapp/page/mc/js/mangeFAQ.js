@@ -37,8 +37,8 @@ var KTDatatablesDataSourceAjaxServer = function () {
                 {data: 'soggetto.ragionesociale'},
                 {data: 'domanda_mod'},
                 {data: 'risposta'},
-                {data: 'date_answer'},
-                {data: 'tipo.descrizione'},
+                {data: 'date_answer'}
+                //{data: 'tipo.descrizione'}
             ],
             drawCallback: function () {
                 $('[data-toggle="kt-tooltip"]').tooltip();
@@ -60,7 +60,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
                                 + '<div class="dropdown-menu dropdown-menu-left">';
 
                         option += '<a class="dropdown-item" href="javascript:void(0);" onclick="modifyFAQ(' + row.id + ')"><i class="fa fa-edit"></i> Modifica</a>';
-                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="setVisibility(' + row.id + ', ' + row.tipo.id + ')"><i class="fa fa-users"></i> Cambia Visibilità</a>';
+                      //  option += '<a class="dropdown-item" href="javascript:void(0);" onclick="setVisibility(' + row.id + ', ' + row.tipo.id + ')"><i class="fa fa-users"></i> Cambia Visibilità</a>';
                         option += '</div></div>';
                         return option;
                     }
@@ -70,14 +70,14 @@ var KTDatatablesDataSourceAjaxServer = function () {
                     type: 'date-it',
                     render: function (data, type, row, meta) {
                         return formattedDate(new Date(data));
-                    },
+                    }
                 }]
         }).columns.adjust();
     };
     return {
         init: function () {
             initTable1();
-        },
+        }
     };
 }();
 
@@ -128,7 +128,7 @@ function setVisibility(idFaq, tipo) {
             $.get(context + "/QueryMicro?type=getTipoFaq", function (resp) {
                 var json = JSON.parse(resp);
                 for (var i = 0; i < json.length; i++) {
-                    if (tipo == json[i].id) {
+                    if (tipo === json[i].id) {
                         $("#tipo_new").append('<option selected value="' + json[i].id + '">' + json[i].descrizione + '</option>');
                     } else {
                         $("#tipo_new").append('<option value="' + json[i].id + '">' + json[i].descrizione + '</option>');
@@ -143,14 +143,13 @@ function setVisibility(idFaq, tipo) {
             if (!err) {
                 return new Promise(function (resolve) {
                     resolve({
-                        "tipo": $('#tipo_new').val(),
+                        "tipo": $('#tipo_new').val()
                     });
                 });
             } else {
                 return false;
             }
         }
-        ,
     }).then((result) => {
         if (result.value) {
             showLoad();
@@ -162,7 +161,7 @@ function setVisibility(idFaq, tipo) {
                     closeSwal();
                     var json = JSON.parse(data);
                     if (json.result) {
-                        swalSuccess('Successo', 'Visibilità aggiornata con successo')
+                        swalSuccess('Successo', 'Visibilità aggiornata con successo');
                         reload();
                     } else {
                         swalError('Errore', json.message);
@@ -179,7 +178,7 @@ function setVisibility(idFaq, tipo) {
 
 function modifyFAQ(idFaq) {
     swal.fire({
-        title: 'Mdifica FAQ',
+        title: 'Modifica FAQ',
         html: '<label class="form-label">Domanda</label>'
                 + '<textarea class="form-control obbligatory" id="domanda" style="min-height:150px"></textarea>'
                 + '<label class="form-label">Risposta</label>'
@@ -191,7 +190,7 @@ function modifyFAQ(idFaq) {
         cancelButtonClass: "btn btn-io-n",
         confirmButtonClass: "btn btn-io",
         customClass: {
-            popup: 'animated bounceInUp swal-responsive',
+            popup: 'animated bounceInUp swal-responsive'
         },
         onOpen: function ()
         {
@@ -209,14 +208,13 @@ function modifyFAQ(idFaq) {
                 return new Promise(function (resolve) {
                     resolve({
                         "domanda": $('#domanda').val(),
-                        "risposta": $('#risposta').val(),
+                        "risposta": $('#risposta').val()
                     });
                 });
             } else {
                 return false;
             }
         }
-        ,
     }).then((result) => {
         if (result.value) {
             showLoad();
