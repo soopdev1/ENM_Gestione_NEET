@@ -49,6 +49,7 @@ import it.refill.entity.MappaturaId;
 import it.refill.entity.OreId;
 import it.refill.entity.OutputId;
 import static it.refill.util.Utility.checkPDF;
+import static it.refill.util.Utility.convertToHours_R;
 import static it.refill.util.Utility.createDir;
 import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.estraiSessodaCF;
@@ -496,8 +497,7 @@ public class Pdf_new {
                     if (oreRendicontabili_faseB.get(al1.getId()) != null) {
                         OreId oreb = list_orecontrollatefaseB.stream().filter(al2 -> al2.getId().equals(String.valueOf(al1.getId()))).findAny().orElse(null);
                         if (oreb != null) {
-                            setFieldsValue(form, fields, "TOTALEB" + indice1.get(),
-                                    Utility.roundFloatAndFormat(Float.parseFloat(oreb.getOre()), false));
+                            setFieldsValue(form, fields, "TOTALEB" + indice1.get(), roundFloatAndFormat(Float.parseFloat(oreb.getOre()), false));
                         }
                     }
 
@@ -515,8 +515,7 @@ public class Pdf_new {
                     setFieldsValue(form, fields, "FASCIAD_A" + indice2.get(),
                             d1.getFascia().getDescrizione());
                     setFieldsValue(form, fields, "TOTALED_B" + indice2.get(),
-                            roundFloatAndFormat((float) (oreRendicontabili_docenti.get(d1.getId()) / 3600000),
-                                    false));
+                            roundFloatAndFormat(oreRendicontabili_docenti.get(d1.getId()),true));
                     indice2.addAndGet(1);
                 });
 
@@ -595,8 +594,7 @@ public class Pdf_new {
                     + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".CL_FIN.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
-                PdfWriter writer = new PdfWriter(pdfOut);
+            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut)) {
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
@@ -639,10 +637,7 @@ public class Pdf_new {
                 allievi_faseA.forEach(al1 -> {
                     setFieldsValue(form, fields, "COGNOMERow" + indice1.get(), al1.getCognome().toUpperCase());
                     setFieldsValue(form, fields, "NOMERow" + indice1.get(), al1.getNome().toUpperCase());
-
-                    setFieldsValue(form, fields, "ORENEETARow" + indice1.get(),
-                            roundFloatAndFormat((float) (oreRendicontabili_faseA.get(al1.getId()) / 3600000),
-                                    false));
+                    setFieldsValue(form, fields, "ORENEETARow" + indice1.get(), roundFloatAndFormat(oreRendicontabili_faseA.get(al1.getId()), true));
 
                     OreId orea = list_orecontrollatefaseA.stream().filter(al2 -> al2.getId().equals(String.valueOf(al1.getId()))).findAny().orElse(null);
                     if (orea != null) {
@@ -664,8 +659,7 @@ public class Pdf_new {
                         if (oreb != null) {
 
                             setFieldsValue(form, fields, "ORE PRESENZE ALLIEVI  FASE BRow" + indice1.get(),
-                                    roundFloatAndFormat((float) (oreRendicontabili_faseB.get(al1.getId()) / 3600000),
-                                            false));
+                                    roundFloatAndFormat(oreRendicontabili_faseB.get(al1.getId()), true));
 
                             setFieldsValue(form, fields, "CONTROLL O ORE PRESENZE ALLIEVI  FASE BRow" + indice1.get(),
                                     Utility.roundFloatAndFormat(Float.parseFloat(oreb.getOre()), false));
@@ -712,8 +706,7 @@ public class Pdf_new {
                     setFieldsValue(form, fields, "NOMERow" + indice2.get() + "_2", d1.getNome().toUpperCase());
 
                     setFieldsValue(form, fields, "CONTROLLO ORE PRESENZE DOCENTE  FASE ARow" + indice2.get(),
-                            roundFloatAndFormat((float) (oreRendicontabili_docenti.get(d1.getId()) / 3600000),
-                                    false));
+                            roundFloatAndFormat(oreRendicontabili_docenti.get(d1.getId()), true));
 
                     setFieldsValue(form, fields, "FASCIA DI APPARTENENZA RICONOSCIUTARow" + indice2.get(),
                             d1.getFascia().getDescrizione());
@@ -721,7 +714,7 @@ public class Pdf_new {
                     setFieldsValue(form, fields, "IMPORTO ORARIO RICONOSCIUTORow" + (indice2.get() + 1) + "_3",
                             roundDoubleAndFormat(Double.parseDouble(fasceDocenti.get(d1.getFascia().getId()))));
 
-                    float tota = ((float) (oreRendicontabili_docenti.get(d1.getId()) / 3600000))
+                    float tota = Float.parseFloat(convertToHours_R(oreRendicontabili_docenti.get(d1.getId())))
                             * Float.parseFloat(fasceDocenti.get(d1.getFascia().getId()));
 
                     setFieldsValue(form, fields, "TOTALE FASE ARow" + indice2.get() + "_2", roundFloatAndFormat(tota, false));
@@ -756,7 +749,6 @@ public class Pdf_new {
                         + " / " + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
                 pdfDoc.close();
-                writer.close();
 
             }
 
@@ -967,8 +959,8 @@ public class Pdf_new {
                         .collect(Collectors.toCollection(LinkedList::new));
 
                 if (!lezioniA.isEmpty()) {
-                    StringBuilder DATAINIZIOFASEA = new StringBuilder(lezioniA.getFirst());
-                    StringBuilder DATAFINEFASEA = new StringBuilder(lezioniA.getLast());
+                    String DATAINIZIOFASEA = lezioniA.getFirst();
+                    String DATAFINEFASEA = lezioniA.getLast();
 
 //                    System.out.println("A) " + DATAINIZIOFASEA + " -- " + DATAFINEFASEA);
                     List<Registro_completo> faseA = out.stream().filter(r1
@@ -1051,8 +1043,8 @@ public class Pdf_new {
                         index_allieviA.addAndGet(1);
                     });
 
-                    setFieldsValue(form, fields, "DATAINIZIOFASEA", DATAINIZIOFASEA.toString());
-                    setFieldsValue(form, fields, "DATAFINEFASEA", DATAFINEFASEA.toString());
+                    setFieldsValue(form, fields, "DATAINIZIOFASEA", DATAINIZIOFASEA);
+                    setFieldsValue(form, fields, "DATAFINEFASEA", DATAFINEFASEA);
 
                     AtomicInteger indicigiorniA = new AtomicInteger(1);
                     lezioniA.forEach(lezione -> {
@@ -1105,7 +1097,6 @@ public class Pdf_new {
                                 .collect(Collectors.toCollection(LinkedList::new));
                         if (lezioniB.isEmpty()) {
                             System.out.println("B) GRUPPO " + i + " VUOTO");
-
                         } else {
                             String DATAINIZIOFASEB = lezioniB.getFirst();
                             String DATAFINEFASEB = lezioniB.getLast();

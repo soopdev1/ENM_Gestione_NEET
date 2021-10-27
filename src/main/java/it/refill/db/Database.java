@@ -63,8 +63,8 @@ public class Database {
         String user = "bando";
         String password = "bando";
         
-        System.out.println("it.refill.db.Database.<init>() "+test);
-        System.out.println("it.refill.db.Database.<init>() "+dbsviluppo);
+//        System.out.println("it.refill.db.Database.<init>() "+test);
+//        System.out.println("it.refill.db.Database.<init>() "+dbsviluppo);
         String host;
         if (bando) {
             if (test) {

@@ -48,7 +48,7 @@ import javax.persistence.Transient;
 })
     
 
-@JsonIgnoreProperties(value = {"progetti", "registri_aula", "registri_allievi"})
+@JsonIgnoreProperties(value = {"progetti", "registri_aula", "registri_allievi","attivita"})
 public class Docenti implements Serializable {
 
     @Id

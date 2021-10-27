@@ -1,17 +1,12 @@
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.refill.db.Entity;
+import it.refill.domain.ModelliPrg;
+import it.refill.domain.ProgettiFormativi;
 //import it.refill.domain.ProgettiFormativi;
-import it.refill.entity.OreId;
 import it.refill.util.Pdf_new;
 import static it.refill.util.Pdf_new.checkFirmaQRpdfA;
+import static it.refill.util.Utility.filterModello6;
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.joda.time.DateTime;
 
 /*
@@ -25,7 +20,29 @@ import org.joda.time.DateTime;
  */
 public class Pdf {
 
-//    public static void main(String[] args) {
+    public static void main(String[] args) {
+        
+        File downloadFile = null;
+        try {
+            Entity e = new Entity();
+            ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class,
+                    110L);
+            
+            System.out.println("Pdf.main() "+pf.getModelli());
+            
+            ModelliPrg m6 = filterModello6(pf.getModelli());
+            if (m6 != null) {
+                downloadFile = Pdf_new.MODELLO6(e,
+                        "AMMINISTRAZIONE",
+                        pf.getSoggetto(),
+                        pf, m6, new DateTime(), true);
+                System.out.println("Pdf.main() "+downloadFile.getPath());
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        
 //        Entity e = new Entity();
 //
 //        ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class, Long.parseLong("53"));
@@ -36,7 +53,7 @@ public class Pdf {
 //        File out1 = Pdf_new.ESITOVALUTAZIONE_BASE(e, "R", pf.getSoggetto(), pf, new DateTime(), true);
 //        System.out.println(out1.getPath());
 
-//    }
+    }
 
 //    public static void main(String[] args) {
 //
@@ -59,10 +76,10 @@ public class Pdf {
 //        System.out.println(f1.getPath());
 //
 //    }
-    public static void main(String[] args) {
-        
-        String o = checkFirmaQRpdfA("MODELLO2", "", new File("C:\\Users\\raf\\Desktop\\SEGRETERIASISTEMAIMPRESATA121020210858515.M2_pdfA.pdf.p7m"), "", "20;0;60;60");
-        System.out.println(o);
-    }
+//    public static void main(String[] args) {
+//        
+//        String o = checkFirmaQRpdfA("MODELLO2", "", new File("C:\\Users\\raf\\Desktop\\SEGRETERIASISTEMAIMPRESATA121020210858515.M2_pdfA.pdf.p7m"), "", "20;0;60;60");
+//        System.out.println(o);
+//    }
 //                    
 }

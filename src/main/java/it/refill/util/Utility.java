@@ -84,6 +84,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.joda.time.DateTimeComparator;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -112,6 +113,7 @@ public class Utility {
     public static final SimpleDateFormat sdfHHMM = new SimpleDateFormat(patternHHMM);
     public static final NumberFormat numITA = NumberFormat.getCurrencyInstance(Locale.ITALY);
     public static boolean pregresso = false;
+    public static final DateTimeZone dtz_italy = DateTimeZone.forID("Europe/Rome");
 
     //END RAF
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String destination) throws ServletException, IOException {
@@ -737,7 +739,8 @@ public class Utility {
                 double hours = f / 1000.0 / 60.0 / 60.0;
                 BigDecimal bigDecimal = new BigDecimal(hours);
                 bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
-                return numITA.format(bigDecimal).replaceAll("[^0123456789.,()-]", "").trim();
+                String out = numITA.format(bigDecimal).replaceAll("[^0123456789.,()-]", "").trim();
+                return out;
             } else {
                 BigDecimal bigDecimal = new BigDecimal(Float.toString(f));
                 bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
@@ -831,18 +834,33 @@ public class Utility {
     }
 
     public static List<Allievi> allievi_fb(long idp, List<Allievi> l) {
-        Long hh64 = new Long(230400000);
-        Map<Long, Long> oreRendicontabili_faseB = Action.OreRendicontabiliAlunni((int) (long) idp);
-        return l.stream().filter(a -> oreRendicontabili_faseB.get(a.getId()) != null && oreRendicontabili_faseB.get(a.getId()).compareTo(hh64) > 0).collect(Collectors.toList());
+
+        return l.stream().filter(a -> a.getGruppo_faseB() > 0).collect(Collectors.toList());
+//        
+//        Long hh64 = new Long(230400000);
+//        Map<Long, Long> oreRendicontabili_faseB = Action.OreRendicontabiliAlunni((int) (long) idp);
+//        return l.stream().filter(a -> oreRendicontabili_faseB.get(a.getId()) != null && oreRendicontabili_faseB.get(a.getId()).compareTo(hh64) > 0).collect(Collectors.toList());
     }
 
     public static List<Docenti> docenti_ore(long idp, List<Docenti> l) {
         Map<Long, Long> oreRendicontabili_docenti = Action.OreRendicontabiliDocenti((int) (long) idp);
         return l.stream().filter(a -> oreRendicontabili_docenti.get(a.getId()) != null).collect(Collectors.toList());
     }
+
     public static List<Docenti> docenti_ore_A(long idp, List<Docenti> l) {
         Map<Long, Long> oreRendicontabili_docenti = Action.OreRendicontabiliDocentiFASEA((int) (long) idp);
         return l.stream().filter(a -> oreRendicontabili_docenti.get(a.getId()) != null).collect(Collectors.toList());
+    }
+
+    public static String convertToHours_R(long value1) {
+        try {
+            double hours = value1 / 1000.0 / 60.0 / 60.0;
+            BigDecimal bigDecimal = new BigDecimal(hours);
+            bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
+            return bigDecimal.toString();
+        } catch (Exception e) {
+        }
+        return "0.00";
     }
 
     public static String roundTwoDigits(double value) {

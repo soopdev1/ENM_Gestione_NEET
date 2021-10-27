@@ -76,7 +76,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import org.apache.commons.io.Charsets;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
@@ -2800,18 +2799,16 @@ public class OperazioniSA extends HttpServlet {
 
             Entity e = new Entity();
             try {
-                
+
                 String ext = p.getSubmittedFileName().substring(p.getSubmittedFileName().lastIndexOf("."));
-                
-                
-                
+
                 e.begin();
                 ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class,
                         Long.parseLong(request.getParameter("id_prg")));
                 DocumentiPrg d = e.getEm().find(DocumentiPrg.class,
                         Long.parseLong(request.getParameter("idfile")));
                 String newpath = d.getPath() + "_v_" + new DateTime().toString(patternComplete) + "."
-                        +ext;
+                        + ext;
 
                 String directory = getStartPath(FilenameUtils.getFullPath(d.getPath()));
                 newpath = getStartPath(newpath);
@@ -2845,10 +2842,6 @@ public class OperazioniSA extends HttpServlet {
 
     protected void addDocente(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //        Utility.printRequest(request);
-//        if (true) {
-//            return;
-//        }
-//
 
         String save = getRequestValue(request, "save");
         String today = new SimpleDateFormat("yyyyMMddHHssSSS").format(new Date());
@@ -2909,7 +2902,7 @@ public class OperazioniSA extends HttpServlet {
 
                 }
                 /*Modifica 14 06 21 - Nuovi campi ed attivita*/
-                String comune_nascita = getRequestValue(request, "com_nas");
+                String comune_nascita = new String(getRequestValue(request, "com_nas").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
                 String reg_res = getRequestValue(request, "reg_res");
                 String pec = getRequestValue(request, "pecmail");
                 String cell = getRequestValue(request, "telefono");
@@ -2928,28 +2921,35 @@ public class OperazioniSA extends HttpServlet {
 
                 e.persist(d);
 
-                /*Modifica 14 06 21 - Singole Attivita*/
-                int nroAttivita_max = Integer.parseInt(e.getPath("numAttivita_docente"));
-                List<Attivita_Docente> list_attivita = new ArrayList();
-                Attivita_Docente temp;
-                for (int i = 1; i <= nroAttivita_max; i++) {
-                    if (Integer.parseInt(getRequestValue(request, "attivita_vis_" + i)) == 1) {
-                        temp = new Attivita_Docente(Integer.parseInt(getRequestValue(request, "tipo_att_" + i)),
-                                getRequestValue(request, "committente_" + i),
-                                new SimpleDateFormat("dd/MM/yyyy").parse(getRequestValue(request, "data_inizio_" + i)),
-                                new SimpleDateFormat("dd/MM/yyyy").parse(getRequestValue(request, "data_fine_" + i)),
-                                Integer.parseInt(getRequestValue(request, "durata_" + i)),
-                                getRequestValue(request, "unita_" + i),
-                                Integer.parseInt(getRequestValue(request, "incarico_" + i)),
-                                Integer.parseInt(getRequestValue(request, "fonte_" + i)),
-                                Integer.parseInt(getRequestValue(request, "progr_" + i)),
-                                d);
-                        list_attivita.add(temp);
-                        e.persist(temp);
+                try {
+                    /*Modifica 14 06 21 - Singole Attivita*/
+                    int nroAttivita_max = Integer.parseInt(e.getPath("numAttivita_docente"));
+                    List<Attivita_Docente> list_attivita = new ArrayList();
+                    Attivita_Docente temp;
+                    for (int i = 1; i <= nroAttivita_max; i++) {
+                        if (Integer.parseInt(getRequestValue(request, "attivita_vis_" + i)) == 1) {
+                            temp = new Attivita_Docente(Integer.parseInt(getRequestValue(request, "tipo_att_" + i)),
+                                    getRequestValue(request, "committente_" + i),
+                                    new SimpleDateFormat("dd/MM/yyyy").parse(getRequestValue(request, "data_inizio_" + i)),
+                                    new SimpleDateFormat("dd/MM/yyyy").parse(getRequestValue(request, "data_fine_" + i)),
+                                    Integer.parseInt(getRequestValue(request, "durata_" + i)),
+                                    getRequestValue(request, "unita_" + i),
+                                    Integer.parseInt(getRequestValue(request, "incarico_" + i)),
+                                    Integer.parseInt(getRequestValue(request, "fonte_" + i)),
+                                    Integer.parseInt(getRequestValue(request, "progr_" + i)),
+                                    d);
+                            list_attivita.add(temp);
+                            e.persist(temp);
+                        }
                     }
+                    d.setAttivita(list_attivita);
+                } catch (Exception ex) {
+                    e.rollBack();
+                    resp.addProperty("result", false);
+                    resp.addProperty("message", "RICHIESTA ACCREDITAMENTO DOCENTE ERRATA ERRORE NELLE ATTIVITA'. " + ex.getMessage() + ". CONTROLLARE.");
+                    ex.printStackTrace();
                 }
-                d.setAttivita(list_attivita);
-
+                
                 //CREA DOCUMENTO
                 if (salvataggio) {
 

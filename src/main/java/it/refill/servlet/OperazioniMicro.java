@@ -753,45 +753,48 @@ public class OperazioniMicro extends HttpServlet {
     }
 
     protected void downloadTarGz(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Entity e = new Entity();
-        e.begin();
-        JsonObject resp = new JsonObject();
-        try {
-            Date today = new Date();
-            String[] progetti = request.getParameterValues("progetti[]");
-            List<ProgettiFormativi> prgs = new ArrayList<>();
-            ArrayList<String> cip = new ArrayList<>();
-            ProgettiFormativi prg;
-            for (String s : progetti) {
-                prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(s));
-                prgs.add(prg);
-                cip.add(prg.getCip());
-            }
-            String path = e.getPath("output_excel_archive") + new SimpleDateFormat("yyyyMMdd_HHmmss").format(today) + ".tar.gz";
-//            File out = 
-            createTarArchive(prgs, path);
-
-            ObjectMapper mapper = new ObjectMapper();
-            e.persist(new Estrazioni(today, mapper.writeValueAsString(cip), path));
-
-            for (ProgettiFormativi p : prgs) {
-                p.setExtract(1);
-                e.merge(p);
-            }
-            e.commit();
-            resp.addProperty("result", true);
-            resp.addProperty("path", path);
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA downloadTarGz: " + ex.getMessage());
-            resp.addProperty("result", false);
-            resp.addProperty("message", "Errore: non &egrave; stato possibile creare il file.");
-        } finally {
-            e.close();
-        }
-        response.getWriter().write(resp.toString());
-        response.getWriter().flush();
-        response.getWriter().close();
+//        Entity e = new Entity();
+//        e.begin();
+//        JsonObject resp = new JsonObject();
+//        try {
+//            Date today = new Date();
+//            String[] progetti = request.getParameterValues("progetti[]");
+//            List<ProgettiFormativi> prgs = new ArrayList<>();
+//            ArrayList<String> cip = new ArrayList<>();
+//            ProgettiFormativi prg;
+//            for (String s : progetti) {
+//                prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(s));
+//                prgs.add(prg);
+//                cip.add(prg.getCip());
+//            }
+//            String path = e.getPath("output_excel_archive") + new SimpleDateFormat("yyyyMMdd_HHmmss").format(today) + ".tar.gz";
+////            File out = 
+//            createTarArchive(prgs, path);
+//
+//            ObjectMapper mapper = new ObjectMapper();
+//            
+//            
+//            
+//            e.persist(new Estrazioni(today, mapper.writeValueAsString(cip), path));
+//
+//            for (ProgettiFormativi p : prgs) {
+//                p.setExtract(1);
+//                e.merge(p);
+//            }
+//            e.commit();
+//            resp.addProperty("result", true);
+//            resp.addProperty("path", path);
+//        } catch (PersistenceException | ParseException ex) {
+//            ex.printStackTrace();
+//            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA downloadTarGz: " + ex.getMessage());
+//            resp.addProperty("result", false);
+//            resp.addProperty("message", "Errore: non &egrave; stato possibile creare il file.");
+//        } finally {
+//            e.close();
+//        }
+//        response.getWriter().write(resp.toString());
+//        response.getWriter().flush();
+//        response.getWriter().close();
     }
 
     protected void checkPiva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

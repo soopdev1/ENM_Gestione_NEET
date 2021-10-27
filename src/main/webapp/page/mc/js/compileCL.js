@@ -53,6 +53,7 @@ $('.decimal_custom.ctrl[id^=fa_controllo_ore_]').on('change', function () {
     });
     $('#fa_total').val(DotToComma(totalA));
 });
+
 $('.decimal_custom.ctrl[id^=fb_controllo_ore_]').on('change', function () {
     let alunno = this.id.split("_")[3];
     this.value = completeOre(this.value, $('#fb_ore_' + alunno).val());
@@ -64,6 +65,7 @@ $('.decimal_custom.ctrl[id^=fb_controllo_ore_]').on('change', function () {
     });
     $('#fb_total').val(DotToComma(totalB));
 });
+
 $('.decimal_custom.ctrl').on('change', function () {
     setTotals();
 });
