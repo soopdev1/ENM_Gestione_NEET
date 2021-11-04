@@ -40,6 +40,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
@@ -83,6 +84,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.apache.tika.parser.txt.CharsetDetector;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
@@ -945,6 +947,17 @@ public class Utility {
             es = false;
         }
         return es;
+    }
+
+    public static String conversionText(String ing) {
+        try {
+            CharsetDetector detector = new CharsetDetector();
+            detector.setText(ing.getBytes());
+            return new String(ing.getBytes(detector.detect().getName()), Charset.forName("utf-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return ing;
     }
 
 }

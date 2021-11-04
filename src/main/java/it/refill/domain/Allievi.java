@@ -180,13 +180,25 @@ public class Allievi implements Serializable {
     @Column(name = "gruppo_faseB")
     private int gruppo_faseB;
 
-    // 0 - NO - 1 SI
+     // 0 - DA SALVARE (NO) - 1 SI
     @Column(name = "mappatura")
     private int mappatura;
+    
+    @Column(name = "mappatura_note")
+    private String mappatura_note;
+    
     
     
     public Allievi() {
         this.pregresso = false;
+    }
+
+    public String getMappatura_note() {
+        return mappatura_note;
+    }
+
+    public void setMappatura_note(String mappatura_note) {
+        this.mappatura_note = mappatura_note;
     }
 
     public String getOrerendicontabili() {

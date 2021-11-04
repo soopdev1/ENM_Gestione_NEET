@@ -296,10 +296,11 @@
                                         <th class="text-uppercase text-center">Stato</th>
                                         <th class="text-uppercase text-center">Ore Effettuate</th>
                                         <th class="text-uppercase text-center">Mappatura Finale</th>
+                                        <th class="text-uppercase text-center">Note</th>
                                     </tr>
                                 </thead>
                             </table>
-                             <table class="table table-bordered" style="width: 100%;" >
+                             <table class="table table-bordered" style="width: 100%; display: none;" id="salvamappatura">
                                 <tfoot style="width: 100%;">
                                 <th colspan="6"><div class="kt-align-center">
                                         <a id="mappaprogetto" onclick="mappaprogetto();" href="javascript:void(0);" class="btn btn-success"> 

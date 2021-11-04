@@ -48,6 +48,7 @@ import it.refill.entity.Presenti;
 import it.refill.util.Pdf_new;
 import static it.refill.util.Pdf_new.checkFirmaQRpdfA;
 import it.refill.util.Utility;
+import static it.refill.util.Utility.conversionText;
 import static it.refill.util.Utility.copyR;
 import static it.refill.util.Utility.createDir;
 import static it.refill.util.Utility.getRequestValue;
@@ -706,7 +707,7 @@ public class OperazioniSA extends HttpServlet {
             ProgettiFormativi p = new ProgettiFormativi();
             p.setNome(e.getEm().find(NomiProgetto.class,
                     Long.parseLong(request.getParameter("nome_pf"))));
-            p.setDescrizione(new String(request.getParameter("descrizione_pf").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+            p.setDescrizione(conversionText(getRequestValue(request, "descrizione_pf")));
             p.setStart(sdf.parse(date[0].trim()));
             p.setEnd(sdf.parse(date[1].trim()));
             p.setSede(e.getEm().find(SediFormazione.class,
@@ -1213,23 +1214,23 @@ public class OperazioniSA extends HttpServlet {
                     a.setComune_nascita(statoEstero);
                 }
 
-                a.setNome(new String(request.getParameter("nome").toUpperCase().getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
-                a.setCognome(new String(request.getParameter("cognome").toUpperCase().getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+                a.setNome(conversionText(request.getParameter("nome").toUpperCase()));
+                a.setCognome(conversionText(request.getParameter("cognome").toUpperCase()));
                 a.setCodicefiscale(request.getParameter("codicefiscale").toUpperCase());
                 a.setDatanascita(sdf.parse(request.getParameter("datanascita")));
                 a.setTelefono(request.getParameter("telefono"));
-                a.setIndirizzoresidenza(new String(request.getParameter("indirizzores").toUpperCase().getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+                a.setIndirizzoresidenza(conversionText(request.getParameter("indirizzores")));
                 a.setCapresidenza(request.getParameter("capres"));
                 a.setComune_residenza((Comuni) e.getEm().find(Comuni.class, Long.parseLong(request.getParameter("comuneres"))));
 
                 if (request.getParameter("checkind") != null) {
-                    a.setIndirizzodomicilio(new String(request.getParameter("indirizzores").toUpperCase().getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+                    a.setIndirizzodomicilio(conversionText(request.getParameter("indirizzores")));
                     a.setCivicodomicilio(request.getParameter("civicores").toUpperCase());
                     a.setCapdomicilio(request.getParameter("capres"));
                     a.setComune_domicilio((Comuni) e.getEm().find(Comuni.class, Long.parseLong(request.getParameter("comuneres"))));
                 } else {
                     a.setCapdomicilio(request.getParameter("capdom"));
-                    a.setIndirizzodomicilio(new String(request.getParameter("indirizzodom").toUpperCase().getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+                    a.setIndirizzodomicilio(conversionText(request.getParameter("indirizzodom").toUpperCase()));
                     a.setCivicodomicilio(request.getParameter("civicodom").toUpperCase());
                     a.setComune_domicilio((Comuni) e.getEm().find(Comuni.class, Long.parseLong(request.getParameter("comunedom"))));
                 }
@@ -1243,7 +1244,6 @@ public class OperazioniSA extends HttpServlet {
                 //29-04-2020 MODIFICA - CONDIZIONE LAVORATIVA PRECEDENTE
                 a.setCondizione_lavorativa((Condizione_Lavorativa) e.getEm().find(Condizione_Lavorativa.class, Integer.parseInt(request.getParameter("condizione_lavorativa"))));
                 a.setNeet(e.getEm().find(Condizione_Lavorativa.class, Integer.parseInt(request.getParameter("condizione_lavorativa"))).getDescrizione());
-//                a.setNeet(new String(request.getParameter("neet").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
                 a.setEmail(request.getParameter("email"));
                 a.setSesso(Integer.parseInt(request.getParameter("codicefiscale").substring(9, 11)) > 40 ? "F" : "M");
 
@@ -2902,7 +2902,7 @@ public class OperazioniSA extends HttpServlet {
 
                 }
                 /*Modifica 14 06 21 - Nuovi campi ed attivita*/
-                String comune_nascita = new String(getRequestValue(request, "com_nas").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
+                String comune_nascita = conversionText(getRequestValue(request, "com_nas"));
                 String reg_res = getRequestValue(request, "reg_res");
                 String pec = getRequestValue(request, "pecmail");
                 String cell = getRequestValue(request, "telefono");
@@ -2928,8 +2928,9 @@ public class OperazioniSA extends HttpServlet {
                     Attivita_Docente temp;
                     for (int i = 1; i <= nroAttivita_max; i++) {
                         if (Integer.parseInt(getRequestValue(request, "attivita_vis_" + i)) == 1) {
-                            temp = new Attivita_Docente(Integer.parseInt(getRequestValue(request, "tipo_att_" + i)),
-                                    getRequestValue(request, "committente_" + i),
+                            temp = new Attivita_Docente(
+                                    Integer.parseInt(getRequestValue(request, "tipo_att_" + i)),
+                                    conversionText(getRequestValue(request, "committente_" + i)),
                                     new SimpleDateFormat("dd/MM/yyyy").parse(getRequestValue(request, "data_inizio_" + i)),
                                     new SimpleDateFormat("dd/MM/yyyy").parse(getRequestValue(request, "data_fine_" + i)),
                                     Integer.parseInt(getRequestValue(request, "durata_" + i)),
@@ -2949,7 +2950,7 @@ public class OperazioniSA extends HttpServlet {
                     resp.addProperty("message", "RICHIESTA ACCREDITAMENTO DOCENTE ERRATA ERRORE NELLE ATTIVITA'. " + ex.getMessage() + ". CONTROLLARE.");
                     ex.printStackTrace();
                 }
-                
+
                 //CREA DOCUMENTO
                 if (salvataggio) {
 
@@ -3175,9 +3176,9 @@ public class OperazioniSA extends HttpServlet {
             mask.setColloquio(request.getParameter("colloquio").equalsIgnoreCase("SI"));
             mask.setFabbisogno_finanziario(Double.parseDouble(request.getParameter(("tff"))));
             mask.setFinanziamento_richiesto_agevolazione(Double.parseDouble(request.getParameter(("tfra"))));
-            mask.setRagione_sociale(new String(request.getParameter("ragioneSociale").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
-            mask.setIdea_impresa(new String(request.getParameter("ideaImpresa").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
-            mask.setMotivazione(new String(request.getParameter("motivazione").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+            mask.setRagione_sociale(conversionText(request.getParameter("ragioneSociale")));
+            mask.setIdea_impresa(conversionText(request.getParameter("ideaImpresa")));
+            mask.setMotivazione(conversionText(request.getParameter("motivazione")));
             mask.setAteco(e.getEm().find(Ateco.class,
                     request.getParameter("ateco")));
 
@@ -3706,7 +3707,7 @@ public class OperazioniSA extends HttpServlet {
             }
             mod6.setScelta_modello6(step3_scelta);
             if (step3_scelta == 2) {
-                mod6.setIndirizzo_modello6(new String(request.getParameter("indirizzo_step3").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8));
+                mod6.setIndirizzo_modello6(conversionText(request.getParameter("indirizzo_step3")));
                 mod6.setCivico_modello6(request.getParameter("civico_step3") != null ? request.getParameter("civico_step3") : "");
                 mod6.setComune_modello6(e.getComune(Long.parseLong(request.getParameter("comune_step3"))));
             } else {

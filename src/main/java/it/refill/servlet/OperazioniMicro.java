@@ -25,7 +25,6 @@ import it.refill.domain.Documenti_Allievi;
 import it.refill.domain.Documenti_Allievi_Pregresso;
 import it.refill.domain.Documenti_UnitaDidattiche;
 import it.refill.domain.Email;
-import it.refill.domain.Estrazioni;
 import it.refill.domain.FadMicro;
 import it.refill.domain.Faq;
 import it.refill.domain.FasceDocenti;
@@ -2133,7 +2132,23 @@ public class OperazioniMicro extends HttpServlet {
 
         String idpr = getRequestValue(request, "idpr");
         List<String> allievimappati = Splitter.on(";").splitToList(getRequestValue(request, "allievimappati"));
-
+        
+        List<String> notemappatura = Splitter.on("$$$").splitToList(getRequestValue(request, "notemappatura"));
+        Map<Long, String> noteallievi = new HashMap<>();
+        notemappatura.forEach(nota1 -> {
+            List<String> nota2 = Splitter.on("###").splitToList(nota1);
+            if (!nota2.isEmpty()) {
+                if (!nota2.get(0).trim().equals("")) {
+                    long idal = Long.parseLong(nota2.get(0));
+                    if (nota2.size() > 1) {
+                        noteallievi.put(idal, nota2.get(1));
+                    } else {
+                        noteallievi.put(idal, "");
+                    }
+                }
+            }
+        });
+        
         Entity e = new Entity();
         try {
             e.begin();
@@ -2141,8 +2156,20 @@ public class OperazioniMicro extends HttpServlet {
             pf.getAllievi().forEach(al1 -> {
                 if (allievimappati.contains(String.valueOf(al1.getId()))) {
                     al1.setMappatura(1);
-                    e.merge(al1);
+                    
                 }
+                
+                try {
+                    if (noteallievi.get(al1.getId()) == null) {
+                        al1.setMappatura_note("");
+                    } else {
+                        al1.setMappatura_note(noteallievi.get(al1.getId()).trim());
+                    }
+                } catch (Exception ex2) {
+                    al1.setMappatura_note("");
+                    e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro mappatura: " + ex2.getMessage());
+                }
+                e.merge(al1);
             });
 
             pf.setStato(e.getStatiByOrdineProcesso(pf.getStato().getOrdine_processo() + 1));
