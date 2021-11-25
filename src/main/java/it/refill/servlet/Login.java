@@ -246,7 +246,7 @@ public class Login extends HttpServlet {
         JSONObject result = new JSONObject();
         try {
             result.put("result", GoogleRecaptcha.isValid(request.getParameter("g-recaptcha-response")));
-        } catch (org.json.simple.parser.ParseException ex) {
+        } catch (Exception ex) {
             result.put("result", false);
             ex.printStackTrace();
         }

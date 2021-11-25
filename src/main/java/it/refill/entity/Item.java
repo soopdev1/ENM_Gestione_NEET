@@ -11,6 +11,8 @@ package it.refill.entity;
  */
 public class Item {
 
+    
+
     String value, desc, desc2, visual;
 
     public Item(String value, String desc, String visual) {
@@ -48,6 +50,7 @@ public class Item {
         this.cod = cod;
     }
 
+  
     public int getCodice() {
         return codice;
     }

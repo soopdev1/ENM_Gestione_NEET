@@ -6,13 +6,28 @@
 package it.refill.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
 import static com.google.common.base.Splitter.on;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.itextpdf.barcodes.BarcodeQRCode;
+import com.itextpdf.io.font.constants.StandardFonts;
+import static com.itextpdf.kernel.colors.ColorConstants.BLACK;
+import com.itextpdf.kernel.font.PdfFont;
+import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfReader;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.kernel.pdf.xobject.PdfFormXObject;
+import com.itextpdf.layout.Canvas;
+import com.itextpdf.layout.element.Image;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Text;
+import com.itextpdf.layout.property.TextAlignment;
 import it.refill.db.Action;
+import it.refill.db.Database;
 import it.refill.db.FileDownload;
 import it.refill.domain.Allievi;
 import it.refill.domain.Docenti;
@@ -38,6 +53,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import static java.lang.Math.toRadians;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
@@ -53,7 +69,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import static java.util.Locale.ITALY;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -72,22 +87,34 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
-import static org.joda.time.format.DateTimeFormat.forPattern;
 import org.joda.time.format.DateTimeFormatter;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Paths.get;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Locale;
+import static java.util.Locale.ITALY;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.tika.parser.txt.CharsetDetector;
 import org.joda.time.DateTimeComparator;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import static org.joda.time.format.DateTimeFormat.forPattern;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -96,6 +123,8 @@ import org.json.JSONObject;
  * @author agodino
  */
 public class Utility {
+
+    public static boolean demoversion = false;
 
     // TEST //
     public static boolean test = false;
@@ -110,13 +139,30 @@ public class Utility {
     public static final String patternITACOMPLETE = "dd/MM/yyyy HH:mm:ss";
     public static final String patternFile = "yyyyMMdd";
     public static final String patternHHMM = "HH:mm";
+    public static final SimpleDateFormat sdfSQL = new SimpleDateFormat(patternSql);
     public static final SimpleDateFormat sdfITA = new SimpleDateFormat(patternITA);
     public static final SimpleDateFormat sdfITAC1 = new SimpleDateFormat(patternITACOMPLETE);
     public static final SimpleDateFormat sdfHHMM = new SimpleDateFormat(patternHHMM);
     public static final NumberFormat numITA = NumberFormat.getCurrencyInstance(Locale.ITALY);
     public static boolean pregresso = false;
     public static final DateTimeZone dtz_italy = DateTimeZone.forID("Europe/Rome");
-
+    
+    public static DecimalFormat doubleformat = new DecimalFormat("#.##");
+    public static final String patternH = "HH:mm:ss";
+    public static final String patternHmin = "HH:mm";
+    public static final String patternid = "yyyyMMdd";
+    public static final String timestamp = "yyyyMMddHHmmssSSS";
+    public static final String timestampFAD = "yyyy-MM-dd HH:mm:ss.SSSSSS";
+    public static final String timestampSQLZONE = "yyyy-MM-dd HH:mm:ss Z";
+    public static final String timestampSQL = "yyyy-MM-dd HH:mm:ss";
+    public static final String timestampITA = "dd/MM/yyyy HH:mm:ss";
+    public static final String timestampITAcomplete = "dd/MM/yyyy HH:mm:ss.SSS";
+    public static final SimpleDateFormat sd0 = new SimpleDateFormat(timestampSQL);
+    public static final DateTimeFormatter dtf = DateTimeFormat.forPattern(patternSql);
+    public static final DateTimeFormatter dtfad = DateTimeFormat.forPattern(timestampFAD);
+    public static final DateTimeFormatter dtfh = DateTimeFormat.forPattern(patternHmin);
+    public static final DateTimeFormatter dtfsql = DateTimeFormat.forPattern(timestampSQL);
+    
     //END RAF
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String destination) throws ServletException, IOException {
         if (response.isCommitted()) {
@@ -592,6 +638,9 @@ public class Utility {
     }
 
     public static boolean invioEmailComunicazione(String stato1, String stato2) {
+        if (Utility.demoversion) {
+            return false;
+        }
         String key = stato1 + "_" + stato2;
         Set s = statiEmail();
         return s.contains(key);
@@ -960,4 +1009,266 @@ public class Utility {
         return ing;
     }
 
+    public static String getstatoannullato(String stato_prec) {
+        switch (stato_prec) {
+            case "ATA":
+            case "ATB":
+                return stato_prec + "E";
+            case "SOA":
+                return "ATAE";
+            case "SOB":
+                return "ATBE";
+            default:
+                return "DVBE";
+        }
+    }
+    
+    
+    public static DateTime format(String ing, String pattern) {
+        try {
+            if (ing.contains(".")) {
+                ing = ing.split("\\.")[0];
+            }
+            return DateTimeFormat.forPattern(pattern).parseDateTime(ing);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    private static final long MAX = 18000000;
+    
+    public static long convertHours(String ore) {
+        try {
+            double d1 = Double.parseDouble(ore);
+            long tot = Math.round(d1) * 3600000;
+            return tot;
+        } catch (Exception e) {
+
+        }
+        return MAX;
+    }
+
+    public static String formatStringtoStringDateSQL(String dat) {
+        return formatStringtoStringDate(dat, patternSql, patternITA, false);
+    }
+    
+    public static void printbarcode(BarcodeQRCode barcode, PdfDocument pdfDoc, boolean page, String add) {
+        try {
+            Rectangle rect = barcode.getBarcodeSize();
+            PdfFormXObject formXObject = new PdfFormXObject(new Rectangle(rect.getWidth(), rect.getHeight() + 10));
+            PdfCanvas pdfCanvas = new PdfCanvas(formXObject, pdfDoc);
+            barcode.placeBarcode(pdfCanvas, BLACK);
+            Image bCodeImage = new Image(formXObject);
+            bCodeImage.setRotationAngle(toRadians(90));
+            bCodeImage.setFixedPosition(25, 5);
+
+            for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
+                new Canvas(pdfDoc.getPage(i), pdfDoc.getDefaultPageSize()).add(bCodeImage);
+                if (page) {
+                    Canvas canvas = new Canvas(pdfDoc.getPage(i), pdfDoc.getDefaultPageSize());
+
+                    canvas.showTextAligned((("Pag. " + i + " di " + pdfDoc.getNumberOfPages())),
+                            pdfDoc.getPage(i).getPageSize().getWidth() - 100,
+                            5, TextAlignment.CENTER)
+                            .close();
+
+                    if (add != null) {
+                        Text text = new Text(add);
+                        PdfFont fontnormal = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
+                        text.setFont(fontnormal);
+                        text.setFontSize(8);
+                        Paragraph p1 = new Paragraph();
+                        p1.add(text);
+                        canvas.showTextAligned(p1,
+                                5,
+                                pdfDoc.getPage(i).getPageSize().getHeight() - 15,
+                                TextAlignment.LEFT).close();
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+   public static void gestisciorerendicontabili(LinkedList<Presenti1> report, long ore) {
+
+        try {
+            DateTimeFormatter fmt = forPattern(timestampSQL);
+            Presenti1 docente = report.stream().filter(pr1 -> pr1.getRuolo().equalsIgnoreCase("DOCENTE")).findAny().orElse(null);
+            List<Presenti1> allievi = report.stream().filter(pr1 -> !pr1.getRuolo().equalsIgnoreCase("DOCENTE")).collect(Collectors.toList());
+
+            if (docente != null && !allievi.isEmpty()) {
+                List<Interval> accessi_docente = new ArrayList<>();
+                List<Interval> accessi_complessivi = new ArrayList<>();
+                List<String> login_docente = Splitter.on("\n").splitToList(docente.getOradilogin());
+                List<String> logout_docente = Splitter.on("\n").splitToList(docente.getOradilogout());
+                for (int x = 0; x < login_docente.size(); x++) {
+                    DateTime start1 = fmt.parseDateTime("2021-01-01 " + login_docente.get(x));
+                    DateTime end1 = fmt.parseDateTime("2021-01-01 " + logout_docente.get(x));
+                    if (end1.isAfter(start1)) {
+                        accessi_docente.add(new Interval(start1, end1));
+                    }
+                }
+
+                AtomicLong millis_rendicontabili_DOCENTE = new AtomicLong(0L);
+
+                allievi.forEach(cnsmr -> {
+                    AtomicLong millis_rendicontabili = new AtomicLong(0L);
+                    List<Interval> accessi = new ArrayList<>();
+                    List<String> login = Splitter.on("\n").splitToList(cnsmr.getOradilogin());
+                    List<String> logout = Splitter.on("\n").splitToList(cnsmr.getOradilogout());
+
+                    for (int x = 0; x < login.size(); x++) {
+                        DateTime start2 = fmt.parseDateTime("2021-01-01 " + login.get(x));
+                        DateTime end2 = fmt.parseDateTime("2021-01-01 " + logout.get(x));
+                        if (end2.isAfter(start2)) {
+                            accessi.add(new Interval(start2, end2));
+                            accessi_complessivi.add(new Interval(start2, end2));
+                        }
+                    }
+                    accessi.forEach(intervallo2 -> {
+                        accessi_docente.forEach(intervallo1 -> {
+                            if (intervallo2.overlaps(intervallo1)) {
+                                millis_rendicontabili.addAndGet(intervallo2.overlap(intervallo1).toDurationMillis());
+                            }
+                        });
+
+                    });
+
+                    if (millis_rendicontabili.get() >= ore) {
+                        cnsmr.setTotaleorerendicontabili(calcoladurata(ore));
+                        cnsmr.setMillistotaleorerendicontabili(ore);
+                    } else if (millis_rendicontabili.get() >= cnsmr.getMillistotaleore()) {
+                        cnsmr.setTotaleorerendicontabili(cnsmr.getTotaleore());
+                        cnsmr.setMillistotaleorerendicontabili(cnsmr.getMillistotaleore());
+                    } else {
+                        cnsmr.setTotaleorerendicontabili(calcoladurata(millis_rendicontabili.get()));
+                        cnsmr.setMillistotaleorerendicontabili(millis_rendicontabili.get());
+                    }
+
+                });
+
+                accessi_docente.forEach(intervallo1 -> {
+                    DateTime start = intervallo1.getStart();
+                    while (start.isBefore(intervallo1.getEnd())) {
+                        for (int i = 0; i < accessi_complessivi.size(); i++) {
+                            Interval ac1 = accessi_complessivi.get(i);
+
+                            if (ac1.getStart().isBefore(start) || ac1.getStart().isEqual(start)) {
+                                if (ac1.getEnd().isAfter(start) || ac1.getEnd().isEqual(start)) {
+                                    millis_rendicontabili_DOCENTE.addAndGet(1000);
+                                    break;
+                                }
+                            }
+                        }
+                        start = start.plusSeconds(1);
+                    }
+                });
+
+                if (millis_rendicontabili_DOCENTE.get() >= ore) {
+                    docente.setTotaleorerendicontabili(calcoladurata(ore));
+                    docente.setMillistotaleorerendicontabili(ore);
+                } else if (millis_rendicontabili_DOCENTE.get() >= docente.getMillistotaleore()) {
+                    docente.setTotaleorerendicontabili(docente.getTotaleore());
+                    docente.setMillistotaleorerendicontabili(docente.getMillistotaleore());
+                } else {
+                    docente.setTotaleorerendicontabili(calcoladurata(millis_rendicontabili_DOCENTE.get()));
+                    docente.setMillistotaleorerendicontabili(millis_rendicontabili_DOCENTE.get());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+   
+   public static int getIdUser(Database db, String nome, String cognome, int idpr, int idsa, String ruolo) {
+        if (ruolo.equalsIgnoreCase("DOCENTE")) {
+            return getIdDocente(db, nome, cognome, idsa);
+        } else if (ruolo.equalsIgnoreCase("ALLIEVO NEET")) {
+            return getIdAllievo(db, nome, cognome, idpr);
+        }
+        return 0;
+    }
+   
+   private static int getIdAllievo(Database db, String nome, String cognome, int idpr) {
+        try {
+            String sql = "SELECT idallievi FROM allievi WHERE nome = ? AND cognome = ? AND idprogetti_formativi = ? AND id_statopartecipazione = ? ORDER BY idallievi DESC LIMIT 1";
+            try (PreparedStatement ps = db.getC().prepareStatement(sql)) {
+                ps.setString(1, nome);
+                ps.setString(2, cognome);
+                ps.setInt(3, idpr);
+                ps.setString(4, "01");
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    private static int getIdDocente(Database db, String nome, String cognome, int idsa) {
+        try {
+            String sql = "SELECT iddocenti FROM docenti WHERE nome = ? AND cognome = ? AND idsoggetti_attuatori = ? AND stato = ? ORDER BY iddocenti DESC LIMIT 1";
+            try (PreparedStatement ps = db.getC().prepareStatement(sql)) {
+                ps.setString(1, nome);
+                ps.setString(2, cognome);
+                ps.setInt(3, idsa);
+                ps.setString(4, "A");
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+   
+    
+    public static String convertTS_Italy(String ts1) {
+//        TimeZone tz1 = TimeZone.getTimeZone("Europe/Rome");
+//        TimeZone tz2 = TimeZone.getTimeZone("GMT");
+//        long timeDifference = tz1.getRawOffset() - tz2.getRawOffset() + tz1.getDSTSavings() - tz2.getDSTSavings();
+        String dt1 = StringUtils.substring(ts1, 0, 26);
+        try {
+            if (dt1.length() != timestampFAD.length()) {
+                if (dt1.length() == 19) {
+                    dt1 += ".000000";
+                }
+            }
+        } catch (Exception e) {
+        }
+        DateTime start = new DateTime(dtfad.parseDateTime(dt1));
+        DateTime dateTimeIT = start.plus(getTimeDiff());
+        return dateTimeIT.toString(timestampSQL);
+    }
+    
+    public static long getTimeDiff() {
+        try {
+            TimeZone tz1 = TimeZone.getTimeZone("Europe/Rome");
+            TimeZone tz2 = TimeZone.getTimeZone("GMT");
+            TimeZone tz3 = TimeZone.getTimeZone("GMT+1");
+            ZoneId arrivingZone = ZoneId.of("Europe/Rome");
+            ZonedDateTime arrival = Instant.now().atZone(arrivingZone);
+            if (arrivingZone.getRules().isDaylightSavings(arrival.toInstant())) {
+                return tz1.getRawOffset() - tz2.getRawOffset() + tz1.getDSTSavings() - tz2.getDSTSavings();
+            } else {
+                return tz1.getRawOffset() - tz3.getRawOffset() + tz1.getDSTSavings() - tz3.getDSTSavings();
+            }
+        } catch (Exception e) {
+        }
+        return 0L;
+    }
+    
+    
+    
+    
+    
 }

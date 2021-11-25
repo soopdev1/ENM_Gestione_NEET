@@ -314,11 +314,13 @@ public class SoggettiAttuatori implements Serializable {
     }
 
     public List<ProgettiFormativi> getProgettiformativi() {
-        List<ProgettiFormativi> pf = new ArrayList();
-        if (this.progettiformativi != null) {
-            pf.addAll(this.progettiformativi);
-        }
-        return pf;
+//        List<ProgettiFormativi> pf = new ArrayList();
+//        if (this.progettiformativi != null) {
+//            pf.addAll(this.progettiformativi);
+//        }
+        List<ProgettiFormativi> a = new ArrayList();//per fixare il bub dello stream  per le lazy list di EclipseLink
+        a.addAll(this.progettiformativi);
+        return a;
     }
 
     public void setProgettiformativi(List<ProgettiFormativi> progettiformativi) {

@@ -37,57 +37,30 @@
         } else {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
             String src = session.getAttribute("src").toString();
-            String visible = "none;", giorni, cip, href;
-            int gg;
-            String[] values;
             Date today = new Date();
             Date todaynotime = Date.from(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS).atZone(ZoneId.systemDefault()).toInstant());
             List<ProgettiFormativi> FA = new ArrayList();
             List<DocumentiPrg> docs = new ArrayList();
             List<DocumentiPrg> filtered = new ArrayList();
-            Map<String, String[]> ms = Utility.mapStyles();
             Entity e = new Entity();
-            List<ProgettiFormativi> pf = e.ProgettiSAOrdered(us.getSoggettoAttuatore());
-
             String messaggio = e.getPath("messageToSA");
             double ore_filter = 0;
-
-            int allievi_foranti = 0, progetti_conclusi = 0;
 
             for (ProgettiFormativi p : e.ProgettiSA_Fa(us.getSoggettoAttuatore())) {
                 docs = p.getDocumenti();
                 filtered = new ArrayList<>();
                 ore_filter = 0;
-//                filtered = docs.stream().filter(o -> o.getGiorno() != null && o.getGiorno().equals(todaynotime)).collect(Collectors.toList());
                 for (DocumentiPrg o : docs) {
                     if (o.getGiorno() != null && o.getGiorno().equals(todaynotime)) {
                         filtered.add(o);
                         ore_filter += o.getOre();
                     }
                 }
-
                 if (filtered.size() < 2 && ore_filter < 5) {
-                    visible = "block;";
                     FA.add(p);
                 }
             }
 
-            for (Allievi a : us.getSoggettoAttuatore().getAllievi()) {
-                if (a.getStatopartecipazione().getId().equals("01")
-                        && a.getProgetto() != null
-                        && a.getProgetto().getStato().getOrdine() > 7) {
-                    allievi_foranti++;
-                }
-            }
-//            us.getSoggettoAttuatore().getAllievi().stream().filter(a -> (a.getStatopartecipazione().getId().equals("01") && a.getProgetto() != null && a.getProgetto().getStato().getOrdine() > 7)).count()
-
-            for (ProgettiFormativi p : pf) {
-                if (p.getStato().getId().equals("C")) {
-                    progetti_conclusi++;
-                }
-            }
-
-//            pf.stream().filter(p -> p.getStato().getId().equals("C")).count()
             e.close();
 %>
 <html>
@@ -143,12 +116,30 @@
                 border-radius: 5px;
             }
 
-            .custom-redbox:before{font-family: 'Flaticon';content: "\f1af";}
-            .custom-redbox.message:before{font-family: 'Flaticon2';content: "";}
-            .custom-greenbox:before{font-family: 'Flaticon';content: "\f1b7";}
-            .custom-yellowbox:before{font-family: 'Flaticon';content: "\f19f";}
-            .custom-bluebox:before{font-family: 'Flaticon2';content: "\f126";}
-            .custom-greenbox.sa:before{font-family: 'Flaticon2';content: "\f126";}
+            .custom-redbox:before{
+                font-family: 'Flaticon';
+                content: "\f1af";
+            }
+            .custom-redbox.message:before{
+                font-family: 'Flaticon2';
+                content: "";
+            }
+            .custom-greenbox:before{
+                font-family: 'Flaticon';
+                content: "\f1b7";
+            }
+            .custom-yellowbox:before{
+                font-family: 'Flaticon';
+                content: "\f19f";
+            }
+            .custom-bluebox:before{
+                font-family: 'Flaticon2';
+                content: "\f126";
+            }
+            .custom-greenbox.sa:before{
+                font-family: 'Flaticon2';
+                content: "\f126";
+            }
         </style>
     </head>
     <body class="kt-header--fixed kt-header-mobile--fixed kt-subheader--fixed kt-subheader--enabled kt-subheader--solid kt-aside--enabled kt-aside--fixed">
@@ -192,7 +183,7 @@
                         <div class="tab-content" style="margin-right: 10px;">
                             <div class="tab-pane" id="kt_widget5_tab1_content" aria-expanded="true">
                                 <div class="row">
-                                    <div class="col-xl-8 col-lg-6 col-md-6" style="padding-right: 0px;">
+                                    <div class="col-md-12" style="padding-right: 0px;">
                                         <%if (!messaggio.equals("")) {%>
                                         <div class="row col">
                                             <div class="col-12 paddig_0_r" style="padding-bottom: 1.5rem;">
@@ -201,19 +192,36 @@
                                         </div>
                                         <%}%>
                                         <div class="row flex col-lg-12"  style="margin-right: 0px; padding-right: 0px;">
+
+                                            <%
+                                                String[] contatori = Action.contatoriHomeSA(us);
+                                            %>
+
                                             <div class="col-xl-3 col-lg-12 col-md-6" style="padding-bottom: 1.5rem;">
-                                                <div class="one-half custom-redbox">Allievi totali<br><label style="font-size: 3rem; font-weight: 800;"><%=us.getSoggettoAttuatore().getAllievi().size()%></label></div>
+                                                <div class="one-half custom-redbox">Allievi totali<br><label style="font-size: 3rem; font-weight: 800;">
+                                                        <%=contatori[0]%></label></div>
                                             </div>
                                             <div class="col-xl-3 col-lg-12 col-md-6" style="padding-bottom: 1.5rem;">
-                                                <div class="one-half custom-greenbox">Allievi formati<br><label style="font-size: 3rem; font-weight: 800;"><%=allievi_foranti%></label></div>
+                                                <div class="one-half custom-greenbox">Allievi formati<br><label style="font-size: 3rem; font-weight: 800;">
+                                                        <%=contatori[1]%></label></div>
                                             </div>
                                             <div class="col-xl-3 col-lg-12 col-md-6" style="padding-bottom: 1.5rem;">
-                                                <div class="one-half custom-yellowbox">Progetti totali<br><label style="font-size: 3rem; font-weight: 800;"><%=pf.size()%></label></div>
+                                                <div class="one-half custom-yellowbox">Progetti totali<br><label style="font-size: 3rem; font-weight: 800;">
+                                                        <%=contatori[2]%></label></div>
                                             </div>
                                             <div class="col-xl-3 col-lg-12 col-md-6" style="padding-bottom: 1.5rem;">
-                                                <div class="one-half custom-bluebox">Progetti conclusi<br><label style="font-size: 3rem; font-weight: 800;"><%=progetti_conclusi%></label></div>
+                                                <div class="one-half custom-bluebox">Progetti conclusi<br><label style="font-size: 3rem; font-weight: 800;">
+                                                        <%=contatori[3]%></label></div>
                                             </div>
                                         </div>
+                                        <%if (Utility.demoversion) {%>
+                                        <div class="row flex col-lg-12"  style="margin-right: 0px; padding-right: 0px;">
+                                            <div class="col-xl-4 col-lg-12 col-md-6">
+                                                <a href="<%=request.getContextPath()%>/OperazioniSA?type=resetdatidemo" 
+                                                   class="btn btn-dark kt-font-bold"><i class="fa fa-times"></i> RESET DATI DEMO</a>
+                                            </div>
+                                        </div>
+                                        <%}%>
                                         <div class="row flex col-lg-12"  style="margin-right: 0px; padding-right: 0px;">
                                             <%if (today.after(us.getSoggettoAttuatore().getScadenza())) {%>
                                             <div class="col-xl-4 col-lg-12 col-md-6">
@@ -240,170 +248,17 @@
                                                 </div>
                                             </div>
                                             <%}%>
-                                            <%if (false) {%>  
-                                            <div class="col-xl-4 col-lg-12 col-md-6">
-                                                <div class="kt-portlet kt-iconbox kt-iconbox--success kt-iconbox--animate-slow">
-                                                    <div class="kt-portlet__body">
-                                                        <div class="row">
-                                                            <div class="col-lg-3">
-                                                                <h4 class="kt-widget27__title kt-font-io" style="font-size: 5vh!important;">
-                                                                    <i class="fa fa-user-plus"></i>
-                                                                </h4>
-                                                            </div>
-                                                            <div class="col-lg-9">
-                                                                <div class="kt-iconbox__desc">
-                                                                    <h3 class="kt-iconbox__title">
-                                                                        <a href="<%=src%>/page/sa/newAllievo.jsp?fb=1" class="kt-link kt-notification__item fancyBoxRafNotReload">Allievo</a>
-                                                                    </h3>
-                                                                    <div class="kt-iconbox__content">
-                                                                        Aggiungi nuovo
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-xl-4 col-lg-12 col-md-6">
-                                                <div class="kt-portlet kt-iconbox kt-iconbox--danger kt-iconbox--animate-slow">
-                                                    <div class="kt-portlet__body">
-                                                        <div class="row" >
-                                                            <div class="col-lg-3">
-                                                                <h4 class="kt-widget27__title kt-font-io" style="font-size: 5vh!important;">
-                                                                    <i class="fa fa-cloud-upload-alt"></i>
-                                                                </h4>
-                                                            </div>
-                                                            <div class="col-lg-9">
-                                                                <div class="kt-iconbox__desc">
-                                                                    <h3 class="kt-iconbox__title">
-                                                                        <a href="<%=src%>/page/sa/newProgettoFormativo.jsp?fb=1" class="kt-link kt-notification__item fancyBoxRafNotReload ">Progetto Formativo</a>
-                                                                    </h3>
-                                                                    <div class="kt-iconbox__content">
-                                                                        Crea nuovo
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <%}%>                   
+
+
                                         </div>
                                     </div>
-                                    <%if (false) {%>                
-                                    <div class="col-xl-4 col-lg-6 col-md-6" style="padding-left: 0px;">
-                                        <div class="kt-portlet kt-portlet--height-fluid" style="border-radius: 5px; ">
-                                            <div class="kt-portlet__head">
-                                                <div class="kt-portlet__head-label">
-                                                    <h3 class="kt-portlet__head-title kt-font-io">
-                                                        Bacheca
-                                                    </h3>
-                                                </div>
-                                                <div class="kt-portlet__head-toolbar" >
-                                                    <ul class="nav nav-pills nav-pills-sm nav-pills-label nav-pills-bold" role="tablist">
-                                                        <li class="nav-item">
-                                                            <a class="nav-link active" data-toggle="tab" href="#progetti" role="tab">
-                                                                Progetti Formativi
-                                                            </a>
-                                                        </li>
-                                                        <li class="nav-item" >
-                                                            <a class="nav-link" data-toggle="tab" href="#registri" role="tab" style="display: <%=visible%>">
-                                                                Registri Aula
-                                                            </a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                            <div class="kt-portlet__body" >
-                                                <div class="tab-content">
-                                                    <div class="tab-pane active kt-scroll" id="progetti" style="max-height: 550px;" aria-expanded="true">
-                                                        <%if (pf.isEmpty()) {%>
-                                                        <div class="kt-notification">
-                                                            <div class="kt-notification__item" style="font-size: 2rem; background-color: #d0d0d036!important;">
-                                                                <div class="kt-notification__item-icon">
-                                                                    <i class="fa fa-info" style="font-size: 2rem;"></i>
-                                                                </div>
-                                                                <div class="kt-notification__item-details">
-                                                                    <div class="kt-notification__item-title">
-                                                                        <b style="font-size: 15px; color: #363a90 !important;">Nessun progetto formativo ancora presente</b>
-                                                                    </div>
-                                                                    <div class="kt-notification__item-time kt-font-io">
-                                                                        Procedi con il caricamento di un nuovo progetto!
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <%} else {
-                                                            for (ProgettiFormativi p : pf) {
-                                                                cip = "";
-                                                                href = "";
-                                                                gg = (int) (Math.ceil((double) (p.getEnd().getTime() - today.getTime()) / (24 * 60 * 60 * 1000)));
-                                                                giorni = gg == 0 ? "<label style='color: #363a90;'>Ultimo giorno disponibile</label>" : (gg > 0 ? "<label style='color: #363a90;'>" + String.valueOf(gg) + " giorni rimanenti</label>" : "<label style='color: #ff0055;'>" + String.valueOf(Math.abs(gg)) + " giorni di ritardo</label>");
-                                                                values = Utility.stylePF(ms, p);
-                                                                if (p.getCip() != null) {
-                                                                    cip = p.getCip();
-                                                                    href = "href='" + src + "/page/sa/searchProgettiFormativi.jsp?icip=" + cip + "'";
-                                                                }%>
-                                                        <div class="kt-notification">
-                                                            <a <%=href%> class="kt-notification__item" style ="<%=values[2]%>">
-                                                                <div class="kt-notification__item-icon">
-                                                                    <i class="fa fa-file-alt" style="font-size: 2rem;<%=values[1]%>"></i>
-                                                                </div>
-                                                                <div class="kt-notification__item-details">
-                                                                    <div class="kt-notification__item-title">
-                                                                        <b style="font-size: 15px;<%=values[1]%>"><%=p.getNome().getDescrizione()%></b> <%=cip%>
-                                                                    </div>
-                                                                    <div class="kt-notification__item-time kt-font-io">
-                                                                        <%=values[0].replace("@stato", p.getStato().getDescrizione()).replace("@giorni", giorni)%>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <%}
-                                                            }%>
-                                                    </div>
-                                                    <div class="tab-pane" id="registri" aria-expanded="false">
-                                                        <% for (ProgettiFormativi p : FA) {%>
-                                                        <div class="kt-notification" >
-                                                            <a href="<%=src%>/page/sa/uploadRegistroAula.jsp?id=<%=p.getId()%>" class="fancyBoxRafRef kt-notification__item" style="background-color: #d0d0d036!important;">
-                                                                <div class="kt-notification__item-icon">
-                                                                    <i class="flaticon2-calendar-6" style="font-size: 2rem;"></i>
-                                                                </div>
-                                                                <div class="kt-notification__item-details ">
-                                                                    <div class="kt-notification__item-title kt-font-io">
-                                                                        <b style="font-size: 15px;"><%=p.getNome().getDescrizione()%></b>
-                                                                    </div> 
-                                                                    <div class="kt-notification__item-time kt-font-io">
-                                                                        <b>Carica registro giornaliero</b><br> <%=sdf.format(today)%>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                        <%}%>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                    </div> 
-                                    <%}%>         
                                 </div>
                             </div>
                             <br>
                             <div class="tab-pane" id="kt_widget5_tab2_content" aria-expanded="true">
                                 <div class="row col-lg-12">
                                     <div class="col-lg-8">
-                                        <div id="infook" style="display:none">
-                                            <%String protocollo = "";
-                                                protocollo = us.getSoggettoAttuatore().getDataprotocollo() != null ? sdf.format(us.getSoggettoAttuatore().getDataprotocollo()) : "";
-                                            %>
-                                            <h1 class="kt-font-io">Soggetto Attuatore: <b><%=us.getSoggettoAttuatore().getRagionesociale()%></b> &nbsp;<a  data-toggle="popover-hover" data-content="<h5>Soggetto attuatore accreditato</h5>" ><i class=" flaticon2-correct kt-font-success"></i></a></h1><br>
-                                            <h3 class="kt-font-io">Approvato dall'Ente Nazionale per il Microcredito in data <%=protocollo%>.</h3>
-                                        </div>
-                                        <div id="infoko" style="display:none">
-                                            <h1 class="kt-font-io">Soggetto Attuatore: <b><%=us.getSoggettoAttuatore().getRagionesociale()%></b> &nbsp;<a  data-toggle="popover-hover" data-content="<h5>In attesa di accreditamento</h5>" ><i class="flaticon2-correct kt-font-io-n"></i></a></h1><br>
-                                            <h3 class="kt-font-io">In attesa di approvazione da parte dell'Ente Nazionale per il Microcredito.</h3>
-                                        </div>
                                         <div class="row">
                                             <div class="col-xl-6 col-lg-12"><br><br>
                                                 <h5 class="kt-font-io-n"><b>Soggetto Attuatore</b></h5><br>

@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 var context = document.getElementById("searchProgettiFormativi").getAttribute("data-context");
+var demoversion = document.getElementById("searchProgettiFormativi").getAttribute("data-demoversion");
 $.getScript(context + '/page/partialView/partialView.js', function () {});
 var ore_max_daily = document.getElementById("ore_max").getAttribute("data-context");
 var mapM4_start = new Map();
@@ -80,7 +81,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
 
                             if (row.stato.modifiche.docenti === 1) {
                                 option += '<a class="dropdown-item fancyBoxAntoRef" href="modifyDocentiProgetto.jsp?id=' + row.id + '"><i class="fas fa-user-edit"></i> Modifica Docenti</a>';
-                            }                            
+                            }
                             if (row.controllable === 1) {
                                 option += '<a class="dropdown-item" href="javascript:void(0);" onclick="confirmNext(' + row.id + ',\'' + row.stato.id + '\')"> Manda avanti la pratica &nbsp;<i class="fa fa-angle-double-right" style="margin-top:-2px"></i></a>';
                             }
@@ -97,14 +98,27 @@ var KTDatatablesDataSourceAjaxServer = function () {
 
                             //TEST modello 4
                             if (row.stato.id === "ATA" || row.stato.id === "SOB") {
-                                if (mapM4_start.has(row.id) && (today >= moment(new Date(mapM4_start.get(row.id))).format('YYYY-MM-DD'))) {
+
+                                if (demoversion === 'true') {
+                                    option += '<a class="dropdown-item kt-font-dark" href="javascript:void(0);" onclick="simulafaseA(' + row.id +
+                                            ')"> SIMULA lezioni Fase A &nbsp;<i class="fa fa-angle-double-right kt-font-dark" style="margin-top:-2px"></i></a>';
+                                    option += '<a class="dropdown-item fancyBoxFullReload" href="modello4.jsp?id=' + row.id + '"><i class="fa fa-calendar-check"></i> Carica Modello 4 e Conferma</a>';
+                                } else if (mapM4_start.has(row.id) && (today >= moment(new Date(mapM4_start.get(row.id))).format('YYYY-MM-DD'))) {
                                     option += '<a class="dropdown-item fancyBoxFullReload" href="modello4.jsp?id=' + row.id + '"><i class="fa fa-calendar-check"></i> Carica Modello 4 e Conferma</a>';
                                 } else {
-                                    option += '<a class="dropdown-item kt-font-danger" href="#" style="cursor:not-allowed!important" data-container="body" data-html="true" data-toggle="kt-tooltip" title="Il caricamento del Modello 4 sarà disponibile una volta completata la fase A (' + formattedDate(new Date(mapM4_start.get(row.id))) + ')"><i class="fa fa-calendar-check kt-font-danger"></i> Carica Modello 4 e Conferma</a>';
+                                    option += '<a class="dropdown-item kt-font-danger" href="#" style="cursor:not-allowed!important" data-container="body" data-html="true" data-toggle="kt-tooltip" title="Il caricamento del Modello 4 sarà disponibile una volta completata la fase A ('
+                                            + formattedDate(new Date(mapM4_start.get(row.id)))
+                                            + ')"><i class="fa fa-calendar-check kt-font-danger"></i> Carica Modello 4 e Conferma</a>';
                                 }
                             } else if (row.stato.id === "ATB") {
                                 option += '<a class="dropdown-item fancyBoxFullReload" href="modello4.jsp?id=' + row.id + '"><i class="fa fa-calendar-check"></i> Visualizza/Modifica Calendario Modello 4</a>';
-                            } else if(row.stato.id === "F"){
+                                if (demoversion === 'true') {
+                                    option += '<a class="dropdown-item kt-font-dark" href="javascript:void(0);" onclick="simulafaseB(' + row.id +
+                                            ')"> SIMULA lezioni Fase B &nbsp;<i class="fa fa-angle-double-right kt-font-dark" style="margin-top:-2px"></i></a>';
+                                }
+                            
+                            
+                            } else if (row.stato.id === "F") {
                                 option += '<a class="dropdown-item fancyBoxFullReload" href="modello4.jsp?id=' + row.id + '"><i class="fa fa-calendar-check"></i> Visualizza Calendario Modello 4</a>';
                                 option += '<a class="dropdown-item" href="concludiPrg.jsp?id=' + row.id + '"><i class="fa fa-angle-double-right"></i> Concludi Progetto</a>';
                             }
@@ -391,6 +405,52 @@ function swalDocumentAllievo(idallievo) {
         $('#doc_modal').modal('show');
         $('.kt-scroll').each(function () {
             const ps = new PerfectScrollbar($(this)[0]);
+        });
+    });
+}
+
+function simulafaseB(id) {
+    swalConfirm("Conferma Simulazione lezioni fase B", "", function simulate() {
+        showLoad();
+        $.ajax({
+            type: "POST",
+            url: context + '/OperazioniSA?type=simulafaseb&idpr=' + id,
+            success: function (data) {
+                closeSwal();
+                var json = JSON.parse(data);
+                if (json.result) {
+                    swalSuccess("Simulazione completata", "Il progetto è ora pronto per la conclusione.");
+                    reload();
+                } else {
+                    swalError("Errore", json.message);
+                }
+            },
+            error: function () {
+                swalError("Errore", "Non è stato possibile simulare questa azione.");
+            }
+        });
+    });
+}
+
+function simulafaseA(id) {
+    swalConfirm("Conferma Simulazione lezioni fase A", "", function simulate() {
+        showLoad();
+        $.ajax({
+            type: "POST",
+            url: context + '/OperazioniSA?type=simulafasea&idpr=' + id,
+            success: function (data) {
+                closeSwal();
+                var json = JSON.parse(data);
+                if (json.result) {
+                    swalSuccess("Simulazione completata", "Il progetto è ora pronto per il caricamento del Modello 4.");
+                    reload();
+                } else {
+                    swalError("Errore", json.message);
+                }
+            },
+            error: function () {
+                swalError("Errore", "Non è stato possibile simulare questa azione.");
+            }
         });
     });
 }

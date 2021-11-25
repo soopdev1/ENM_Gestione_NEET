@@ -8,6 +8,7 @@ package it.refill.db;
 import it.refill.domain.Docenti;
 import it.refill.domain.ProgettiFormativi;
 import it.refill.domain.SoggettiAttuatori;
+import it.refill.domain.User;
 import it.refill.entity.FadCalendar;
 import static it.refill.util.Utility.pregresso;
 import java.io.File;
@@ -46,7 +47,7 @@ public class Action {
         boolean c = db.isVisible(gruppo, page);
         db.closeDB();
         return c;
-        
+
 //        Entity e = new Entity();
 //        boolean out = e.isVisible(gruppo, page);
 //        e.close();
@@ -99,6 +100,56 @@ public class Action {
         return out;
     }
 
+    public static String[] contatoriHomeSA(User us) {
+        String[] out = {
+            "0", "0", "0",
+            "0"
+        };
+
+        AtomicInteger out_0 = new AtomicInteger(0);
+        AtomicInteger out_1 = new AtomicInteger(0);
+        Long hh36 = new Long(129600000);
+
+        Entity e = new Entity();
+        e.begin();
+        List<ProgettiFormativi> allpr = e.ProgettiSAOrdered(us.getSoggettoAttuatore());
+        e.close();
+
+        allpr.forEach(pr1 -> {
+            out_0.addAndGet(pr1.getAllievi().size());
+        });
+
+        List<ProgettiFormativi> conclusi = allpr.stream().filter(pr
+                -> pr.getStato().getId().equalsIgnoreCase("F")
+                || pr.getStato().getId().equalsIgnoreCase("DVB")
+                || pr.getStato().getId().equalsIgnoreCase("MA")
+                || pr.getStato().getId().equalsIgnoreCase("IV")
+                || pr.getStato().getId().equalsIgnoreCase("CK")
+                || pr.getStato().getId().equalsIgnoreCase("EVI")
+                || pr.getStato().getId().contains("CO")
+        ).collect(Collectors.toList());
+
+        conclusi.forEach(pr1 -> {
+            Map<Long, Long> orealunni = OreRendicontabiliAlunni_faseA(Integer.parseInt(String.valueOf(pr1.getId())));
+            pr1.getAllievi().forEach(al1 -> {
+                if (al1.getStatopartecipazione().getId().equals("01")) {
+                    if (orealunni.get(al1.getId()) != null) {
+                        if (orealunni.get(al1.getId()) >= hh36) {
+                            out_1.addAndGet(1);
+                        }
+                    }
+                }
+            });
+        });
+
+        out[0] = String.valueOf(out_0.get());
+        out[1] = String.valueOf(out_1.get());
+        out[2] = String.valueOf(allpr.size());
+        out[3] = String.valueOf(conclusi.size());
+
+        return out;
+    }
+
     public static String[] contatoriHome() {
 
         String[] out = {
@@ -110,6 +161,8 @@ public class Action {
             "0", "0", "0",
             "0", "0", "0"
         };
+
+        Long hh36 = new Long(129600000);
 
         Entity e = new Entity();
         e.begin();
@@ -135,10 +188,21 @@ public class Action {
                 && !pr.getStato().getTipo().equalsIgnoreCase("sospeso")
         )
                 .collect(Collectors.toList());
+        
+//        List<ProgettiFormativi> conclusi = allpr.stream().filter(pr
+//                -> pr.getStato().getTipo().equalsIgnoreCase("chiuso")
+//        )
+//                .collect(Collectors.toList());
+
         List<ProgettiFormativi> conclusi = allpr.stream().filter(pr
-                -> pr.getStato().getTipo().equalsIgnoreCase("chiuso")
-        )
-                .collect(Collectors.toList());
+                -> pr.getStato().getId().equalsIgnoreCase("F")
+                || pr.getStato().getId().equalsIgnoreCase("DVB")
+                || pr.getStato().getId().equalsIgnoreCase("MA")
+                || pr.getStato().getId().equalsIgnoreCase("IV")
+                || pr.getStato().getId().equalsIgnoreCase("CK")
+                || pr.getStato().getId().equalsIgnoreCase("EVI")
+                || pr.getStato().getId().contains("CO")
+        ).collect(Collectors.toList());
 
         AtomicInteger out_0 = new AtomicInteger(0);
         AtomicInteger out_1 = new AtomicInteger(0);
@@ -185,9 +249,14 @@ public class Action {
             });
 
             conclusi.forEach(pr1 -> {
+                Map<Long, Long> orealunni = OreRendicontabiliAlunni_faseA(Integer.parseInt(String.valueOf(pr1.getId())));
                 pr1.getAllievi().forEach(al1 -> {
                     if (al1.getStatopartecipazione().getId().equals("01")) {
-                        out_2.addAndGet(1);
+                        if (orealunni.get(al1.getId()) != null) {
+                            if (orealunni.get(al1.getId()) >= hh36) {
+                                out_2.addAndGet(1);
+                            }
+                        }
                     }
                 });
             });
@@ -249,14 +318,15 @@ public class Action {
         return out;
 
     }
-    
-     //Totale Ore rendicontabili per Docenti
+
+    //Totale Ore rendicontabili per Docenti
     public static Map<Long, Long> OreRendicontabiliDocenti(int pf) {
         Database db = new Database(false);
         Map<Long, Long> r = db.OreRendicontabiliDocenti(pf);
         db.closeDB();
         return r;
     }
+
     public static Map<Long, Long> OreRendicontabiliDocentiFASEA(int pf) {
         Database db = new Database(false);
         Map<Long, Long> r = db.OreRendicontabiliDocentiFASEA(pf);
@@ -271,7 +341,7 @@ public class Action {
         db.closeDB();
         return r;
     }
-    
+
     public static Map<Long, Long> OreRendicontabiliAlunni_faseB(int pf) {
         Database db = new Database(false);
         Map<Long, Long> r = db.OreRendicontabiliAlunni_faseB(pf);
@@ -292,5 +362,5 @@ public class Action {
         db.closeDB();
         return r;
     }
-    
+
 }

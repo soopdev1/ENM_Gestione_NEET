@@ -504,12 +504,14 @@ public class QuerySA extends HttpServlet {
                     list.add(new ProgettiLezioniModelli(p.getId(), filter_lastDay));
                 }
             }
+            
+            System.out.println("it.refill.servlet.QuerySA.checkModello4Start() "+list.size());
+            
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(list));
         } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            e.close();
+//            ex.printStackTrace();
+            response.getWriter().write(new ObjectMapper().writeValueAsString(new ArrayList()));
         }
     }
 
@@ -532,10 +534,9 @@ public class QuerySA extends HttpServlet {
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(list));
         } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            e.close();
-        }
+//            ex.printStackTrace();
+            response.getWriter().write(new ObjectMapper().writeValueAsString(new ArrayList()));
+        } 
     }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)

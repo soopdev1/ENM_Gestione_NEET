@@ -68,6 +68,7 @@ import it.refill.util.Utility;
 import static it.refill.util.Utility.checkPDF;
 import static it.refill.util.Utility.createDir;
 import static it.refill.util.Utility.getRequestValue;
+import static it.refill.util.Utility.getstatoannullato;
 import static it.refill.util.Utility.patternITA;
 import static it.refill.util.Utility.patternSql;
 import static it.refill.util.Utility.redirect;
@@ -332,12 +333,14 @@ public class OperazioniMicro extends HttpServlet {
             }
             //RAF 29/06 mail di istruzioni sa
             if (stato_prec.equals("DC") && stato_succ.equals("ATA")) {
-                Email email_txt = e.getEmail("sa_start");
-                SendMailJet.sendMail(
-                        e.getPath("mailsender"),
-                        new String[]{p.getSoggetto().getEmail()},
-                        email_txt.getTesto(),
-                        email_txt.getOggetto());
+                if (!Utility.demoversion) {
+                    Email email_txt = e.getEmail("sa_start");
+                    SendMailJet.sendMail(
+                            e.getPath("mailsender"),
+                            new String[]{p.getSoggetto().getEmail()},
+                            email_txt.getTesto(),
+                            email_txt.getOggetto());
+                }
             }
 
             resp.addProperty("result", check);
@@ -347,6 +350,39 @@ public class OperazioniMicro extends HttpServlet {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro validatePrg: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile validare il progetto formativo.");
+        } finally {
+            e.close();
+        }
+        response.getWriter().write(resp.toString());
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
+
+    protected void annullaPrg(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Entity e = new Entity();
+        JsonObject resp = new JsonObject();
+        try {
+            e.begin();
+            ProgettiFormativi p = e.getEm().find(ProgettiFormativi.class, Long.parseLong(request.getParameter("id")));
+            String stato_prec = p.getStato().getId();
+            p.setMotivo(request.getParameter("motivo"));
+            e.persist(new Storico_Prg("Rigettato: " + request.getParameter("motivo"), new Date(), p, p.getStato()));//storico progetto
+            String stato_succ = getstatoannullato(stato_prec);
+            p.setStato(e.getEm().find(StatiPrg.class, stato_succ));
+            p.getAllievi().forEach(al1 -> {
+                if (al1.getStatopartecipazione().getId().equals("01")) {
+                    al1.setStatopartecipazione(e.getEm().find(StatoPartecipazione.class, "03"));
+                    e.merge(al1);
+                }
+            });
+            e.merge(p);
+            e.commit();
+            resp.addProperty("result", true);
+        } catch (PersistenceException ex) {
+            ex.printStackTrace();
+            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro annullaPrg: " + ex.getMessage());
+            resp.addProperty("result", false);
+            resp.addProperty("message", "Errore: non &egrave; stato possibile annullare il progetto formativo.");
         } finally {
             e.close();
         }
@@ -445,7 +481,6 @@ public class OperazioniMicro extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-  
     protected void setHoursRegistro(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Entity e = new Entity();
         JsonObject resp = new JsonObject();
@@ -1985,7 +2020,7 @@ public class OperazioniMicro extends HttpServlet {
                 ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
                 TipoDoc tipo = e.getEm().find(TipoDoc.class, 11L);
                 //creao il path
-                String path = e.getPath("pathDocSA_Prg").replace("@rssa", 
+                String path = e.getPath("pathDocSA_Prg").replace("@rssa",
                         prg.getSoggetto().getId().toString()).replace("@folder", prg.getId().toString());
                 File dir = new File(path);
                 createDir(path);
@@ -2032,8 +2067,9 @@ public class OperazioniMicro extends HttpServlet {
                 e.begin();
                 ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
                 DocumentiPrg esitovalutazione = pf.getDocumenti().stream().filter(d1 -> d1.getTipo().getId() == 36L).findAny().orElse(null);
-                String destpath = esitovalutazione.getPath() + "SIGNED" + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));;
-                part.write(destpath);
+                String destpath = esitovalutazione.getPath() + "SIGNED" + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));                
+                File destfile = new File(destpath);
+                part.write(destfile.getAbsolutePath());
                 esitovalutazione.setDeleted(1);
                 e.merge(esitovalutazione);
                 DocumentiPrg nuovoesitovalutazione = new DocumentiPrg(destpath, esitovalutazione.getTipo(), pf);
@@ -2132,7 +2168,7 @@ public class OperazioniMicro extends HttpServlet {
 
         String idpr = getRequestValue(request, "idpr");
         List<String> allievimappati = Splitter.on(";").splitToList(getRequestValue(request, "allievimappati"));
-        
+
         List<String> notemappatura = Splitter.on("$$$").splitToList(getRequestValue(request, "notemappatura"));
         Map<Long, String> noteallievi = new HashMap<>();
         notemappatura.forEach(nota1 -> {
@@ -2148,7 +2184,7 @@ public class OperazioniMicro extends HttpServlet {
                 }
             }
         });
-        
+
         Entity e = new Entity();
         try {
             e.begin();
@@ -2156,9 +2192,9 @@ public class OperazioniMicro extends HttpServlet {
             pf.getAllievi().forEach(al1 -> {
                 if (allievimappati.contains(String.valueOf(al1.getId()))) {
                     al1.setMappatura(1);
-                    
+
                 }
-                
+
                 try {
                     if (noteallievi.get(al1.getId()) == null) {
                         al1.setMappatura_note("");
@@ -2381,6 +2417,7 @@ public class OperazioniMicro extends HttpServlet {
         User us = (User) request.getSession().getAttribute("user");
         if (us != null && us.getTipo() == 2) {
             String type = request.getParameter("type");
+
             switch (type) {
                 case "saveanpal":
                     saveanpal(request, response);
@@ -2411,6 +2448,9 @@ public class OperazioniMicro extends HttpServlet {
                     break;
                 case "rejectPrg":
                     rejectPrg(request, response);
+                    break;
+                case "annullaPrg":
+                    annullaPrg(request, response);
                     break;
                 case "validateHourRegistroAula":
                     validateHourRegistroAula(request, response);
@@ -2544,6 +2584,7 @@ public class OperazioniMicro extends HttpServlet {
                 case "assegnaPrg":
                     assegnaPrg(request, response);
                     break;
+
                 default:
                     break;
             }

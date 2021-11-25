@@ -9,11 +9,14 @@ import com.google.common.base.Splitter;
 import it.refill.domain.Comuni;
 import it.refill.domain.Docenti;
 import it.refill.domain.FasceDocenti;
+import it.refill.domain.Lezioni_Modelli;
+import it.refill.domain.ProgettiFormativi;
 import it.refill.domain.SediFormazione;
 import it.refill.domain.SoggettiAttuatori;
 import it.refill.entity.FadCalendar;
 import it.refill.entity.Item;
 import it.refill.util.Fadroom;
+import it.refill.util.Utenti;
 import it.refill.util.Utility;
 import static it.refill.util.Utility.calcoladurata;
 import static it.refill.util.Utility.createDir;
@@ -25,9 +28,11 @@ import static it.refill.util.Utility.patternFile;
 import static it.refill.util.Utility.patternITA;
 import static it.refill.util.Utility.patternSql;
 import static it.refill.util.Utility.preparefilefordownload;
+import static it.refill.util.Utility.sdfSQL;
 import static it.refill.util.Utility.test;
 import java.io.File;
 import static java.lang.Class.forName;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -46,7 +51,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.StringUtils.right;
+import static org.apache.commons.lang3.StringUtils.stripAccents;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 
@@ -62,7 +69,7 @@ public class Database {
         String driver = "com.mysql.cj.jdbc.Driver";
         String user = "bando";
         String password = "bando";
-        
+
 //        System.out.println("it.refill.db.Database.<init>() "+test);
 //        System.out.println("it.refill.db.Database.<init>() "+dbsviluppo);
         String host;
@@ -100,8 +107,8 @@ public class Database {
             }
 
             this.c = DriverManager.getConnection("jdbc:mysql://" + host, p);
-//            boolean ok = connesso(this.c);
-//            System.out.println("HOST: " + host + " - CONNESSO " + ok + " - ISDBTEST: " + test);
+            boolean ok = connesso(this.c);
+            System.out.println("HOST: " + host + " - CONNESSO " + ok + " - ISDBTEST: " + test);
         } catch (Exception ex) {
             System.err.println("ERROR SYSTEM: " + host + "-" + estraiEccezione(ex));
             if (this.c != null) {
@@ -611,6 +618,7 @@ public class Database {
         FileDownload out = null;
         try {
             String sql = "SELECT path FROM docuserbandi WHERE username = '" + username + "' AND codicedoc = 'DOCR' AND stato='1' ORDER BY datacar DESC LIMIT 1";
+            System.out.println(sql);
             try (PreparedStatement ps = this.c.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     out = preparefilefordownload(rs.getString(1));
@@ -746,12 +754,36 @@ public class Database {
     public Map<Long, Long> OreRendicontabiliDocentiFASEA(int pf) {
         Map result = new HashMap();
         try {
-            String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE ruolo = 'DOCENTE' AND fase='A' AND idprogetti_formativi = ? GROUP BY idutente";
-            PreparedStatement ps = this.c.prepareStatement(sql);
-            ps.setInt(1, pf);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+
+            if (Utility.demoversion) {
+                String sql1 = "SELECT MAX(totaleorerendicontabili) as totOre,idutente "
+                        + "FROM registro_completo WHERE fase = 'A' "
+                        + "AND idutente IN (SELECT DISTINCT(idutente) "
+                        + "FROM registro_completo WHERE fase = 'A' "
+                        + "AND idprogetti_formativi = ? "
+                        + "AND ruolo = 'DOCENTE') GROUP BY idutente,data";
+                PreparedStatement ps = this.c.prepareStatement(sql1);
+                ps.setInt(1, pf);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    if (result.get(rs.getLong("idutente")) == null) {
+                        result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+                    } else {
+                        long pres = (long) result.get(rs.getLong("idutente"));
+                        result.put(rs.getLong("idutente"), pres + rs.getLong("totOre"));
+                    }
+
+                }
+            } else {
+
+                String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE ruolo = 'DOCENTE' "
+                        + "AND fase='A' AND idprogetti_formativi = ? GROUP BY idutente";
+                PreparedStatement ps = this.c.prepareStatement(sql);
+                ps.setInt(1, pf);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+                }
             }
             return result;
         } catch (Exception e) {
@@ -760,6 +792,7 @@ public class Database {
         }
         return result;
     }
+
     public Map<Long, Long> OreRendicontabiliDocenti(int pf) {
         Map result = new HashMap();
         try {
@@ -801,12 +834,35 @@ public class Database {
     public Map<Long, Long> OreRendicontabiliAlunni_faseB(int pf) {
         Map result = new HashMap();
         try {
-            String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE fase = 'B' AND  idprogetti_formativi = ? GROUP BY idutente;";
-            PreparedStatement ps = this.c.prepareStatement(sql);
-            ps.setInt(1, pf);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+
+            if (Utility.demoversion) {
+                String sql1 = "SELECT MAX(totaleorerendicontabili) as totOre,idutente "
+                        + "FROM registro_completo WHERE fase = 'B' "
+                        + "AND idutente IN (SELECT DISTINCT(idutente) "
+                        + "FROM registro_completo WHERE fase = 'B' "
+                        + "AND idprogetti_formativi = ? "
+                        + "AND ruolo LIKE 'ALLIEVO%') GROUP BY idutente,data";
+                PreparedStatement ps = this.c.prepareStatement(sql1);
+                ps.setInt(1, pf);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    if (result.get(rs.getLong("idutente")) == null) {
+                        result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+                    } else {
+                        long pres = (long) result.get(rs.getLong("idutente"));
+                        result.put(rs.getLong("idutente"), pres + rs.getLong("totOre"));
+                    }
+
+                }
+            } else {
+
+                String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE fase = 'B' AND  idprogetti_formativi = ? GROUP BY idutente;";
+                PreparedStatement ps = this.c.prepareStatement(sql);
+                ps.setInt(1, pf);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+                }
             }
             return result;
         } catch (Exception e) {
@@ -820,14 +876,38 @@ public class Database {
     public Map<Long, Long> OreRendicontabiliAlunni_faseA(int pf) {
         Map result = new HashMap();
         try {
-            String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE fase = 'A' AND idprogetti_formativi = ? GROUP BY idutente;";
-            PreparedStatement ps = this.c.prepareStatement(sql);
-            ps.setInt(1, pf);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+
+            if (Utility.demoversion) {
+                String sql1 = "SELECT MAX(totaleorerendicontabili) as totOre,idutente "
+                        + "FROM registro_completo WHERE fase = 'A' "
+                        + "AND idutente IN (SELECT DISTINCT(idutente) "
+                        + "FROM registro_completo WHERE fase = 'A' "
+                        + "AND idprogetti_formativi = ? "
+                        + "AND ruolo LIKE 'ALLIEVO%') GROUP BY idutente,data";
+                PreparedStatement ps = this.c.prepareStatement(sql1);
+                ps.setInt(1, pf);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    if (result.get(rs.getLong("idutente")) == null) {
+                        result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+                    } else {
+                        long pres = (long) result.get(rs.getLong("idutente"));
+                        result.put(rs.getLong("idutente"), pres + rs.getLong("totOre"));
+                    }
+
+                }
+            } else {
+                String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE fase = 'A' "
+                        + "AND idprogetti_formativi = ? GROUP BY idutente";
+                PreparedStatement ps = this.c.prepareStatement(sql);
+                ps.setInt(1, pf);
+                ResultSet rs = ps.executeQuery();
+                while (rs.next()) {
+                    result.put(rs.getLong("idutente"), rs.getLong("totOre"));
+                }
             }
             return result;
+
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
@@ -855,12 +935,185 @@ public class Database {
         return new String[]{datafinepercorso, calcoladurata(orefrequenza.get())};
     }
 
+    public void popolaregistro_B(ProgettiFormativi p, Lezioni_Modelli lm) {
+        try {
+            String ins = "INSERT INTO registro_completo (idprogetti_formativi,idsoggetti_attuatori,cip,data,idriunione,numpartecipanti,orainizio,orafine,durata,nud,fase,gruppofaseb,ruolo,cognome,nome,email,orelogin,orelogout,totaleore,totaleorerendicontabili,idutente) "
+                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+            long durata = new BigDecimal(lm.getLezione_calendario().getOre() * 3600000L).longValue();
+
+            p.getAllievi().forEach(al1 -> {
+                if (al1.getStatopartecipazione().getId().equals("01") && al1.getGruppo_faseB() == lm.getGruppo_faseB()) {
+                    try {
+                        try (PreparedStatement ps = this.c.prepareStatement(ins)) {
+                            ps.setLong(1, p.getId());
+                            ps.setLong(2, p.getSoggetto().getId());
+                            ps.setString(3, p.getCip());
+                            ps.setString(4, sdfSQL.format(lm.getGiorno()));
+                            ps.setString(5, "TESTINGID_B" + lm.getGruppo_faseB() + "_" + lm.getLezione_calendario().getLezione());
+                            ps.setInt(6, p.getAllievi_ok() + 1);
+                            ps.setString(7, lm.getOrainizio());
+                            ps.setString(8, lm.getOrafine());
+                            ps.setLong(9, durata);
+                            ps.setString(10, "GIORNO " + lm.getLezione_calendario().getLezione() + " - " + lm.getLezione_calendario().getUnitadidattica().getCodice());
+                            ps.setString(11, "B");
+                            ps.setInt(12, lm.getGruppo_faseB());
+                            ps.setString(13, "ALLIEVO NEET");
+                            ps.setString(14, al1.getCognome());
+                            ps.setString(15, al1.getNome());
+                            ps.setString(16, al1.getEmail());
+                            ps.setString(17, lm.getOrainizio());
+                            ps.setString(18, lm.getOrafine());
+                            ps.setLong(19, durata);
+                            ps.setLong(20, durata);
+                            ps.setLong(21, al1.getId());
+                            ps.execute();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
+                    }
+                }
+            });
+
+            try (PreparedStatement ps = this.c.prepareStatement(ins)) {
+                ps.setLong(1, p.getId());
+                ps.setLong(2, p.getSoggetto().getId());
+                ps.setString(3, p.getCip());
+                ps.setString(4, sdfSQL.format(lm.getGiorno()));
+                ps.setString(5, "TESTINGID_B" + lm.getGruppo_faseB() + "_" + lm.getLezione_calendario().getLezione());
+                ps.setInt(6, p.getAllievi_ok() + 1);
+                ps.setString(7, lm.getOrainizio());
+                ps.setString(8, lm.getOrafine());
+                ps.setLong(9, durata);
+                ps.setString(10, "GIORNO " + lm.getLezione_calendario().getLezione() + " - " + lm.getLezione_calendario().getUnitadidattica().getCodice());
+                ps.setString(11, "B");
+                ps.setInt(12, lm.getGruppo_faseB());
+                ps.setString(13, "DOCENTE");
+                ps.setString(14, lm.getDocente().getCognome());
+                ps.setString(15, lm.getDocente().getNome());
+                ps.setString(16, lm.getDocente().getEmail());
+                ps.setString(17, lm.getOrainizio());
+                ps.setString(18, lm.getOrafine());
+                ps.setLong(19, durata);
+                ps.setLong(20, durata);
+                ps.setLong(21, lm.getDocente().getId());
+                ps.execute();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    public void popolaregistro_A(ProgettiFormativi p, Lezioni_Modelli lm) {
+        try {
+
+            String ins = "INSERT INTO registro_completo (idprogetti_formativi,idsoggetti_attuatori,cip,data,idriunione,numpartecipanti,orainizio,orafine,durata,nud,fase,gruppofaseb,ruolo,cognome,nome,email,orelogin,orelogout,totaleore,totaleorerendicontabili,idutente) "
+                    + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            long durata = new BigDecimal(lm.getLezione_calendario().getOre() * 3600000L).longValue();
+            p.getAllievi().forEach(al1 -> {
+                if (al1.getStatopartecipazione().getId().equals("01")) {
+                    try {
+                        try (PreparedStatement ps = this.c.prepareStatement(ins)) {
+                            ps.setLong(1, p.getId());
+                            ps.setLong(2, p.getSoggetto().getId());
+                            ps.setString(3, p.getCip());
+                            ps.setString(4, sdfSQL.format(lm.getGiorno()));
+                            ps.setString(5, "TESTINGID_" + lm.getLezione_calendario().getLezione());
+                            ps.setInt(6, p.getAllievi_ok() + 1);
+                            ps.setString(7, lm.getOrainizio());
+                            ps.setString(8, lm.getOrafine());
+                            ps.setLong(9, durata);
+                            ps.setString(10, "GIORNO " + lm.getLezione_calendario().getLezione() + " - " + lm.getLezione_calendario().getUnitadidattica().getCodice());
+                            ps.setString(11, "A");
+                            ps.setInt(12, 1);
+                            ps.setString(13, "ALLIEVO NEET");
+                            ps.setString(14, al1.getCognome());
+                            ps.setString(15, al1.getNome());
+                            ps.setString(16, al1.getEmail());
+                            ps.setString(17, lm.getOrainizio());
+                            ps.setString(18, lm.getOrafine());
+                            ps.setLong(19, durata);
+                            ps.setLong(20, durata);
+                            ps.setLong(21, al1.getId());
+                            ps.execute();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
+                    }
+                }
+            });
+
+            try (PreparedStatement ps = this.c.prepareStatement(ins)) {
+                ps.setLong(1, p.getId());
+                ps.setLong(2, p.getSoggetto().getId());
+                ps.setString(3, p.getCip());
+                ps.setString(4, sdfSQL.format(lm.getGiorno()));
+                ps.setString(5, "TESTINGID_" + lm.getLezione_calendario().getLezione());
+                ps.setInt(6, p.getAllievi_ok() + 1);
+                ps.setString(7, lm.getOrainizio());
+                ps.setString(8, lm.getOrafine());
+                ps.setLong(9, durata);
+                ps.setString(10, "GIORNO " + lm.getLezione_calendario().getLezione() + " - " + lm.getLezione_calendario().getUnitadidattica().getCodice());
+                ps.setString(11, "A");
+                ps.setInt(12, 1);
+                ps.setString(13, "DOCENTE");
+                ps.setString(14, lm.getDocente().getCognome());
+                ps.setString(15, lm.getDocente().getNome());
+                ps.setString(16, lm.getDocente().getEmail());
+                ps.setString(17, lm.getOrainizio());
+                ps.setString(18, lm.getOrafine());
+                ps.setLong(19, durata);
+                ps.setLong(20, durata);
+                ps.setLong(21, lm.getDocente().getId());
+                ps.execute();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    public void svuotaregistroB(String idpr) {
+        try {
+            if (test) {
+                String del = "DELETE FROM registro_completo WHERE fase = 'B' AND idprogetti_formativi = " + idpr;
+                try (Statement st = this.c.createStatement()) {
+                    st.execute(del);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
+    public void svuotaregistro(String idpr) {
+        try {
+            if (test) {
+                String del = "DELETE FROM registro_completo WHERE idprogetti_formativi = " + idpr;
+                try (Statement st = this.c.createStatement()) {
+                    st.execute(del);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("ERROR: " + ExceptionUtils.getStackTrace(e));
+        }
+    }
+
     public List<Registro_completo> registro_modello6(String idpr) {
         List<Registro_completo> registro = new ArrayList<>();
         try {
-            String sql = "SELECT * FROM registro_completo WHERE idprogetti_formativi = " + idpr + " ORDER BY data";
+            String sql = "SELECT * FROM registro_completo WHERE idprogetti_formativi = " + idpr + " GROUP BY ruolo,idutente,data ORDER BY data";
             try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
                 while (rs.next()) {
+
+                    long orerend = rs.getLong(21);
                     Registro_completo rc = new Registro_completo(
                             rs.getInt(1),
                             rs.getInt(2),
@@ -882,7 +1135,7 @@ public class Database {
                             rs.getString(18),
                             rs.getString(19),
                             rs.getLong(20),
-                            rs.getLong(21),
+                            orerend,
                             rs.getInt(23));
                     registro.add(rc);
                 }
@@ -987,4 +1240,129 @@ public class Database {
         return out;
     }
 
+    public String[] sa_cip(int idpr) {
+        try {
+
+            String sql0 = "SELECT cip,idsoggetti_attuatori FROM progetti_formativi WHERE idprogetti_formativi = " + idpr;
+            try (Statement st0 = this.c.createStatement(); ResultSet rs0 = st0.executeQuery(sql0)) {
+                if (rs0.next()) {
+                    String cip = rs0.getString(1);
+                    String sql1 = "SELECT ragionesociale FROM soggetti_attuatori WHERE idsoggetti_attuatori = " + rs0.getInt(2);
+                    try (Statement st1 = this.c.createStatement(); ResultSet rs1 = st1.executeQuery(sql1)) {
+                        if (rs1.next()) {
+                            String[] out = {rs1.getString(1).trim().toUpperCase(), cip, rs0.getString(2)};
+                            return out;
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<Utenti> list_Allievi_noAccento(int idpr) {
+        List<Utenti> out = new ArrayList<>();
+        try {
+            String sql = "SELECT idallievi,nome,cognome,codicefiscale,email FROM allievi WHERE id_statopartecipazione='01' AND idprogetti_formativi = " + idpr;
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    Utenti u = new Utenti(rs.getInt("idallievi"),
+                            stripAccents(rs.getString("cognome").toUpperCase().trim()),
+                            stripAccents(rs.getString("nome").toUpperCase().trim()),
+                            rs.getString("codicefiscale").toUpperCase(), "ALLIEVO NEET",
+                            rs.getString("email").toLowerCase());
+                    out.add(u);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return out;
+    }
+
+    public List<Utenti> list_Allievi_noAccento(int idpr, int gruppo) {
+        List<Utenti> out = new ArrayList<>();
+        try {
+            String sql = "SELECT idallievi,nome,cognome,codicefiscale,email FROM allievi WHERE id_statopartecipazione='01' AND idprogetti_formativi = " + idpr + " AND gruppo_faseB = " + gruppo;
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    Utenti u = new Utenti(rs.getInt("idallievi"),
+                            stripAccents(rs.getString("cognome").toUpperCase().trim()),
+                            stripAccents(rs.getString("nome").toUpperCase().trim()),
+                            rs.getString("codicefiscale").toUpperCase(), "ALLIEVO NEET",
+                            rs.getString("email").toLowerCase());
+                    out.add(u);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return out;
+    }
+
+    public List<Utenti> list_Allievi(int idpr) {
+        List<Utenti> out = new ArrayList<>();
+        try {
+            String sql = "SELECT idallievi,nome,cognome,codicefiscale,email FROM allievi WHERE id_statopartecipazione='01' AND idprogetti_formativi = " + idpr;
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    Utenti u = new Utenti(rs.getInt("idallievi"),
+                            (rs.getString("cognome").toUpperCase().trim()),
+                            (rs.getString("nome").toUpperCase().trim()),
+                            rs.getString("codicefiscale").toUpperCase(), "ALLIEVO NEET",
+                            rs.getString("email").toLowerCase());
+                    out.add(u);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return out;
+    }
+
+    public List<Utenti> list_Docenti(int idpr) {
+        List<Utenti> out = new ArrayList<>();
+        try {
+            String sql = "SELECT iddocenti,nome,cognome,codicefiscale,email FROM docenti WHERE iddocenti IN "
+                    + "(SELECT iddocenti FROM progetti_docenti WHERE idprogetti_formativi = " + idpr + ")";
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    Utenti u = new Utenti(rs.getInt("iddocenti"),
+                            (rs.getString("cognome").toUpperCase().trim()),
+                            (rs.getString("nome").toUpperCase().trim()),
+                            rs.getString("codicefiscale").toUpperCase(), "DOCENTE",
+                            rs.getString("email").toLowerCase());
+                    out.add(u);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return out;
+    }
+
+    public List<Utenti> list_Docenti_noAccento(int idpr) {
+        List<Utenti> out = new ArrayList<>();
+        try {
+            String sql = "SELECT iddocenti,nome,cognome,codicefiscale,email FROM docenti WHERE iddocenti IN "
+                    + "(SELECT iddocenti FROM progetti_docenti WHERE idprogetti_formativi = " + idpr + ")";
+            try (Statement st = this.c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+                while (rs.next()) {
+                    Utenti u = new Utenti(rs.getInt("iddocenti"),
+                            stripAccents(rs.getString("cognome").toUpperCase().trim()),
+                            stripAccents(rs.getString("nome").toUpperCase().trim()),
+                            rs.getString("codicefiscale").toUpperCase(), "DOCENTE",
+                            rs.getString("email").toLowerCase());
+                    out.add(u);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return out;
+    }
 }

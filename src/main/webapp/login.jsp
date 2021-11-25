@@ -75,12 +75,19 @@
                             <hr>
                             <div class="kt-login__signin">
                                 <div class="kt-login__head">
+                                    <%if (Utility.demoversion) {%>
+                                    <div class="kt-login__title">
+                                        <img src="resource/demologo.png" alt="" height="100"/>
+                                    </div>
+                                    <h3 class="kt-login__title kt-font-io" style="font-size:2rem"><b>YES I STARTUP 2021/2022</b></h3>
+                                    <%} else {%>
                                     <h3 class="kt-login__title kt-font-io" style="font-size:2rem"><b>YES I STARTUP 2021/2022</b></h3>
                                     <%if (Utility.test) {%>
                                     <br>
                                     <div class="kt-login__title">
                                         <img src="resource/beta.png" alt="" height="100"/>
                                     </div>
+                                    <%}%>
                                     <%}%>
                                     <div class="kt-login__title">Accedi</div>
                                 </div>
@@ -121,7 +128,7 @@
                                             <a href="" onclick="document.getElementById('manform').submit();"
                                                class="kt-login__link document"
                                                >
-                                                
+
                                                 <i class="fa fa-file-pdf kt-font-danger2"></i> 
                                                 Guida all'uso della piattaforma
 
@@ -180,29 +187,29 @@
         <!--begin:: Global Mandatory Vendors -->
         <script src="assets/refill/js/utility.js" type="text/javascript"></script>
         <script>
-                                                       function ctrlForm() {
-                                                           var err = false;
-                                                           var user = $("#user");
-                                                           var pass = $("#password");
-                                                           if (checkValue(user, false)) {
-                                                               err = true;
-                                                           }
-                                                           if (checkValue(pass, false)) {
-                                                               err = true;
-                                                           }
-                                                           if (err) {
-                                                               $("#drop_login").trigger('click')
-                                                               return false;
-                                                           }
-                                                           swal.fire({
-                                                               title: 'Sto Accedendo...',
-                                                               text: '',
-                                                               onOpen: function () {
-                                                                   swal.showLoading();
-                                                               }
-                                                           });
-                                                           return true;
-                                                       }
+                                    function ctrlForm() {
+                                        var err = false;
+                                        var user = $("#user");
+                                        var pass = $("#password");
+                                        if (checkValue(user, false)) {
+                                            err = true;
+                                        }
+                                        if (checkValue(pass, false)) {
+                                            err = true;
+                                        }
+                                        if (err) {
+                                            $("#drop_login").trigger('click')
+                                            return false;
+                                        }
+                                        swal.fire({
+                                            title: 'Sto Accedendo...',
+                                            text: '',
+                                            onOpen: function () {
+                                                swal.showLoading();
+                                            }
+                                        });
+                                        return true;
+                                    }
         </script>
 
         <script>

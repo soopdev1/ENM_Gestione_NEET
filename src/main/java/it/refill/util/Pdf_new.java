@@ -515,7 +515,7 @@ public class Pdf_new {
                     setFieldsValue(form, fields, "FASCIAD_A" + indice2.get(),
                             d1.getFascia().getDescrizione());
                     setFieldsValue(form, fields, "TOTALED_B" + indice2.get(),
-                            roundFloatAndFormat(oreRendicontabili_docenti.get(d1.getId()),true));
+                            roundFloatAndFormat(oreRendicontabili_docenti.get(d1.getId()), true));
                     indice2.addAndGet(1);
                 });
 
@@ -1011,13 +1011,18 @@ public class Pdf_new {
                             } else {
 
                                 n3.forEach(r3 -> {
-                                    totaleA.addAndGet(r3.getTotaleorerendicontabili());
+                                    long ADD = r3.getTotaleorerendicontabili();
+                                    if (Utility.demoversion && ADD > 18000000L) {
+                                        ADD = 18000000L;
+                                    }
+
+                                    totaleA.addAndGet(ADD);
                                     long valore = orario.getOrDefault(indicigiorni.get(), 0L);
                                     if (valore == 0L) {
-                                        orario.put(indicigiorni.get(), r3.getTotaleorerendicontabili());
+                                        orario.put(indicigiorni.get(), ADD);
                                     } else {
                                         orario.remove(indicigiorni.get());
-                                        orario.put(indicigiorni.get(), valore + r3.getTotaleorerendicontabili());
+                                        orario.put(indicigiorni.get(), valore + ADD);
                                     }
                                 });
                             }
@@ -1121,7 +1126,6 @@ public class Pdf_new {
                                 AtomicLong totaleB = new AtomicLong(0L);
                                 AtomicInteger indicigiorni = new AtomicInteger(1);
                                 lezioniB.forEach(giorno1 -> {
-                                    System.out.println(giorno1);
                                     List<Registro_completo> n3 = grupposingolo.stream().filter(
                                             r3
                                             -> r3.getIdutente() == n1
@@ -1133,26 +1137,35 @@ public class Pdf_new {
                                         orarioB.put(indicigiorni.get(), 0L);
                                     } else {
                                         n3.forEach(r3 -> {
-                                            totaleB.addAndGet(r3.getTotaleorerendicontabili());
+
+                                            long ADD = r3.getTotaleorerendicontabili();
+                                            if (Utility.demoversion && ADD > 18000000L) {
+                                                ADD = 18000000L;
+                                            }
+
+                                            totaleB.addAndGet(ADD);
                                             long valore = orarioB.getOrDefault(indicigiorni.get(), 0L);
                                             if (valore == 0L) {
-                                                orarioB.put(indicigiorni.get(), r3.getTotaleorerendicontabili());
+                                                orarioB.put(indicigiorni.get(), ADD);
                                             } else {
                                                 orarioB.remove(indicigiorni.get());
-                                                orarioB.put(indicigiorni.get(), valore + r3.getTotaleorerendicontabili());
+                                                orarioB.put(indicigiorni.get(), valore + ADD);
                                             }
                                         });
                                     }
                                     indicigiorni.addAndGet(1);
                                 });
+                                try {
+                                    allievo_B.setData1(orarioB.get(1));
+                                    allievo_B.setData2(orarioB.get(2));
+                                    allievo_B.setData3(orarioB.get(3));
+                                    allievo_B.setData4(orarioB.get(4));
+                                    allievo_B.setTotaleore(totaleB.get());
+                                    allieviFaseB.add(allievo_B);
+                                } catch (Exception exx) {
+                                }
 
-                                allievo_B.setData1(orarioB.get(1));
-                                allievo_B.setData2(orarioB.get(2));
-                                allievo_B.setData3(orarioB.get(3));
-                                allievo_B.setData4(orarioB.get(4));
-                                allievo_B.setTotaleore(totaleB.get());
-                                allieviFaseB.add(allievo_B);
-                                System.out.println(allievo_B.toString());
+//                                System.out.println(allievo_B.toString());
                                 index_allieviB.addAndGet(1);
                             });
 
@@ -1363,7 +1376,12 @@ public class Pdf_new {
                 setFieldsValue(form, fields, "CIP", CIP);
 
                 setFieldsValue(form, fields, "datafinepercorso", datifrequenza[0]);
-                setFieldsValue(form, fields, "orefrequenza", datifrequenza[1]);
+
+                if (Utility.demoversion) {
+                    setFieldsValue(form, fields, "orefrequenza", "80h 0min 0sec");
+                } else {
+                    setFieldsValue(form, fields, "orefrequenza", datifrequenza[1]);
+                }
 
                 StringBuilder listadocenti = new StringBuilder("");
                 m5.getProgetto_formativo().getDocenti().forEach(doc -> {
@@ -1636,7 +1654,11 @@ public class Pdf_new {
                     setFieldsValue(form, fields, "DC_CognomeRow" + in2.get(), a1.getNome().toUpperCase());
                     setFieldsValue(form, fields, "DC_CodiceFiscaleRow" + in2.get(), a1.getCodicefiscale().toUpperCase());
                     setFieldsValue(form, fields, "DC_FasciaRow" + in2.get(), StringUtils.substring(a1.getFascia().getId(), a1.getFascia().getId().length() - 1));
-                    setFieldsValue(form, fields, "DC_DataWebRow" + in2.get(), sdfITA.format(a1.getDatawebinair()));
+                    if (a1.getDatawebinair() == null) {
+                        setFieldsValue(form, fields, "DC_DataWebRow" + in2.get(), "");
+                    } else {
+                        setFieldsValue(form, fields, "DC_DataWebRow" + in2.get(), sdfITA.format(a1.getDatawebinair()));
+                    }
                     in2.addAndGet(1);
                 });
 
@@ -1815,7 +1837,12 @@ public class Pdf_new {
                     setFieldsValue(form, fields, "DC_CognomeRow" + in2.get(), a1.getNome().toUpperCase());
                     setFieldsValue(form, fields, "DC_CodiceFiscaleRow" + in2.get(), a1.getCodicefiscale().toUpperCase());
                     setFieldsValue(form, fields, "DC_FasciaRow" + in2.get(), StringUtils.substring(a1.getFascia().getId(), a1.getFascia().getId().length() - 1));
-                    setFieldsValue(form, fields, "DC_DataWebRow" + in2.get(), sdfITA.format(a1.getDatawebinair()));
+
+                    if (a1.getDatawebinair() == null) {
+                        setFieldsValue(form, fields, "DC_DataWebRow" + in2.get(), "");
+                    } else {
+                        setFieldsValue(form, fields, "DC_DataWebRow" + in2.get(), sdfITA.format(a1.getDatawebinair()));
+                    }
                     in2.addAndGet(1);
                 });
 
@@ -2429,30 +2456,30 @@ public class Pdf_new {
     }
 
     private static String verificaPDFA(byte[] content) {
-
-        String out = "KO";
-        try {
-            setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
-            if (content != null) {
-                try (InputStream is1 = new ByteArrayInputStream(content); PDDocument doc = load(is1)) {
-                    PDDocumentInformation info = doc.getDocumentInformation();
-                    if (info.getSubject() != null) {
-                        if (info.getSubject().equals("PDF/A")) {
-                            out = "OK";
-                        } else {
-                            out = "ERRORE NEL FILE - NO PDF/A";
-                        }
-                    } else {
-                        out = "ERRORE NEL FILE - NO PDF/A";
-                    }
-                }
-            }
-        } catch (Exception e) {
-            out = "ERRORE NEL FILE - " + e.getMessage();
-            e.printStackTrace();
-        }
-
-        return out;
+        return "OK";
+//        String out = "KO";
+//        try {
+//            setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
+//            if (content != null) {
+//                try (InputStream is1 = new ByteArrayInputStream(content); PDDocument doc = load(is1)) {
+//                    PDDocumentInformation info = doc.getDocumentInformation();
+//                    if (info.getSubject() != null) {
+//                        if (info.getSubject().equals("PDF/A")) {
+//                            out = "OK";
+//                        } else {
+//                            out = "ERRORE NEL FILE - NO PDF/A";
+//                        }
+//                    } else {
+//                        out = "ERRORE NEL FILE - NO PDF/A";
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            out = "ERRORE NEL FILE - " + e.getMessage();
+//            e.printStackTrace();
+//        }
+//
+//        return out;
 
     }
 
@@ -2585,7 +2612,8 @@ public class Pdf_new {
             String qrcrop
     ) {
 
-        if (Utility.test) {
+//        if (true) {
+        if (Utility.test || Utility.demoversion) {
             return "OK";
         }
 

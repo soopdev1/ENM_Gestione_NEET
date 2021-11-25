@@ -3,6 +3,7 @@
     Created on : 18-set-2019, 12.31.26
     Author     : agodino
 --%>
+<%@page import="it.refill.util.Utility"%>
 <%@page import="it.refill.domain.Nazioni_rc"%>
 <%@page import="it.refill.domain.Motivazione"%>
 <%@page import="it.refill.domain.Canale"%>
@@ -153,13 +154,16 @@
                                                   action="<%=request.getContextPath()%>/OperazioniSA?type=newAllievo" 
                                                   style="padding-top: 0;"  method="post" enctype="multipart/form-data">
                                                 <input type="hidden" name="save" id="save" value="0" />
-                                                <div class="kt-portlet__head" style="display: none;">
+                                                <%if(Utility.demoversion){%>
+                                                <div class="kt-portlet__head">
                                                     <div class="kt-portlet__head-label">
                                                         <h3 class="kt-portlet__head-title">
-                                                            Aggiungi:
+                                                            <a href="<%=request.getContextPath()%>/OperazioniSA?type=generaterandomAllievi" 
+                                                               class="btn btn-dark kt-font-bold"><i class="fa fa-user"></i> INSERISCI 5 ALLIEVI RANDOM</a>
                                                         </h3>
                                                     </div>
                                                 </div>
+                                                <%}%>
                                                 <div class="kt-portlet__body">
                                                     <div class="kt-section kt-section--space-md">
                                                         <div class="form-group form-group-sm row">

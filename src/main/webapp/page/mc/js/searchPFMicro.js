@@ -68,6 +68,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="assegna(' + row.id + ')"><i class="fa fa-user"></i> Assegnazione</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadDocGenerico(' + row.id + ')"><i class="fa fa-upload" style="margin-top:-2px"></i>Carica Altra Documentazione</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="modifyDate(' + row.id + ',' + row.start + ',' + row.end + ',' + row.end_fa + ')"><i class="fa fa-calendar-alt"></i> Modifica Date</a>';
+                            
                         }
 
 
@@ -77,7 +78,9 @@ var KTDatatablesDataSourceAjaxServer = function () {
 
 
 
-                        if (row.stato.id === "P" || row.stato.id === "DC" || row.stato.id === "ATA" || row.stato.id === "ATB" || row.stato.id === "SOA" || row.stato.id === "SOB") {
+                        if (row.stato.id === "P" || row.stato.id === "DC" || row.stato.id === "ATA" ||
+                                row.stato.id === "ATB" || row.stato.id === "SOA"
+                                || row.stato.id === "SOB") {
                             option += '<a class="dropdown-item fancyBoxNoRef" href="showModelli.jsp?id=' + row.id + '"><i class="fa fa-file-alt"></i> Visualizza Lezioni Modelli 3 e 4</a>';
                         }
                         option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalTableStory(' + row.id + ')"><i class="fa fa-clipboard-list"></i> Visualizza Storico Progetto</a>';
@@ -93,16 +96,37 @@ var KTDatatablesDataSourceAjaxServer = function () {
                                 option += '<a class="dropdown-item kt-font-success" href="compileCL.jsp?id=' + row.id + '" ><i class="fa fa-file-excel kt-font-success"></i> Compila Checklist Finale</a>';
                             } else if (row.stato.id === "CK") {
                                 option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMappaAllievi(' + row.id + ')"><i class="fa fa-check" style="margin-top:-2px"></i> Mappatura</a>';
-                                option += '<a class="dropdown-item kt-font-success" href="javascript:void(0);" onclick="sendMailEsito(' + row.id + ')"><i class="flaticon2-envelope kt-font-success" style="margin-top:-2px"></i>Invia Esito a ENM</a>';
+                                option += '<a class="dropdown-item kt-font-success" href="javascript:void(0);" onclick="sendMailEsito(' + row.id + ')"><i class="flaticon2-envelope kt-font-success" style="margin-top:-2px"></i> Invia Esito a ENM</a>';
                             } else if (row.stato.id === "EVI") {
                                 option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMappaAllievi(' + row.id + ')"><i class="fa fa-check" style="margin-top:-2px"></i> Mappatura</a>';
-                                option += '<a class="dropdown-item kt-font-success" href="javascript:void(0);" onclick="uploadEsito(' + row.id + ')"><i class="fa fa-upload kt-font-success" style="margin-top:-2px"></i>Upload Esito Firmato</a>';
+                                option += '<a class="dropdown-item kt-font-success" href="javascript:void(0);" onclick="uploadEsito(' + row.id + ')"><i class="fa fa-upload kt-font-success" style="margin-top:-2px"></i> Upload Esito Firmato</a>';
                             } else if (row.stato.controllare === 1) {
-                                option += '<a class="dropdown-item kt-font-success" href="javascript:void(0);" onclick="valitdatePrg(' + row.id + ',&quot;' + row.stato.id + '&quot;)"><i class="fa fa-check kt-font-success" style="margin-top:-2px"></i>Convalida Progetto</a>';
-                                option += '<a class="dropdown-item kt-font-danger" href="javascript:void(0);" onclick="rejectPrg(' + row.id + ')"><i class="flaticon2-delete kt-font-danger" style="margin-top:-2px"></i>Annulla Progetto</a>';
+                                option += '<a class="dropdown-item kt-font-success" href="javascript:void(0);" onclick="valitdatePrg(' + row.id + ',&quot;' + row.stato.id + '&quot;)"><i class="fa fa-check kt-font-success" style="margin-top:-2px"></i> Convalida Progetto</a>';
+                                option += '<a class="dropdown-item kt-font-danger" href="javascript:void(0);" onclick="rejectPrg(' + row.id + ')"><i class="flaticon2-delete kt-font-danger" style="margin-top:-2px"></i> Rigetta Progetto</a>';
                             } else if (row.stato.id === "CO") {
                                 option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMappaAllievi(' + row.id + ')"><i class="fa fa-check" style="margin-top:-2px"></i> Mappatura</a>';
                             }
+
+
+                            if (
+                                    row.stato.id === "ATA" ||
+                                    row.stato.id === "ATB" ||
+                                    row.stato.id === "F" ||
+                                    row.stato.id === "MA" ||
+                                    row.stato.id === "IV" ||
+                                    row.stato.id === "CK" ||
+                                    row.stato.id === "EVI" ||
+                                    row.stato.id === "CO" ||
+                                    row.stato.id === "SOA" ||
+                                    row.stato.id === "SOB"
+                                    ) {
+                                option += '<a class="dropdown-item kt-font-danger" href="javascript:void(0);" onclick="annullaPrg(' +
+                                        row.id + ')"><i class="flaticon2-delete kt-font-danger" style="margin-top:-2px"></i>Annulla Progetto</a>';
+                                
+                                
+                                
+                            }
+
                         }
 
                         if (row.fadroom !== null) {
@@ -441,8 +465,6 @@ function swalMappaAllievi(idprogetto) {
         $(".dataTables_scrollHead").css("overflow", "visible");
     });
 }
-
-
 
 var registri_aula = new Map();
 function swalDocumentPrg(idprogetto) {
@@ -910,6 +932,8 @@ function validate(id, result) {
     });
 }
 
+
+
 function rejectPrg(id) {
     var html = "<div class='form-group' id='swal_motivo'><textarea class='form-control obbligatory' id='motivo' placeholder='Motivazione del rigetto'></textarea></div>";
     swal.fire({
@@ -945,6 +969,8 @@ function rejectPrg(id) {
         }
     });
 }
+
+
 
 function reject(id, result) {
     showLoad();
@@ -1432,3 +1458,61 @@ function orderListAllievi(a) {
     return a;
 }
 
+function annullaPrg(id) {
+    var html = "<div class='form-group' id='swal_motivo'><textarea class='form-control obbligatory' id='motivo' placeholder='Motivazione'></textarea></div>";
+    swal.fire({
+        title: '<h2 class="kt-font-io-n"><b>Annulla Progetto</b></h2><br>',
+        html: html,
+        animation: false,
+        width:'50%',
+        showCancelButton: true,
+        confirmButtonText: '&nbsp;<i class="la la-check"></i>',
+        cancelButtonText: '&nbsp;<i class="la la-close"></i>',
+        cancelButtonClass: "btn btn-io-n",
+        confirmButtonClass: "btn btn-io",
+        customClass: {
+            popup: 'animated bounceInUp'
+        },
+        preConfirm: function () {
+            var err = false;
+            err = checkObblFieldsContent($('#swal_motivo')) ? true : err;
+            if (!err) {
+                return new Promise(function (resolve) {
+                    resolve({
+                        "motivo": $('#motivo').val()
+                    });
+                });
+            } else {
+                return false;
+            }
+        }
+    }).then((result) => {
+        if (result.value) {
+            annulla(id, result.value);
+        } else {
+            swal.close();
+        }
+    });
+}
+
+function annulla(id, result) {
+    showLoad();
+    $.ajax({
+        type: "POST",
+        url: context + '/OperazioniMicro?type=annullaPrg&id=' + id,
+        data: result,
+        success: function (data) {
+            closeSwal();
+            var json = JSON.parse(data);
+            if (json.result) {
+                reload();
+                swalSuccess("Progetto Annullato", json.message !== null ? json.message : "Progetto formativo annullato con successo");
+            } else {
+                swalError("Errore", json.message);
+            }
+        },
+        error: function () {
+            swalError("Errore", "Non è stato possibile annullare il progetto formativo");
+        }
+    });
+}

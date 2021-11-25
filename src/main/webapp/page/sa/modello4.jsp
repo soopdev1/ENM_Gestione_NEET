@@ -291,7 +291,11 @@
                                             <%}
                                                 }%>
 
-
+                                            <%if (Utility.demoversion) {%>
+                                            <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>   
+                                            <a href="<%=request.getContextPath()%>/OperazioniSA?type=simulacalendario&modello=4&idpr=<%=p.getId()%>&idmodello=<%=m4.getId()%>" class="btn btn-dark kt-font-bold"><i class="fa fa-user"></i> SIMULA INSERIMENTO CALENDARIO</a>
+                                            <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>
+                                            <%}%>
 
                                             <%if (m4.getStato().equals("R")) {%>
                                             <div class="kt-portlet__foot" style="padding-left: 10px;">

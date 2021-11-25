@@ -1,4 +1,4 @@
-
+<!DOCTYPE HTML>
 <%@page import="com.sun.xml.internal.ws.util.StringUtils"%>
 <%@page import="it.refill.domain.MascheraM5"%>
 <%@page import="it.refill.domain.ModelliPrg"%>
@@ -249,9 +249,16 @@
                                                         <!--step: 1-->
                                                         <div class="kt-wizard-v1__content" id="step1" data-ktwizard-type="step-content" data-ktwizard-state="current">
                                                             <div class="kt-form__section kt-form__section--first">
+
+                                                                <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>   
+                                                                <a href="<%=request.getContextPath()%>/OperazioniSA?type=simulaconcludi&fase=1&idpr=<%=p.getId()%>" class="btn btn-dark kt-font-bold"><i class="fa fa-user"></i> SIMULA RENDICONTO ALLIEVI</a>
+                                                                <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>
+
+
                                                                 <div class="kt-wizard-v1__form" style="color: #6c7293; min-height: 40vh">
                                                                     <%for (Allievi a : al) {
-                                                                            if (oreRendicontabili_faseA.get(a.getId()) == null || (oreRendicontabili_faseA.get(a.getId()) != null && oreRendicontabili_faseA.get(a.getId()).compareTo(hh36) < 0)) {
+                                                                            if (oreRendicontabili_faseA.get(a.getId()) == null || (oreRendicontabili_faseA.get(a.getId())
+                                                                                    != null && oreRendicontabili_faseA.get(a.getId()).compareTo(hh36) < 0)) {
                                                                                 cntA--;%>
                                                                     <div class="accordion  accordion-toggle-arrow" id="al_<%=a.getId()%>">
                                                                         <div class="card" style="border-radius: 17px; margin-block: 20px; color: #363a90;">
@@ -275,7 +282,11 @@
                                                                             <div id="collapse_al_<%=a.getId()%>" class="collapse" aria-labelledby="headingOne" data-parent="#al_<%=a.getId()%>" style="">
                                                                                 <div class="card-body">
                                                                                     <div class="form-group row">
-                                                                                        <label class="col-3 col-form-label"><b>Domanda di ammissione</b></label>
+                                                                                        <label class="col-3 col-form-label"><b>Domanda di ammissione 
+                                                                                                <i class="fa fa-info-circle  kt-font-io-n" data-container="body" data-toggle="kt-popover" 
+                                                                                                   data-placement="top" data-original-title="Domanda di ammissione" 
+                                                                                                   data-content="È possibile caricare SOLO la domanda di Ammissione scaricata dal sito di Invitalia oppure il modello presente nel Gestionale nella cartellina Materiale Didattico."></i>
+                                                                                            </b></label>
                                                                                         <div class="col-3">
                                                                                             <span class="kt-switch kt-switch--lg kt-switch--icon">
                                                                                                 <label>
@@ -342,7 +353,7 @@
                                                                                     </div>    
                                                                                     <div class="form-group">
                                                                                         <label for="ideaimpresa_<%=a.getId()%>"><b>Idea d'impresa</b></label><label class="kt-font-danger kt-font-boldest">*</label>
-                                                                                        <textarea class="form-control obbligatory" maxlenght="600" id="ideaimpresa_<%=a.getId()%>" name="ideaimpresa_<%=a.getId()%>" placeholder="Descrizione Idea d'impresa" rows="5"></textarea>
+                                                                                        <textarea class="form-control obbligatory tinyta" maxlenght="600" id="ideaimpresa_<%=a.getId()%>" name="ideaimpresa_<%=a.getId()%>" placeholder="Descrizione Idea d'impresa" rows="5"></textarea>
                                                                                     </div>
                                                                                     <div class="form-group row">
                                                                                         <div class="form-group col-12">
@@ -388,7 +399,7 @@
                                                                                     </div>    
                                                                                     <div class="form-group">
                                                                                         <label for="motivazione_<%=a.getId()%>"><b>Motivazione</b></label><label class="kt-font-danger kt-font-boldest">*</label>
-                                                                                        <textarea class="form-control obbligatory" maxlenght="300" id="motivazione_<%=a.getId()%>" name="motivazione_<%=a.getId()%>" placeholder="Perchè questa attività?" rows="3"></textarea>
+                                                                                        <textarea class="form-control obbligatory tinyta" maxlenght="300" id="motivazione_<%=a.getId()%>" name="motivazione_<%=a.getId()%>" placeholder="Perchè questa attività?" rows="3"></textarea>
                                                                                     </div>
 
                                                                                     <div class="form-group row">
@@ -505,7 +516,7 @@
                                                                                         </div>
                                                                                     </div> 
                                                                                     <label style="margin-top:2.5rem;"><b><%=modello7.getDescrizione()%></b></label>
-                                                                                    <%if (oreRendicontabili.get(a.getId()) != null && oreRendicontabili.get(a.getId()).compareTo(hh64) >= 0) {%>
+                                                                                            <%if (oreRendicontabili.get(a.getId()) != null && oreRendicontabili.get(a.getId()).compareTo(hh64) >= 0) {%>
                                                                                     <i class="fa fa-info-circle  kt-font-io-n" data-container="body" data-toggle="kt-popover" data-placement="top" data-original-title="Tabella Premialità" data-content="Per poter usufruire della tabella relativa alla premialità è obbligatorio scaricare il modello 7, firmarlo digitalmente e ricaricarlo."></i>
                                                                                     <div class="hh64_<%=a.getId()%>"></div>
                                                                                     <%}%>
@@ -797,10 +808,24 @@
         <script src="<%=src%>/assets/app/custom/general/crud/forms/widgets/input-mask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/inputmask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/jquery.inputmask.js" type="text/javascript"></script>
+
+        <script src="https://cdn.tiny.cloud/1/x58q84nl0ol5hipr98106p13ns8tn6unummy0pcynuezjrhf/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+  
+
         <script id="concludiPrg" src="<%=src%>/page/sa/js/concludiPrg.js<%="?dummy=" + String.valueOf(new Date().getTime())%>" data-context="<%=request.getContextPath()%>" type="text/javascript"></script>
         <script type="text/javascript">
 
-
+                                                                                       $(function () {
+                                                                                           tinymce.init({
+                                                                                               selector: '.tinyta',
+                                                                                               height: 200,
+                                                                                               menubar: false,
+                                                                                               statusbar: false,
+                                                                                               schema: 'html5',
+                                                                                               toolbar1: 'undo redo',
+                                                                                               language: 'it'
+                                                                                           });
+                                                                                       });
 
                                                                                        var KTAppOptions = {
                                                                                            "colors": {
