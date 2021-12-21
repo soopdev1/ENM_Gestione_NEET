@@ -654,7 +654,7 @@ function setStep3() {
 }
 
 $("input:radio[name=scelta_step3]").change(function () {
-    if (this.value === 2) {
+    if (this.value === 2 || this.value === "2") {
         $('#info_step3').show();
     } else {
         $('#info_step3').hide();

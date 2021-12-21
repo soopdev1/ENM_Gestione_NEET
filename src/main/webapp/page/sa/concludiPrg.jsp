@@ -249,11 +249,11 @@
                                                         <!--step: 1-->
                                                         <div class="kt-wizard-v1__content" id="step1" data-ktwizard-type="step-content" data-ktwizard-state="current">
                                                             <div class="kt-form__section kt-form__section--first">
-
+                                                                <%if (Utility.demoversion) {%>
                                                                 <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>   
                                                                 <a href="<%=request.getContextPath()%>/OperazioniSA?type=simulaconcludi&fase=1&idpr=<%=p.getId()%>" class="btn btn-dark kt-font-bold"><i class="fa fa-user"></i> SIMULA RENDICONTO ALLIEVI</a>
                                                                 <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>
-
+                                                                <%}%>
 
                                                                 <div class="kt-wizard-v1__form" style="color: #6c7293; min-height: 40vh">
                                                                     <%for (Allievi a : al) {
@@ -810,7 +810,7 @@
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/jquery.inputmask.js" type="text/javascript"></script>
 
         <script src="https://cdn.tiny.cloud/1/x58q84nl0ol5hipr98106p13ns8tn6unummy0pcynuezjrhf/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
-  
+
 
         <script id="concludiPrg" src="<%=src%>/page/sa/js/concludiPrg.js<%="?dummy=" + String.valueOf(new Date().getTime())%>" data-context="<%=request.getContextPath()%>" type="text/javascript"></script>
         <script type="text/javascript">

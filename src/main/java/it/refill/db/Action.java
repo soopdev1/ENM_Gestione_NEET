@@ -188,12 +188,11 @@ public class Action {
                 && !pr.getStato().getTipo().equalsIgnoreCase("sospeso")
         )
                 .collect(Collectors.toList());
-        
+
 //        List<ProgettiFormativi> conclusi = allpr.stream().filter(pr
 //                -> pr.getStato().getTipo().equalsIgnoreCase("chiuso")
 //        )
 //                .collect(Collectors.toList());
-
         List<ProgettiFormativi> conclusi = allpr.stream().filter(pr
                 -> pr.getStato().getId().equalsIgnoreCase("F")
                 || pr.getStato().getId().equalsIgnoreCase("DVB")
@@ -361,6 +360,13 @@ public class Action {
         String[] r = db.dati_modello5_neet(idneet, idsa, pf);
         db.closeDB();
         return r;
+    }
+
+    public static boolean rendicontazione_abilitata(String username) {
+        Database db = new Database(false);
+        String listuser = db.getPathtemp("user_rend");
+        db.closeDB();
+        return listuser.toLowerCase().contains(listuser.toLowerCase());
     }
 
 }

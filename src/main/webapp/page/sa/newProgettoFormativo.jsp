@@ -28,7 +28,6 @@
             String src = session.getAttribute("src").toString();
             Entity e = new Entity();
             List<Allievi> alunni = e.getAllieviSoggettoNoPrgAttivi(us.getSoggettoAttuatore());
-//            List<Allievi> alunni = e.getAllieviSoggettoNoPrg(us.getSoggettoAttuatore());
             List<SediFormazione> sedi = e.getSediFormazione(session);
             List<NomiProgetto> nomi = e.findAll(NomiProgetto.class);
 //            List<Docenti> docente = e.getActiveDocenti(session);

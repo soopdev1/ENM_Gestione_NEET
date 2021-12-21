@@ -769,62 +769,70 @@ public class OperazioniSA extends HttpServlet {
         ProgettiFormativi pr = e.getEm().find(ProgettiFormativi.class,
                 Long.parseLong(idpr));
 
-        TipoDoc modello = e.getEm().find(TipoDoc.class,
-                6L);
-        User us = (User) request.getSession().getAttribute("user");
-        String path = e.getPath("pathDocSA_Prg").replace("@rssa",
-                us.getSoggettoAttuatore().getId().toString()).replace("@folder",
-                pr.getId().toString());
+        //verifica se ci sono almeno 4 allievi totali
+        int size = pr.getAllievi().stream().filter(al1 -> al1.getGruppo_faseB() > 0).collect(Collectors.toList()).size();
+        int min_allievi = Integer.parseInt(e.getPath("min_allievi"));
+        if (size >= min_allievi) {
+            TipoDoc modello = e.getEm().find(TipoDoc.class,
+                    6L);
+            User us = (User) request.getSession().getAttribute("user");
+            String path = e.getPath("pathDocSA_Prg").replace("@rssa",
+                    us.getSoggettoAttuatore().getId().toString()).replace("@folder",
+                    pr.getId().toString());
 
-        String file_path;
-        String today = new SimpleDateFormat("yyyyMMddHHssSSS").format(new Date());
-        File dir = new File(path);
-        createDir(path);
-        Part part = request.getPart("doc_" + modello.getId());
-        if (part != null && part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0) {
-            file_path = dir.getAbsolutePath()
-                    + File.separator
-                    + modello.getDescrizione()
-                    + "_"
-                    + today
-                    + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));
-            part.write(file_path);
-            File pdfdest = new File(file_path);
-            String res = checkFirmaQRpdfA("MODELLO4", us.getUsername(), pdfdest, us.getSoggettoAttuatore().getCodicefiscale(), qrcrop);
-            if (res.equals("OK")) {
-                DocumentiPrg doc = new DocumentiPrg();
-                doc.setPath(file_path);
-                doc.setTipo(modello);
-                doc.setProgetto(pr);
-                e.persist(doc);
-                List<DocumentiPrg> documenti = pr.getDocumenti();
-                documenti.add(doc);
-                pr.setDocumenti(documenti);
-                //29-06-21 Richiesta di passare lo stato direttamente in accettato da parte del micro (si salta da ATA ad ATB)
-                pr.setStato(e.getEm().find(StatiPrg.class,
-                        "ATB"));//pr.setStato(e.getEm().find(StatiPrg.class, "DVA"));
-                //Ri-setto il giorno di fine progetto, inserisco infatti quello dell'ultima lezione del modello m4 
-                Date ultimaLezM4 = Utility.getUltimoGiornoLezioneM4(pr);
-                if (ultimaLezM4 != null) {
-                    pr.setEnd(ultimaLezM4);
+            String file_path;
+            String today = new SimpleDateFormat("yyyyMMddHHssSSS").format(new Date());
+            File dir = new File(path);
+            createDir(path);
+            Part part = request.getPart("doc_" + modello.getId());
+            if (part != null && part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0) {
+                file_path = dir.getAbsolutePath()
+                        + File.separator
+                        + modello.getDescrizione()
+                        + "_"
+                        + today
+                        + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));
+                part.write(file_path);
+                File pdfdest = new File(file_path);
+                String res = checkFirmaQRpdfA("MODELLO4", us.getUsername(), pdfdest, us.getSoggettoAttuatore().getCodicefiscale(), qrcrop);
+                if (res.equals("OK")) {
+                    DocumentiPrg doc = new DocumentiPrg();
+                    doc.setPath(file_path);
+                    doc.setTipo(modello);
+                    doc.setProgetto(pr);
+                    e.persist(doc);
+                    List<DocumentiPrg> documenti = pr.getDocumenti();
+                    documenti.add(doc);
+                    pr.setDocumenti(documenti);
+                    //29-06-21 Richiesta di passare lo stato direttamente in accettato da parte del micro (si salta da ATA ad ATB)
+                    pr.setStato(e.getEm().find(StatiPrg.class,
+                            "ATB"));//pr.setStato(e.getEm().find(StatiPrg.class, "DVA"));
+                    //Ri-setto il giorno di fine progetto, inserisco infatti quello dell'ultima lezione del modello m4 
+                    Date ultimaLezM4 = Utility.getUltimoGiornoLezioneM4(pr);
+                    if (ultimaLezM4 != null) {
+                        pr.setEnd(ultimaLezM4);
+                    }
+                    m.setStato("OK");
+                    e.merge(pr);
+                    e.merge(m);
+                    e.flush();
+                    e.commit();
+                    e.close();
+                    redirect(request, response, request.getContextPath() + "/page/sa/modello4.jsp?id=" + idpr);
+                } else {
+                    e.close();
+                    pdfdest.delete();
+                    request.getSession().setAttribute("esito4", res);
+                    redirect(request, response, request.getContextPath() + "/page/sa/modello4.jsp?id=" + idpr + "&esito=ko");
                 }
-                m.setStato("OK");
-                e.merge(pr);
-                e.merge(m);
-                e.flush();
-                e.commit();
-                e.close();
-                redirect(request, response, request.getContextPath() + "/page/sa/modello4.jsp?id=" + idpr);
             } else {
+                request.getSession().setAttribute("esito4", "ERRORE DURANTE IL CARICAMENTO DEL FILE. RIPROVARE.");
                 e.close();
-                pdfdest.delete();
-                request.getSession().setAttribute("esito4", res);
                 redirect(request, response, request.getContextPath() + "/page/sa/modello4.jsp?id=" + idpr + "&esito=ko");
             }
         } else {
-            request.getSession().setAttribute("esito4", "ERRORE DURANTE IL CARICAMENTO DEL FILE. RIPROVARE.");
             e.close();
-            redirect(request, response, request.getContextPath() + "/page/sa/modello4.jsp?id=" + idpr + "&esito=ko");
+            redirect(request, response, request.getContextPath() + "/page/sa/modello4.jsp?id=" + idpr + "&esito=konumero");
         }
 
     }
@@ -2984,7 +2992,8 @@ public class OperazioniSA extends HttpServlet {
         response.getWriter().close();
     }
 
-    protected void creaGruppi(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void creaGruppi(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         JsonObject resp = new JsonObject();
         Entity e = new Entity();
         try {
@@ -2992,7 +3001,9 @@ public class OperazioniSA extends HttpServlet {
             e.begin();
             ModelliPrg m = e.getEm().find(ModelliPrg.class,
                     Long.parseLong(request.getParameter("id_modello")));
+//            ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class, m.getProgetto().getId());
             Allievi a;
+//            int numallievi = 0;
             for (String neet : gruppi) {
                 int gruppo = Integer.parseInt(neet.split("_")[0]);
                 int allievo = Integer.parseInt(neet.split("_")[1]);
@@ -3000,17 +3011,34 @@ public class OperazioniSA extends HttpServlet {
                         (long) allievo);
                 a.setGruppo_faseB(gruppo);
                 e.merge(a);
+//                numallievi++;
             }
             m.setStato("L"); //L, pronto per la creazione delle lezioni
             e.merge(m);
-
-            e.commit();
-            resp.addProperty("result", true);
+//            int min_allievi = Integer.parseInt(e.getPath("min_allievi"));
+//            if (numallievi >= min_allievi) {
+                e.commit();
+                resp.addProperty("result", true);
+//            } else {
+//                e.rollBack();
+//                prg.setStato(e.getEm().find(StatiPrg.class, "ATAE"));
+//                prg.getAllievi().forEach(al1 -> {
+//                    if (al1.getStatopartecipazione().getId().equals("01")) {
+//                        al1.setStatopartecipazione(e.getEm().find(StatoPartecipazione.class, "02"));
+//                        e.merge(al1);
+//                    }
+//                });
+//                e.merge(prg);
+//                e.commit();
+//                resp.addProperty("result", false);
+//                resp.addProperty("message", "ERRORE DURANTE LA CREAZIONE DEI GRUPPI. IMPOSSIBILE RAGGIUNGERE IL NUMERO MINIMO DI ALLIEVI. IL PROGETTO VERRA' RIGETTATO. CHIUDERE QUESTA FINESTRA E TORNARE ALL'ELENCO PROGETTI.");
+//            }
         } catch (Exception ex) {
             e.rollBack();
             ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA creaGruppi: " + ex.getMessage());
             resp.addProperty("result", false);
+            resp.addProperty("message", "ERRORE DURANTE LA CREAZIONE DEI GRUPPI.");
         } finally {
             e.close();
         }
@@ -3565,11 +3593,10 @@ public class OperazioniSA extends HttpServlet {
             } else {
                 modello7OK = false;
             }
-
+            
             if (modello7OK) {
                 e.persist(mask);
-                e.rollBack();
-//                e.commit();
+                e.commit();
                 resp.addProperty("result", true);
             } else {
                 e.rollBack();

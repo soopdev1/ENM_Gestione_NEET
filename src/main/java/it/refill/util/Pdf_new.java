@@ -53,6 +53,7 @@ import static it.refill.util.Utility.convertToHours_R;
 import static it.refill.util.Utility.createDir;
 import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.estraiSessodaCF;
+import static it.refill.util.Utility.getOnlyStrings;
 import static it.refill.util.Utility.get_eta;
 import static it.refill.util.Utility.patternITA;
 import static it.refill.util.Utility.roundDoubleAndFormat;
@@ -458,7 +459,7 @@ public class Pdf_new {
             Map<Long, Long> oreRendicontabili_docenti = Action.OreRendicontabiliDocentiFASEA((int) (long) pf.getId());
 
             File pdfOut = new File(startpath + username + "_"
-                    + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_"
+                    + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".EV.pdf");
 
             try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
@@ -591,7 +592,7 @@ public class Pdf_new {
             Map<String, String> fasceDocenti = Utility.mapCoeffDocenti(coeff_fasciaA, coeff_fasciaB);
 
             File pdfOut = new File(startpath + username + "_"
-                    + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_"
+                    + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".CL_FIN.pdf");
 
             try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut)) {
@@ -779,7 +780,7 @@ public class Pdf_new {
             createDir(pathtemp);
 
             File pdfOut = new File(pathtemp + username + "_"
-                    + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_"
+                    + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".AssenzaINPS.pdf");
 
             try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
@@ -909,7 +910,7 @@ public class Pdf_new {
             createDir(pathtemp);
 
             File pdfOut = new File(pathtemp + username + "_"
-                    + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_"
+                    + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M6.pdf");
 
             try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
@@ -1598,7 +1599,7 @@ public class Pdf_new {
             String pathtemp = e.getPath("pathtemp");
             createDir(pathtemp);
 
-            File pdfOut = new File(pathtemp + username + "_" + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M4.pdf");
+            File pdfOut = new File(pathtemp + username + "_" + getOnlyStrings(sa.getRagionesociale()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M4.pdf");
 
             try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
                 PdfWriter writer = new PdfWriter(pdfOut);
@@ -1779,7 +1780,7 @@ public class Pdf_new {
             createDir(pathtemp);
 
             File pdfOut = new File(pathtemp + username + "_"
-                    + StringUtils.deleteWhitespace(sa.getRagionesociale()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M3.pdf");
+                    + getOnlyStrings(sa.getRagionesociale()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M3.pdf");
             try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
                 PdfWriter writer = new PdfWriter(pdfOut);
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);

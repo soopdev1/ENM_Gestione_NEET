@@ -28,7 +28,7 @@ let numberGroups = new Set();
 let msg_neet_excluded = "I seguenti NEET sono stati esclusi durante la creazione dei gruppi:<br>";
 
 function setRangeDatesDay(giornoLezione, lezione, gruppo) {
-    setDateInizioFine(lezioniModello4.filter(i => i.gruppo_faseB == gruppo));
+    setDateInizioFine(lezioniModello4.filter(i => i.gruppo_faseB === gruppo));
 
     let rangeDate_min = dataStart;
     let rangeDate_max = dataEnd;
@@ -41,22 +41,22 @@ function setRangeDatesDay(giornoLezione, lezione, gruppo) {
             days++;
         }
         rangeDate_min = moment(new Date(mapDateLezioni.get(prevLez))).add(days, 'd')._d;
-    } else if (giornoLezione != null && rangeDate_min > giornoLezione) {
+    } else if (giornoLezione !== null && rangeDate_min > giornoLezione) {
         rangeDate_min = giornoLezione;
     }
-    sunday = rangeDate_min.getDay() == 0 ? 1 : 0;//se è domenica vado al giorno successivo;
+    sunday = rangeDate_min.getDay() === 0 ? 1 : 0;//se è domenica vado al giorno successivo;
     rangeDate_min = moment(rangeDate_min).add(sunday, 'd')._d;
 
     if (typeof (mapDateLezioni.get(nextLez)) !== 'undefined') {
         rangeDate_max = moment(new Date(mapDateLezioni.get(nextLez))).subtract(1, 'd')._d;
     }
-    sunday = rangeDate_max.getDay() == 0 ? 1 : 0;//se è domenica, vado al giorno precedente;
+    sunday = rangeDate_max.getDay() === 0 ? 1 : 0;//se è domenica, vado al giorno precedente;
     rangeDate_max = moment(rangeDate_max).subtract(sunday, 'd')._d;
 
     /*Controllo dell'orario, per lezioni a distanza di un giorno e superate le 12 aggiungo +2 lavorativi*/
     if (checkDateAndHour(rangeDate_min)) {
         rangeDate_min = moment(rangeDate_min).add(1, 'd')._d;
-        if (rangeDate_min.getDay() == 0) {
+        if (rangeDate_min.getDay() === 0) {
             //se è domenica, aggiungo un ulteriore giorno
             rangeDate_min = moment(rangeDate_min).add(1, 'd')._d;
         }
@@ -908,7 +908,7 @@ function showLezioneDouble(idlezione1, idlezione2, l, grp) {
 }
 
 $('#createGroups').on("click", function () {
-    let allievi_ok = allievi_total.filter(al => al.gruppo_faseB != -1);
+    let allievi_ok = allievi_total.filter(al => al.gruppo_faseB !== -1);
     let diff = allievi_ok.length - $("[id^=param_] :selected").length;
     let msg = diff !== 0 ? ('Attenzione, non hai selezionato <b>' + diff + '</b> NEET durante la creazione dei gruppi.<br> Se procedi, non sarà possibile una loro assegnazione secondaria.') : 'Vuoi procedere con la creazione dei gruppi?';
     swal.fire({
@@ -937,13 +937,13 @@ $('#createGroups').on("click", function () {
                 });
                 return new Promise(function (resolve) {
                     resolve({
-                        "gruppi": groups,
+                        "gruppi": groups
                     });
                 });
             } else {
                 return false;
             }
-        },
+        }
     }).then((result) => {
         if (result.value) {
             showLoad();
@@ -997,15 +997,16 @@ function buttonCreateGroups() {
 function disableOptions() {
     $('#lezioni_m4').show();
     setTimeout(function () {
-        $('span.select2-selection__choice__remove').remove()
+        $('span.select2-selection__choice__remove').remove();
     }, 500);
 }
 
 function createGroups() {
     let current, data;
     allievi_total = getNeets("no");
-    let allievi_ko = allievi_total.filter(al => al.gruppo_faseB == -1);
-    let allievi_ok = allievi_total.filter(al => al.gruppo_faseB != -1);
+    let allievi_ko = allievi_total.filter(al => al.gruppo_faseB === -1);
+    let allievi_ok = allievi_total.filter(al => al.gruppo_faseB !== -1);
+    
     let mapAllievi = new Map(allievi_ok.map(i => [i.id, (i.nome + " " + i.cognome)]));
     msg_neet_excluded = "I seguenti NEET sono stati esclusi dalla creazione dei gruppi in quanto non hanno effettuato le 36 ore durante la Fase A:<br>";
 
@@ -1031,7 +1032,7 @@ function createGroups() {
         data = this.id.split("_")[1];
         $('[id^=param_]').each(function () {
             current = this.id.split("_")[1];
-            if (data != current) {
+            if (data !== current) {
                 $('#param_' + current + ' option[value=' + e.params.data.id + ']').remove();
             }
             buttonCreateGroups();
@@ -1041,7 +1042,7 @@ function createGroups() {
         data = this.id.split("_")[1];
         $('[id^=param_]').each(function () {
             current = this.id.split("_")[1];
-            if (data != current) {
+            if (data !== current) {
                 $("#param_" + current).append('<option value="' + e.params.data.id + '">' + mapAllievi.get(Number(e.params.data.id)) + '</option>');
             }
             buttonCreateGroups();
@@ -1060,7 +1061,7 @@ function loadGroups() {
             $('#param_' + a[0]).append('<option selected="selected">' + a[1] + '</option>');
         } else {
             excludedPresent = true;
-            if (a[0] == -1) {
+            if (a[0] === -1) {
                 msg_neet_excluded += '<b>' + a[1] + ' (36 ore non raggiunte durante la Fase A)</b><br>';
             } else {
                 msg_neet_excluded += '<b>' + a[1] + '</b><br>';
@@ -1102,8 +1103,7 @@ $('button[id=revert]').on('click', function () {
         confirmButtonClass: "btn btn-io",
         customClass: {
             popup: 'animated bounceInUp'
-        },
-
+        }
     }).then((result) => {
         if (result.value) {
             showLoad();
@@ -1147,8 +1147,7 @@ $('button[id=deleteAll]').on('click', function () {
         confirmButtonClass: "btn btn-io",
         customClass: {
             popup: 'animated bounceInUp'
-        },
-
+        }
     }).then((result) => {
         if (result.value) {
             showLoad();
@@ -1300,7 +1299,6 @@ $('button[id^=deleteAllGroup_]').on('click', function () {
         }
     });
 });
-
 
 jQuery(document).ready(function () {
     setMultiselect();

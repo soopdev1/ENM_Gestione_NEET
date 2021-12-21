@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <%@page import="it.refill.domain.Revisori"%>
 <%@page import="it.refill.domain.Docenti"%>
 <%@page import="java.text.DecimalFormat"%>
@@ -497,10 +498,13 @@
                                                                             <div class="col-2"><b>Totale</b></div>
                                                                         </div>
                                                                         <%for (Allievi al : allievi_faseA) {
-                                                                        
-                                                                        
-                                                                        String orerend = Utility.convertToHours_R(oreRendicontabili_faseA.get(al.getId()));
-                                                                        
+
+                                                                                String orerend = "0.00";
+
+                                                                                if (oreRendicontabili_faseA.get(al.getId()) != null) {
+                                                                                    orerend = Utility.convertToHours_R(oreRendicontabili_faseA.get(al.getId()));
+                                                                                }
+
                                                                         %>
                                                                         <div class="row" id="farow_<%=al.getId()%>">
                                                                             <div class="col-4"><%=al.getNome()%> <%=al.getCognome()%></div>
@@ -527,16 +531,22 @@
                                                                             <div class="col-2"><b>Totale</b></div>
                                                                         </div>
                                                                         <%for (Allievi al : allievi_faseB) {
-                                                                        
-                                                                        String orerend = Utility.convertToHours_R(oreRendicontabili_faseB.get(al.getId()));
+
+                                                                                String orerend1 = "0.00";
+
+                                                                                if (oreRendicontabili_faseB.get(al.getId()) != null) {
+                                                                                    orerend1 = Utility.convertToHours_R(oreRendicontabili_faseB.get(al.getId()));
+                                                                                }
+
+
                                                                         %>
                                                                         <div class="row" id="fbrow_<%=al.getId()%>">
                                                                             <div class="col-4"><%=al.getNome()%> <%=al.getCognome()%></div>
                                                                             <div class="col-2"><input style="background-color: rgb(237, 243, 255)!important;" class="form-control decimal_custom" 
                                                                                                       disabled="disabled" type="text" 
-                                                                                                      value="<%=orerend%>" name="fb_ore_<%=al.getId()%>" id="fb_ore_<%=al.getId()%>" /></div>
+                                                                                                      value="<%=orerend1%>" name="fb_ore_<%=al.getId()%>" id="fb_ore_<%=al.getId()%>" /></div>
                                                                             <div class="col-2"><input class="form-control decimal_custom obbligatory kt-font-bold kt-font-danger ctrl" type="text" 
-                                                                                                      value="<%=orerend%>" name="fb_controllo_ore_<%=al.getId()%>" id="fb_controllo_ore_<%=al.getId()%>" /></div>
+                                                                                                      value="<%=orerend1%>" name="fb_controllo_ore_<%=al.getId()%>" id="fb_controllo_ore_<%=al.getId()%>" /></div>
                                                                             <div class="col-2"><input style="background-color: rgb(237, 243, 255)!important;" class="form-control decimal_custom"  disabled="disabled" type="text" value="<%=coeff_fb%>" name="fb_coeff_<%=al.getId()%>" id="fb_coeff_<%=al.getId()%>" /></div>
                                                                             <div class="col-2"><input style="background-color: rgb(237, 243, 255)!important;" class="form-control decimal_custom" disabled="disabled" type="text" name="fb_tot_<%=al.getId()%>" id="fb_tot_<%=al.getId()%>" /></div>
                                                                         </div>
@@ -555,8 +565,12 @@
                                                                             <div class="col-2"><b>Totale</b></div>
                                                                         </div>
                                                                         <%for (Docenti al : docenti_tab) {
-                                                                        
-                                                                        String orerend = Utility.convertToHours_R(oreRendicontabili_docenti.get(al.getId()));
+
+                                                                                String orerend = "0.00";
+
+                                                                                if (oreRendicontabili_docenti.get(al.getId()) != null) {
+                                                                                    orerend = Utility.convertToHours_R(oreRendicontabili_docenti.get(al.getId()));
+                                                                                }
                                                                         %>
                                                                         <div class="row" id="dcrow_<%=al.getId()%>">
                                                                             <div class="col-4"><%=al.getNome()%> <%=al.getCognome()%></div>
@@ -663,7 +677,7 @@
                                                                         </div>
                                                                         <div class="form-group col-lg-4 col-md-12 col-sm-12">
                                                                             <label for="nota_controllore"><b>Nota Controllore</b></label>
-                                                                            <textarea class="form-control" maxlength="500" id="nota_controllore" name="nota_controllore" placeholder="Inserire eventuali note" style="white-space: pre-wrap;"></textarea>
+                                                                            <textarea class="form-control tinyta" maxlength="500" id="nota_controllore" name="nota_controllore" placeholder="Inserire eventuali note" style="white-space: pre-wrap;"></textarea>
                                                                         </div>
                                                                     </div>
                                                                     <br>
@@ -892,11 +906,23 @@
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/inputmask.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/jquery.inputmask.js" type="text/javascript"></script>
         <script src="<%=src%>/resource/jquery.maskMoney.js" type="text/javascript"></script>
-        
+
+        <script src="https://cdn.tiny.cloud/1/x58q84nl0ol5hipr98106p13ns8tn6unummy0pcynuezjrhf/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
         <script id="compileCL" src="<%=src%>/page/mc/js/compileCL.js<%="?dummy=" + String.valueOf(new Date().getTime())%>" data-context="<%=request.getContextPath()%>" type="text/javascript"></script>
         <script type="text/javascript">
 
-
+                                                                                                $(function () {
+                                                                                                    tinymce.init({
+                                                                                                        selector: '.tinyta',
+                                                                                                        height: 200,
+                                                                                                        menubar: false,
+                                                                                                        statusbar: false,
+                                                                                                        schema: 'html5',
+                                                                                                        toolbar1: 'undo redo',
+                                                                                                        language: 'it'
+                                                                                                    });
+                                                                                                });
 
                                                                                                 var KTAppOptions = {
                                                                                                     "colors": {

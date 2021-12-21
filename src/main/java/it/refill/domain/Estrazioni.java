@@ -5,7 +5,6 @@
  */
 package it.refill.domain;
 
-import static it.refill.util.Utility.dtz_italy;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
@@ -19,14 +18,14 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-import org.joda.time.DateTime;
 
 /**
  *
- * @author agodino
+ * @author rcosco
  */
 @NamedQueries(value = {
-    @NamedQuery(name = "estrazioni.timestampDesc", query = "SELECT e FROM Estrazioni e ORDER BY e.timestamp DESC")
+    @NamedQuery(name = "estrazioni.timestampDesc", query = "SELECT e FROM Estrazioni e WHERE e.progetti LIKE 'E%' ORDER BY e.timestamp DESC"),
+    @NamedQuery(name = "estrazioni.rendicontazione", query = "SELECT e FROM Estrazioni e WHERE e.progetti NOT LIKE 'E%' ORDER BY e.timestamp DESC")
 })
 
 @Entity
@@ -50,6 +49,13 @@ public class Estrazioni implements Serializable {
 
     public Estrazioni() {
     }
+    
+    public Estrazioni(Date timestamp, String progetti, String path) {
+        this.timestamp = timestamp;
+        this.progetti = progetti;
+        this.path = path;
+    }
+    
 
     public String getVisualTime() {
         return visualTime;

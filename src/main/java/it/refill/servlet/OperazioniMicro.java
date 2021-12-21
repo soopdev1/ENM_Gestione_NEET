@@ -25,6 +25,7 @@ import it.refill.domain.Documenti_Allievi;
 import it.refill.domain.Documenti_Allievi_Pregresso;
 import it.refill.domain.Documenti_UnitaDidattiche;
 import it.refill.domain.Email;
+import it.refill.domain.Estrazioni;
 import it.refill.domain.FadMicro;
 import it.refill.domain.Faq;
 import it.refill.domain.FasceDocenti;
@@ -211,14 +212,19 @@ public class OperazioniMicro extends HttpServlet {
             e.begin();
 
             SediFormazione p = e.getEm().find(SediFormazione.class, Long.parseLong(getRequestValue(request, "id")));
-            if (status.equals("OK")) {
-                p.setStato("A");
-            } else if (status.equals("OK1")) {
-                p.setStato("A1");
-            } else if (status.equals("KO")) {
-                p.setStato("R");
-            } else {
-                p.setStato("DV");
+            switch (status) {
+                case "OK":
+                    p.setStato("A");
+                    break;
+                case "OK1":
+                    p.setStato("A1");
+                    break;
+                case "KO":
+                    p.setStato("R");
+                    break;
+                default:
+                    p.setStato("DV");
+                    break;
             }
             e.merge(p);
             e.commit();
@@ -786,49 +792,44 @@ public class OperazioniMicro extends HttpServlet {
         response.getWriter().close();
     }
 
-    protected void downloadTarGz(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        Entity e = new Entity();
-//        e.begin();
-//        JsonObject resp = new JsonObject();
-//        try {
-//            Date today = new Date();
-//            String[] progetti = request.getParameterValues("progetti[]");
-//            List<ProgettiFormativi> prgs = new ArrayList<>();
-//            ArrayList<String> cip = new ArrayList<>();
-//            ProgettiFormativi prg;
-//            for (String s : progetti) {
-//                prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(s));
-//                prgs.add(prg);
-//                cip.add(prg.getCip());
-//            }
-//            String path = e.getPath("output_excel_archive") + new SimpleDateFormat("yyyyMMdd_HHmmss").format(today) + ".tar.gz";
-////            File out = 
-//            createTarArchive(prgs, path);
-//
-//            ObjectMapper mapper = new ObjectMapper();
-//            
-//            
-//            
-//            e.persist(new Estrazioni(today, mapper.writeValueAsString(cip), path));
-//
-//            for (ProgettiFormativi p : prgs) {
-//                p.setExtract(1);
-//                e.merge(p);
-//            }
-//            e.commit();
-//            resp.addProperty("result", true);
-//            resp.addProperty("path", path);
-//        } catch (PersistenceException | ParseException ex) {
-//            ex.printStackTrace();
-//            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA downloadTarGz: " + ex.getMessage());
-//            resp.addProperty("result", false);
-//            resp.addProperty("message", "Errore: non &egrave; stato possibile creare il file.");
-//        } finally {
-//            e.close();
-//        }
-//        response.getWriter().write(resp.toString());
-//        response.getWriter().flush();
-//        response.getWriter().close();
+    protected void crearendicontazione(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Entity e = new Entity();
+        e.begin();
+        JsonObject resp = new JsonObject();
+        try {
+            Date today = new Date();
+            String[] progetti = request.getParameterValues("progetti[]");
+            List<ProgettiFormativi> prgs = new ArrayList<>();
+            ArrayList<String> cip = new ArrayList<>();
+            ProgettiFormativi prg;
+            for (String s : progetti) {
+                prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(s));
+                prgs.add(prg);
+                cip.add(prg.getCip());
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            String path = null;
+            e.persist(new Estrazioni(today, mapper.writeValueAsString(cip), path));
+
+            for (ProgettiFormativi p : prgs) {
+                p.setExtract(2);
+                e.merge(p);
+            }
+            e.commit();
+            resp.addProperty("result", true);
+            resp.addProperty("path", path);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA crearendicontazione: " + ex.getMessage());
+            resp.addProperty("result", false);
+            resp.addProperty("message", "Errore: non &egrave; stato possibile creare il file.");
+        } finally {
+            e.close();
+        }
+        response.getWriter().write(resp.toString());
+        response.getWriter().flush();
+        response.getWriter().close();
     }
 
     protected void checkPiva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -861,13 +862,13 @@ public class OperazioniMicro extends HttpServlet {
             SoggettiAttuatori sa = e.getEm().find(SoggettiAttuatori.class, Long.parseLong(request.getParameter("idsa")));
             String today = new SimpleDateFormat("yyyyMMddHHssSSS").format(new Date());
             e.begin();
-            String piva = request.getParameter("piva_sa");
-            String cf = request.getParameter("cf_sa");
+            String piva = getRequestValue(request, "piva_sa").trim();
+            String cf = getRequestValue(request, "cf_sa").trim();
             boolean check_piva = e.getUserPiva(piva) == null || piva.equalsIgnoreCase(sa.getPiva() == null ? "" : sa.getPiva());
             boolean check_cf = e.getUserCF(cf) == null || cf.equalsIgnoreCase(sa.getCodicefiscale() == null ? "" : sa.getCodicefiscale());
             String rs_nota = !request.getParameter("rs_sa").equalsIgnoreCase(sa.getRagionesociale()) ? "Rag. Sociale: " + request.getParameter("rs_sa") + " (" + sa.getRagionesociale() + "); " : "";
-            String cf_nota = !cf.equalsIgnoreCase(sa.getCodicefiscale() == null ? "" : sa.getCodicefiscale()) ? ("C.F.: " + (cf == null || cf.equals("") ? "-" : cf) + " (" + (sa.getCodicefiscale() == null ? "-" : sa.getCodicefiscale()) + "); ") : "";
-            String piva_nota = !piva.equalsIgnoreCase(sa.getPiva() == null ? "" : sa.getPiva()) ? ("P.IVA: " + (piva == null || piva.equals("") ? "-" : piva) + " (" + (sa.getPiva() == null ? "-" : sa.getPiva()) + "); ") : "";
+            String cf_nota = !cf.equalsIgnoreCase(sa.getCodicefiscale() == null ? "" : sa.getCodicefiscale()) ? ("C.F.: " + (cf.equals("") ? "-" : cf) + " (" + (sa.getCodicefiscale() == null ? "-" : sa.getCodicefiscale()) + "); ") : "";
+            String piva_nota = !piva.equalsIgnoreCase(sa.getPiva() == null ? "" : sa.getPiva()) ? ("P.IVA: " + (piva.equals("") ? "-" : piva) + " (" + (sa.getPiva() == null ? "-" : sa.getPiva()) + "); ") : "";
             if (check_cf || check_piva) {
                 Part p = request.getPart("file");
                 if (p != null && p.getSubmittedFileName() != null && p.getSubmittedFileName().length() > 0) {
@@ -1118,8 +1119,6 @@ public class OperazioniMicro extends HttpServlet {
 
             ObjectMapper mapper = new ObjectMapper();
 
-            String mailjet_api = e.getPath("mailjet_api");
-            String mailjet_secret = e.getPath("mailjet_secret");
             String link = e.getPath("linkfad");
             String dominio;
             if (request.getContextPath().contains("Enm_NEET")) {
@@ -1185,13 +1184,8 @@ public class OperazioniMicro extends HttpServlet {
         Entity e = new Entity();
         try {
             String nome_fad = request.getParameter("name_fad").trim();//.replaceAll("\\s+", "_");rimuove tutti gli spazi
-            String pwd = Utility.getRandomString(8);
             String[] emails = request.getParameterValues("email[]");
             String[] date = request.getParameter("range").split("-");
-            String note = request.getParameter("note") == null || request.getParameter("note").trim().isEmpty()
-                    ? ""
-                    : "Note:<br>" + request.getParameter("note");
-
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
             ObjectMapper mapper = new ObjectMapper();
@@ -1254,8 +1248,6 @@ public class OperazioniMicro extends HttpServlet {
         JsonObject resp = new JsonObject();
         Entity e = new Entity();
         try {
-            String mailjet_api = e.getPath("mailjet_api");
-            String mailjet_secret = e.getPath("mailjet_secret");
             String link = e.getPath("linkfad");
             String dominio;
             if (request.getContextPath().contains("Enm_NEET")) {
@@ -1467,7 +1459,7 @@ public class OperazioniMicro extends HttpServlet {
                     ore_convalidate += d.getOrericonosciute();
                 }
                 for (DocumentiPrg r : registri) {
-                    ore_convalidate += r.getPresenti_list().stream().filter(x -> x.getId() == a.getId()).findFirst().orElse(new Presenti()).getOre_riconosciute();
+                    ore_convalidate += r.getPresenti_list().stream().filter(x -> x.getId().equals(a.getId())).findFirst().orElse(new Presenti()).getOre_riconosciute();
                 }
 
                 a.setImporto(ore_convalidate * euro_ore);
@@ -1586,7 +1578,7 @@ public class OperazioniMicro extends HttpServlet {
 
     protected void accreditaSA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        PrintWriter pw = response.getWriter();
+        
 
         JsonObject resp = new JsonObject();
 
@@ -1684,10 +1676,11 @@ public class OperazioniMicro extends HttpServlet {
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore:4 - " + Utility.estraiEccezione(e));
         }
-
-        pw.write(resp.toString());
-        pw.flush();
-        pw.close();
+        
+        try (PrintWriter pw = response.getWriter()) {
+            pw.write(resp.toString());
+            pw.flush();
+        }
 
     }
 
@@ -1918,9 +1911,9 @@ public class OperazioniMicro extends HttpServlet {
         try {
             Allievi a1 = e.getEm().find(Allievi.class, Long.parseLong(request.getParameter("idallievo")));
             if (a1 != null) {
-                String nomepdf = a1.getProgetto().getCip() + "_" + a1.getCodicefiscale().toUpperCase().trim() + ".pdf";
+                String nomepdf = a1.getCodicefiscale().toUpperCase().trim() + "_" + a1.getProgetto().getCip() + ".pdf";
                 File downloadFile = new File(a1.getProgetto().getPdfunico());
-                if (downloadFile != null && downloadFile.exists()) {
+                if (downloadFile.exists() && downloadFile.canRead()) {
                     OutputStream outStream;
                     try (FileInputStream inStream = new FileInputStream(downloadFile)) {
                         String mimeType = Files.probeContentType(downloadFile.toPath());
@@ -1942,24 +1935,32 @@ public class OperazioniMicro extends HttpServlet {
                 } else {
                     User us = (User) request.getSession().getAttribute("user");
                     String page = "page/";
-                    if (us.getTipo() == 1) {
-                        page += "sa/indexSoggettoAttuatore.jsp";
-                    } else if (us.getTipo() == 4) {
-                        page += "ci/indexCi.jsp";
-                    } else {
-                        page += "mc/indexMicrocredito.jsp";
+                    switch (us.getTipo()) {
+                        case 1:
+                            page += "sa/indexSoggettoAttuatore.jsp";
+                            break;
+                        case 4:
+                            page += "ci/indexCi.jsp";
+                            break;
+                        default:
+                            page += "mc/indexMicrocredito.jsp";
+                            break;
                     }
                     response.sendRedirect("redirect.jsp?page=" + page + "&fileNotFound=true");
                 }
             } else {
                 User us = (User) request.getSession().getAttribute("user");
                 String page = "page/";
-                if (us.getTipo() == 1) {
-                    page += "sa/indexSoggettoAttuatore.jsp";
-                } else if (us.getTipo() == 4) {
-                    page += "ci/indexCi.jsp";
-                } else {
-                    page += "mc/indexMicrocredito.jsp";
+                switch (us.getTipo()) {
+                    case 1:
+                        page += "sa/indexSoggettoAttuatore.jsp";
+                        break;
+                    case 4:
+                        page += "ci/indexCi.jsp";
+                        break;
+                    default:
+                        page += "mc/indexMicrocredito.jsp";
+                        break;
                 }
                 response.sendRedirect("redirect.jsp?page=" + page + "&fileNotFound=true");
             }
@@ -1968,12 +1969,16 @@ public class OperazioniMicro extends HttpServlet {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro deleteDocCloud: " + ex.getMessage());
             User us = (User) request.getSession().getAttribute("user");
             String page = "page/";
-            if (us.getTipo() == 1) {
-                page += "sa/indexSoggettoAttuatore.jsp";
-            } else if (us.getTipo() == 4) {
-                page += "ci/indexCi.jsp";
-            } else {
-                page += "mc/indexMicrocredito.jsp";
+            switch (us.getTipo()) {
+                case 1:
+                    page += "sa/indexSoggettoAttuatore.jsp";
+                    break;
+                case 4:
+                    page += "ci/indexCi.jsp";
+                    break;
+                default:
+                    page += "mc/indexMicrocredito.jsp";
+                    break;
             }
             response.sendRedirect("redirect.jsp?page=" + page + "&fileNotFound=true");
         }
@@ -2067,7 +2072,7 @@ public class OperazioniMicro extends HttpServlet {
                 e.begin();
                 ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
                 DocumentiPrg esitovalutazione = pf.getDocumenti().stream().filter(d1 -> d1.getTipo().getId() == 36L).findAny().orElse(null);
-                String destpath = esitovalutazione.getPath() + "SIGNED" + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));                
+                String destpath = esitovalutazione.getPath() + "SIGNED" + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));
                 File destfile = new File(destpath);
                 part.write(destfile.getAbsolutePath());
                 esitovalutazione.setDeleted(1);
@@ -2473,8 +2478,8 @@ public class OperazioniMicro extends HttpServlet {
                 case "downloadTarGz_only":
                     downloadTarGz_only(request, response);
                     break;
-                case "downloadTarGz":
-                    downloadTarGz(request, response);
+                case "crearendicontazione":
+                    crearendicontazione(request, response);
                     break;
                 case "checkPiva":
                     checkPiva(request, response);

@@ -106,6 +106,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.tika.parser.txt.CharsetDetector;
@@ -146,7 +148,7 @@ public class Utility {
     public static final NumberFormat numITA = NumberFormat.getCurrencyInstance(Locale.ITALY);
     public static boolean pregresso = false;
     public static final DateTimeZone dtz_italy = DateTimeZone.forID("Europe/Rome");
-    
+
     public static DecimalFormat doubleformat = new DecimalFormat("#.##");
     public static final String patternH = "HH:mm:ss";
     public static final String patternHmin = "HH:mm";
@@ -162,7 +164,7 @@ public class Utility {
     public static final DateTimeFormatter dtfad = DateTimeFormat.forPattern(timestampFAD);
     public static final DateTimeFormatter dtfh = DateTimeFormat.forPattern(patternHmin);
     public static final DateTimeFormatter dtfsql = DateTimeFormat.forPattern(timestampSQL);
-    
+
     //END RAF
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String destination) throws ServletException, IOException {
         if (response.isCommitted()) {
@@ -1022,8 +1024,7 @@ public class Utility {
                 return "DVBE";
         }
     }
-    
-    
+
     public static DateTime format(String ing, String pattern) {
         try {
             if (ing.contains(".")) {
@@ -1035,9 +1036,9 @@ public class Utility {
         }
         return null;
     }
-    
+
     private static final long MAX = 18000000;
-    
+
     public static long convertHours(String ore) {
         try {
             double d1 = Double.parseDouble(ore);
@@ -1052,7 +1053,7 @@ public class Utility {
     public static String formatStringtoStringDateSQL(String dat) {
         return formatStringtoStringDate(dat, patternSql, patternITA, false);
     }
-    
+
     public static void printbarcode(BarcodeQRCode barcode, PdfDocument pdfDoc, boolean page, String add) {
         try {
             Rectangle rect = barcode.getBarcodeSize();
@@ -1093,7 +1094,7 @@ public class Utility {
         }
     }
 
-   public static void gestisciorerendicontabili(LinkedList<Presenti1> report, long ore) {
+    public static void gestisciorerendicontabili(LinkedList<Presenti1> report, long ore) {
 
         try {
             DateTimeFormatter fmt = forPattern(timestampSQL);
@@ -1183,8 +1184,8 @@ public class Utility {
             e.printStackTrace();
         }
     }
-   
-   public static int getIdUser(Database db, String nome, String cognome, int idpr, int idsa, String ruolo) {
+
+    public static int getIdUser(Database db, String nome, String cognome, int idpr, int idsa, String ruolo) {
         if (ruolo.equalsIgnoreCase("DOCENTE")) {
             return getIdDocente(db, nome, cognome, idsa);
         } else if (ruolo.equalsIgnoreCase("ALLIEVO NEET")) {
@@ -1192,8 +1193,8 @@ public class Utility {
         }
         return 0;
     }
-   
-   private static int getIdAllievo(Database db, String nome, String cognome, int idpr) {
+
+    private static int getIdAllievo(Database db, String nome, String cognome, int idpr) {
         try {
             String sql = "SELECT idallievi FROM allievi WHERE nome = ? AND cognome = ? AND idprogetti_formativi = ? AND id_statopartecipazione = ? ORDER BY idallievi DESC LIMIT 1";
             try (PreparedStatement ps = db.getC().prepareStatement(sql)) {
@@ -1230,8 +1231,7 @@ public class Utility {
         }
         return 0;
     }
-   
-    
+
     public static String convertTS_Italy(String ts1) {
 //        TimeZone tz1 = TimeZone.getTimeZone("Europe/Rome");
 //        TimeZone tz2 = TimeZone.getTimeZone("GMT");
@@ -1249,7 +1249,7 @@ public class Utility {
         DateTime dateTimeIT = start.plus(getTimeDiff());
         return dateTimeIT.toString(timestampSQL);
     }
-    
+
     public static long getTimeDiff() {
         try {
             TimeZone tz1 = TimeZone.getTimeZone("Europe/Rome");
@@ -1266,9 +1266,12 @@ public class Utility {
         }
         return 0L;
     }
-    
-    
-    
-    
-    
+
+    public static String getOnlyStrings(String s) {
+        Pattern pattern = Pattern.compile("[^a-z A-Z]");
+        Matcher matcher = pattern.matcher(s);
+        String number = matcher.replaceAll("");
+        return number;
+    }
+
 }
