@@ -1578,8 +1578,6 @@ public class OperazioniMicro extends HttpServlet {
 
     protected void accreditaSA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        
-
         JsonObject resp = new JsonObject();
 
         try {
@@ -1676,7 +1674,7 @@ public class OperazioniMicro extends HttpServlet {
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore:4 - " + Utility.estraiEccezione(e));
         }
-        
+
         try (PrintWriter pw = response.getWriter()) {
             pw.write(resp.toString());
             pw.flush();
@@ -2121,7 +2119,7 @@ public class OperazioniMicro extends HttpServlet {
             e.begin();
             ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
 //            DocumentiPrg esitovalutazione = pf.getDocumenti().stream().filter(d1 -> d1.getTipo().getId() == 33L).findAny().orElse(null); //R^TEST
-            DocumentiPrg esitovalutazione = pf.getDocumenti().stream().filter(d1 -> d1.getTipo().getId() == 36L).findAny().orElse(null);
+            DocumentiPrg esitovalutazione = pf.getDocumenti().stream().filter(d1 -> d1.getTipo().getId() == 36L && d1.getDeleted() == 0).findAny().orElse(null);
             if (esitovalutazione != null) {
 //                File content = new File("F:\\mnt\\mcn\\BECONSULTING260720211205764.M2_pdfA.pdf");//R^TEST
                 File content = new File(esitovalutazione.getPath());
