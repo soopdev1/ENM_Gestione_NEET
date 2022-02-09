@@ -197,6 +197,7 @@
                                                         <th class="text-uppercase text-center">Data inserimento ANPAL</th>
                                                         <th class="text-uppercase text-center">Stato di partecipazione</th>
                                                         <th class="text-uppercase text-center">Stato NEET</th>
+                                                        <th class="text-uppercase text-center">Questionari</th>
                                                         <th class="text-uppercase text-center">Documento Id.</th>
                                                     </tr>
                                                 </thead>
@@ -281,27 +282,27 @@
                 var initTable1 = function () {
                     var table = $('#kt_table_1');
                     table.DataTable({
-                    dom: `<'row'<'col-sm-12'ftr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>`,
-                            lengthMenu: [5, 10, 25, 50],
-                            language: {
+                        dom: `<'row'<'col-sm-12'ftr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>`,
+                        lengthMenu: [5, 10, 25, 50],
+                        language: {
                             'lengthMenu': 'Mostra _MENU_',
-                                    "infoEmpty": "Mostrati 0 di 0 per 0",
-                                    "loadingRecords": "Caricamento...",
-                                    "search": "Cerca:",
-                                    "zeroRecords": "Nessun risultato trovato",
-                                    "info": "Mostrati _START_ di _TOTAL_ ",
-                                    "emptyTable": "Nessun risultato",
-                                    "sInfoFiltered": "(filtrato su _MAX_ risultati totali)"
-                            },
-                            ScrollX: "100%",
-                            sScrollXInner: "110%",
-                            searchDelay: 500,
-                            processing: true,
-                            pageLength: 10,
-                            ajax: context + '/QueryMicro?type=searchAllievo&soggettoattuatore=' + $('#soggettoattuatore').val() + '&cf=' + $('#cf').val()
-                            + '&nome=' + $('#nome').val() + '&cognome=' + $('#cognome').val() + '&cpi=' + $('#cpi').val() + '&pregresso=0',
-                            order: [],
-                            columns: [
+                            "infoEmpty": "Mostrati 0 di 0 per 0",
+                            "loadingRecords": "Caricamento...",
+                            "search": "Cerca:",
+                            "zeroRecords": "Nessun risultato trovato",
+                            "info": "Mostrati _START_ di _TOTAL_ ",
+                            "emptyTable": "Nessun risultato",
+                            "sInfoFiltered": "(filtrato su _MAX_ risultati totali)"
+                        },
+                        ScrollX: "100%",
+                        sScrollXInner: "110%",
+                        searchDelay: 500,
+                        processing: true,
+                        pageLength: 10,
+                        ajax: context + '/QueryMicro?type=searchAllievo&soggettoattuatore=' + $('#soggettoattuatore').val() + '&cf=' + $('#cf').val()
+                                + '&nome=' + $('#nome').val() + '&cognome=' + $('#cognome').val() + '&cpi=' + $('#cpi').val() + '&pregresso=0',
+                        order: [],
+                        columns: [
                             {defaultContent: ''},
                             {data: 'nome', className: 'text-center text-uppercase'},
                             {data: 'cognome', className: 'text-center text-uppercase'},
@@ -315,125 +316,141 @@
                             {data: 'data_anpal', className: 'text-center'},
                             {data: 'statopartecipazione.descrizione', className: 'text-center'},
                             {data: '',
-                                    className: 'text-center',
-                                    render: function (data, type, row) {
+                                className: 'text-center',
+                                render: function (data, type, row) {
                                     switch (row.stato) {
-                                    case "A":
+                                        case "A":
                                             stato = "Attivo";
                                             break;
-                                            case "I":
+                                        case "I":
                                             stato = "In Attesa";
                                             break;
-                                            case "D":
+                                        case "D":
                                             stato = "Disattivo";
                                             break;
-                                            default:
+                                        default:
                                             stato = "Non Definito";
                                             break;
                                     }
                                     return stato;
-                                    }
+                                }
                             },
+                            {data: '', className: 'text-center',
+                                render: function (data, type, row) {
+                                    var quest = "";
+                                    if (row.surveyin === null || !row.surveyin) {
+                                        quest += "ING. KO";
+                                    } else {
+                                        quest += "ING. OK";
+                                    }
+                                    quest += " - ";
+                                    if (row.surveyout === null || !row.surveyout) {
+                                        quest += "USC. KO";
+                                    } else {
+                                        quest += "USC. OK";
+                                    }
+                                    return quest;
+                                }},
                             {defaultContent: ''
                             }
-                            ],
-                    drawCallback: function () {
-                        $('[data-toggle="kt-tooltip"]').tooltip();
-                    }
-                    ,
-                    rowCallback: function (row, data) {
-                        $(row).attr("id", "row_" + data.id);
+                        ],
+                        drawCallback: function () {
+                            $('[data-toggle="kt-tooltip"]').tooltip();
+                        }
+                        ,
+                        rowCallback: function (row, data) {
+                            $(row).attr("id", "row_" + data.id);
 
-                    }
-                    ,
-                    columnDefs: [
-                    {
-                    targets: 0,
-                            className: 'text-center',
-                            orderable: false,
-                            render: function (data, type, row, meta) {
-                            var option = '<div class="dropdown dropdown-inline">'
-                                    + '<button type="button" class="btn btn-icon btn-sm btn-icon-md btn-circle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
-                                    + '   <i class="flaticon-more-1"></i>'
-                                    + '</button>'
-                                    + '<div class="dropdown-menu dropdown-menu-left">';
+                        }
+                        ,
+                        columnDefs: [
+                            {
+                                targets: 0,
+                                className: 'text-center',
+                                orderable: false,
+                                render: function (data, type, row, meta) {
+                                    var option = '<div class="dropdown dropdown-inline">'
+                                            + '<button type="button" class="btn btn-icon btn-sm btn-icon-md btn-circle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'
+                                            + '   <i class="flaticon-more-1"></i>'
+                                            + '</button>'
+                                            + '<div class="dropdown-menu dropdown-menu-left">';
                                     if (row.progetto !== null) {
-                            prg.set(row.progetto.id, row.progetto);
-                                    option += '<a class="dropdown-item" href="javascript:void(0);" onclick="showPrg(' + row.progetto.id + ')"><i class="flaticon-presentation-1"></i> Visualizza Progetto Formativo</a>';
-                            }
-                            option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalDocumentAllievo(' + row.id + ')"><i class="fa fa-file-alt"></i> Visualizza Documenti</a>';
+                                        prg.set(row.progetto.id, row.progetto);
+                                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="showPrg(' + row.progetto.id + ')"><i class="flaticon-presentation-1"></i> Visualizza Progetto Formativo</a>';
+                                    }
+                                    option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalDocumentAllievo(' + row.id + ')"><i class="fa fa-file-alt"></i> Visualizza Documenti</a>';
 //                                    option += '<a class="dropdown-item" href="#"><i class="fa fa-list"></i> Visualizza Registro</a>';
 
                                     if (row.data_anpal === '' || row.data_anpal === '-') {
-                            option += '<a class="dropdown-item fancyBoxFullReload" href="editANPAL.jsp?id=' +
-                                    row.id + '"><i class="fa fa-calendar"></i> Inserisci Data ANPAL</a>';
-                            }
-                            option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMail(' + row.id + ',\'' + row.email + '\')"><i class="fa fa-envelope"></i> Modifica Email</a>'
+                                        option += '<a class="dropdown-item fancyBoxFullReload" href="editANPAL.jsp?id=' +
+                                                row.id + '"><i class="fa fa-calendar"></i> Inserisci Data ANPAL</a>';
+                                    }
+                                    option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMail(' + row.id + ',\'' + row.email + '\')"><i class="fa fa-envelope"></i> Modifica Email</a>'
 
                                     option += '</div></div>';
                                     return option;
-                            }
+                                }
 
-                    }, {
-                    targets: 5,
-                            className: 'text-center',
-                            type: 'date-it',
-                            render: function (data, type, row, meta) {
-                            return formattedDate(new Date(row.datanascita));
-                            }
-                    }, {
-                    targets: 6,
-                            className: 'text-center',
-                            render: function (data, type, row, meta) {
-                            var comune = (row.comune_residenza.nome === null ? "N.I." : row.comune_residenza.nome)
-                                    + " (" + (row.comune_residenza.provincia === null ? "N.I." : row.comune_residenza.provincia) + ")";
+                            }, {
+                                targets: 5,
+                                className: 'text-center',
+                                type: 'date-it',
+                                render: function (data, type, row, meta) {
+                                    return formattedDate(new Date(row.datanascita));
+                                }
+                            }, {
+                                targets: 6,
+                                className: 'text-center',
+                                render: function (data, type, row, meta) {
+                                    var comune = (row.comune_residenza.nome === null ? "N.I." : row.comune_residenza.nome)
+                                            + " (" + (row.comune_residenza.provincia === null ? "N.I." : row.comune_residenza.provincia) + ")";
                                     return comune + ",<br> " + row.indirizzoresidenza + " " + row.civicoresidenza;
-                            }
-                    }, {
-                    targets: 7,
-                            className: 'text-center',
-                            render: function (data, type, row, meta) {
-                            if (row.comune_domicilio === null) {
-                            return "";
-                            } else {
-                            var comune = (row.comune_domicilio.nome === null ? "N.I." : row.comune_domicilio.nome)
-                                    + " (" + (row.comune_domicilio.provincia === null ? "N.I." : row.comune_domicilio.provincia) + ")";
-                                    return comune + ",<br> " + row.indirizzodomicilio + " " + row.civicodomicilio;
-                            }
+                                }
+                            }, {
+                                targets: 7,
+                                className: 'text-center',
+                                render: function (data, type, row, meta) {
+                                    if (row.comune_domicilio === null) {
+                                        return "";
+                                    } else {
+                                        var comune = (row.comune_domicilio.nome === null ? "N.I." : row.comune_domicilio.nome)
+                                                + " (" + (row.comune_domicilio.provincia === null ? "N.I." : row.comune_domicilio.provincia) + ")";
+                                        return comune + ",<br> " + row.indirizzodomicilio + " " + row.civicodomicilio;
+                                    }
 
-                            }
-                    }, {
-                    targets: 8,
-                            className: 'text-center',
-                            type: 'date-it',
-                            render: function (data, type, row, meta) {
-                            return formattedDate(new Date(row.iscrizionegg));
-                            }
-                    }, {
-                    targets: 13,
-                            className: 'text-center',
-                            orderable: false,
-                            render: function (data, type, row, meta) {
-                            var option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io fa fa-address-card fancyDocument" style="font-size: 20px;"'
-                                    + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
-                                    + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' + formattedDate(new Date(row.scadenzadocid)) + '</h5>"></a>';
+                                }
+                            }, {
+                                targets: 8,
+                                className: 'text-center',
+                                type: 'date-it',
+                                render: function (data, type, row, meta) {
+                                    return formattedDate(new Date(row.iscrizionegg));
+                                }
+                            }, {
+                                targets: 14,
+                                className: 'text-center',
+                                orderable: false,
+                                render: function (data, type, row, meta) {
+                                    var option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io fa fa-address-card fancyDocument" style="font-size: 20px;"'
+                                            + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
+                                            + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' + formattedDate(new Date(row.scadenzadocid)) + '</h5>"></a>';
                                     if (new Date(row.scadenzadocid) <= new Date()) {
-                            option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io-n fancyDocument" style="font-size: 20px"'
-                                    + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
-                                    + 'data-placement="top" title="<h6>Scadenza:</h6><h5>'
-                                    + formattedDate(new Date(row.scadenzadocid)) + '</h5>">&nbsp;<i class="fa fa-exclamation-triangle"></i></a>';
+                                        option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io-n fancyDocument" style="font-size: 20px"'
+                                                + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
+                                                + 'data-placement="top" title="<h6>Scadenza:</h6><h5>'
+                                                + formattedDate(new Date(row.scadenzadocid)) + '</h5>">&nbsp;<i class="fa fa-exclamation-triangle"></i></a>';
+                                    }
+                                    return option;
+                                }
                             }
-                            return option;
-                            }
-                    }
-                    ]
+                        ]
                     }
                     ).columns.adjust();
                 };
                 return {
-                init: function () {
-                initTable1();
-                }
+                    init: function () {
+                        initTable1();
+                    }
                 };
             }();
             jQuery(document).ready(function () {

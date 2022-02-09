@@ -68,7 +68,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="assegna(' + row.id + ')"><i class="fa fa-user"></i> Assegnazione</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadDocGenerico(' + row.id + ')"><i class="fa fa-upload" style="margin-top:-2px"></i>Carica Altra Documentazione</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="modifyDate(' + row.id + ',' + row.start + ',' + row.end + ',' + row.end_fa + ')"><i class="fa fa-calendar-alt"></i> Modifica Date</a>';
-                            
+
                         }
 
 
@@ -122,9 +122,9 @@ var KTDatatablesDataSourceAjaxServer = function () {
                                     ) {
                                 option += '<a class="dropdown-item kt-font-danger" href="javascript:void(0);" onclick="annullaPrg(' +
                                         row.id + ')"><i class="flaticon2-delete kt-font-danger" style="margin-top:-2px"></i>Annulla Progetto</a>';
-                                
-                                
-                                
+
+
+
                             }
 
                         }
@@ -239,7 +239,6 @@ var DatatablesAllievi = function () {
                 "emptyTable": "Nessun risultato",
                 "sInfoFiltered": "(filtrato su _MAX_ risultati totali)"
             },
-//            scrollY: "40vh",
             scrollX: true,
             sScrollXInner: "110%",
             order: [],
@@ -250,6 +249,22 @@ var DatatablesAllievi = function () {
                 {data: 'codicefiscale'},
                 {data: 'statopartecipazione.descrizione'},
                 {data: 'esclusione_prg'},
+                {data: '', className: 'text-center',
+                    render: function (data, type, row) {
+                        var quest = "";
+                        if (row.surveyin === null || !row.surveyin) {
+                            quest += "ING. KO";
+                        } else {
+                            quest += "ING. OK";
+                        }
+                        quest += " - ";
+                        if (row.surveyout === null || !row.surveyout) {
+                            quest += "USC. KO";
+                        } else {
+                            quest += "USC. OK";
+                        }
+                        return quest;
+                    }},
                 {defaultContent: ''}
             ],
             drawCallback: function () {
@@ -267,11 +282,18 @@ var DatatablesAllievi = function () {
                                 + '</button>'
                                 + '<div class="dropdown-menu dropdown-menu-left">';
                         option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalDocumentAllievo(' + row.id + ');"><i class="fa fa-file-alt"></i> Visualizza Documenti</a>';
+
+                        if (row.statopartecipazione.id === "01") {
+                            option += '<a class="dropdown-item " href="javascript:void(0);" onclick="swalSigma(' + row.id + ',\'' + row.statopartecipazione.id +
+                                    '\')"><i class="fa fa-user-check" data-container="body" data-html="true" data-toggle="kt-tooltip" title="Stato '
+                                    + row.statopartecipazione.descrizione + '"></i>Cambia stato di partecipazione</a>';
+                        }
+
                         option += '</div></div>';
                         return option;
                     }
                 }, {
-                    targets: 6,
+                    targets: 7,
                     className: 'text-center',
                     orderable: false,
                     render: function (data, type, row, meta) {
@@ -372,6 +394,87 @@ var DatatablesAllievi = function () {
         }
     };
 }();
+
+function swalSigma(id, idsp) {
+    swal.fire({
+        title: 'Stato di partecipazione',
+        html: '<div id="swalModificaStato">'
+                + '<div id="warning_sp" class="form-group kt-font-io-n row col" style="margin-left: 0px;margin-right: 0px; display: none;" ><div class="col-1"><i class="fa fa-exclamation-triangle" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);font-size:20px;" ></i></div><div id="warningmsg" class="col-10" ></div><div class="col-1"><i class="fa fa-exclamation-triangle" style="position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);font-size:20px;"></i></div></div>'
+                + '<div class="select-div" id="sigma_div">'
+                + '<select class="form-control kt-select2-general obbligatory" id="sigma" name="sigma"  style="width: 100%" >'
+                + '<option value="-">Seleziona stato di partecipazione</option>'
+                + '</select></div><br>'
+                + '</div>',
+        animation: false,
+        showCancelButton: true,
+        confirmButtonText: '&nbsp;<i class="la la-check"></i>',
+        cancelButtonText: '&nbsp;<i class="la la-close"></i>',
+        customClass: {
+            popup: 'animated bounceInUp',
+            cancelButton: "btn btn-io-n",
+            confirmButton: "btn btn-io"
+        },
+        onOpen: function () {
+            $('#sigma').select2({
+                dropdownCssClass: "select2-on-top",
+                minimumResultsForSearch: -1
+            });
+            $.get(context + "/QueryMicro?type=getSIGMA", function (resp) {
+                var json = JSON.parse(resp);
+                for (var i = 0; i < json.length; i++) {
+                    if (json[i].id === idsp) {
+                        $("#sigma").append('<option selected value="' + json[i].id + '">' + json[i].descrizione + '</option>');
+                    } else {
+                        $("#sigma").append('<option value="' + json[i].id + '">' + json[i].descrizione + '</option>');
+                    }
+                }
+            });
+        },
+        preConfirm: function () {
+            var err = false;
+            err = checkObblFieldsContent($('#swalModificaStato')) ? true : err;
+            if (!err) {
+                return new Promise(function (resolve) {
+                    resolve({
+                        "sigma": $('#sigma').val()
+                    });
+                });
+            } else {
+                return false;
+            }
+        }
+    }).then((result) => {
+        if (result.value) {
+            setValueStato(id, result.value.sigma);
+        } else {
+            swal.close();
+        }
+    }
+    );
+}
+
+function setValueStato(id, sigma) {
+    showLoad();
+    $.ajax({
+        type: "POST",
+        url: context + '/OperazioniMicro?type=setSIGMA&id=' + id + '&sigma=' + sigma,
+        success: function (data) {
+            closeSwal();
+            console.log(data);
+            var json = JSON.parse(data);
+            if (json.result) {
+                swalSuccess("Modifica Stato Allievo", "Stato di partecipazione impostato correttamente");
+                reload_table($('#kt_table_allievi'));
+            } else {
+                swalError("Errore", json.message);
+            }
+        },
+        error: function () {
+            swalError("Errore", "Non è stato possibile impostare lo stato di partecipazione");
+        }
+    });
+}
+
 
 function mappaprogetto() {
     var idpr = $('#idprmappa').val();
@@ -1464,7 +1567,7 @@ function annullaPrg(id) {
         title: '<h2 class="kt-font-io-n"><b>Annulla Progetto</b></h2><br>',
         html: html,
         animation: false,
-        width:'50%',
+        width: '50%',
         showCancelButton: true,
         confirmButtonText: '&nbsp;<i class="la la-check"></i>',
         cancelButtonText: '&nbsp;<i class="la la-close"></i>',

@@ -61,15 +61,6 @@
         <link href="<%=src%>/assets/vendors/general/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css" rel="stylesheet" type="text/css" />
         <link rel="shortcut icon" href="<%=src%>/assets/media/logos/favicon.ico" />
 
-        <!--        <style>
-                    .table {
-                        overflow-x: scroll!important;
-                        max-width: 100%!important;
-                        display: block!important;
-                        white-space: nowrap!important;
-                    }
-                </style>-->
-
     </head>
     <body class="kt-header--fixed kt-header-mobile--fixed kt-subheader--fixed kt-subheader--enabled kt-subheader--solid kt-aside--enabled kt-aside--fixed">
         <!-- begin:: Page -->
@@ -207,6 +198,7 @@
                                                         <th class="text-uppercase text-center">CPI</th>
                                                         <th class="text-uppercase text-center">Stato di partecipazione</th>
                                                         <th class="text-uppercase text-center">Stato NEET</th>
+                                                        <th class="text-uppercase text-center">Questionari</th>
                                                         <th class="text-uppercase text-center">Documento d'Identità</th>
                                                     </tr>
                                                 </thead>

@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
  *
  * @author agodino
  */
-public class Test {
+public class Example {
 
     public static boolean copyR(File source, File dest) {
         boolean es;

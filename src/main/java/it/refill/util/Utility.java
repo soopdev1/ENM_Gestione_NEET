@@ -106,6 +106,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
@@ -165,6 +166,10 @@ public class Utility {
     public static final DateTimeFormatter dtfh = DateTimeFormat.forPattern(patternHmin);
     public static final DateTimeFormatter dtfsql = DateTimeFormat.forPattern(timestampSQL);
 
+    
+    public static final String APP = "ENM_NEET";
+    public static final Logger LOGAPP = Logger.getLogger(APP);
+    
     //END RAF
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String destination) throws ServletException, IOException {
         if (response.isCommitted()) {

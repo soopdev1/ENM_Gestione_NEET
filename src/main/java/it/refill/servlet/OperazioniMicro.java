@@ -2413,6 +2413,37 @@ public class OperazioniMicro extends HttpServlet {
         response.getWriter().flush();
         response.getWriter().close();
     }
+    
+    protected void setSIGMA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        JsonObject resp = new JsonObject();
+        Entity e = new Entity();
+        e.begin();
+
+        try {
+            Allievi a = e.getEm().find(Allievi.class,
+                    Long.parseLong(request.getParameter("id")));
+            if (request.getParameter("sigma") != null) {
+                a.setStatopartecipazione((StatoPartecipazione) e.getEm().find(StatoPartecipazione.class,
+                        request.getParameter("sigma")));
+                e.merge(a);
+            }
+            e.commit();
+            resp.addProperty("result", true);
+        } catch (PersistenceException ex) {
+            e.rollBack();
+            ex.printStackTrace();
+            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro setSIGMA: " + ex.getMessage());
+            resp.addProperty("result", false);
+            resp.addProperty("message", "Errore: non &egrave; stato possibile impostare lo stato di partecipazione dell'allievo.");
+        } finally {
+            e.close();
+        }
+        response.getWriter().write(resp.toString());
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -2587,7 +2618,9 @@ public class OperazioniMicro extends HttpServlet {
                 case "assegnaPrg":
                     assegnaPrg(request, response);
                     break;
-
+                case "setSIGMA":
+                    setSIGMA(request, response);
+                    break;    
                 default:
                     break;
             }

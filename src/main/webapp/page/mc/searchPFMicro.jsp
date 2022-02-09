@@ -266,6 +266,7 @@
                                         <th class="text-uppercase text-center">Codice Fiscale</th>
                                         <th class="text-uppercase text-center">Stato</th>
                                         <th class="text-uppercase text-center">Motivazione</th>
+                                        <th class="text-uppercase text-center">Questionari</th>
                                         <th class="text-uppercase text-center">Documento Id.</th>
                                     </tr>
                                 </thead>

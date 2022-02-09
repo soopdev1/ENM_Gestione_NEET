@@ -186,12 +186,32 @@ public class Allievi implements Serializable {
     @Column(name = "mappatura_note")
     private String mappatura_note;
     
+    @Column(name = "surveyin", columnDefinition = "TINYINT", length = 1)
+    private boolean surveyin;
     
+    @Column(name = "surveyout", columnDefinition = "TINYINT", length = 1)
+    private boolean surveyout;
     
     public Allievi() {
         this.pregresso = false;
     }
 
+    public boolean isSurveyin() {
+        return surveyin;
+    }
+
+    public void setSurveyin(boolean surveyin) {
+        this.surveyin = surveyin;
+    }
+
+    public boolean isSurveyout() {
+        return surveyout;
+    }
+
+    public void setSurveyout(boolean surveyout) {
+        this.surveyout = surveyout;
+    }
+    
     public String getMappatura_note() {
         return mappatura_note;
     }
@@ -682,10 +702,7 @@ public class Allievi implements Serializable {
             return false;
         }
         Allievi other = (Allievi) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return !((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id)));
     }
 
     @Override

@@ -32,6 +32,7 @@ import it.refill.domain.ProgettiFormativi;
 import it.refill.domain.SediFormazione;
 import it.refill.domain.SoggettiAttuatori;
 import it.refill.domain.StatiPrg;
+import it.refill.domain.StatoPartecipazione;
 import it.refill.domain.Storico_ModificheInfo;
 import it.refill.domain.Storico_Prg;
 import it.refill.domain.TipoDoc;
@@ -716,6 +717,19 @@ public class QueryMicro extends HttpServlet {
         response.getWriter().write(json);
     }
 
+    protected void getSIGMA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Entity e = new Entity();
+        try {
+            List<StatoPartecipazione> sp = e.lista_StatoPartecipazioneMOD();
+            ObjectMapper mapper = new ObjectMapper();
+            response.getWriter().write(mapper.writeValueAsString(sp));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            e.close();
+        }
+    }
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -824,6 +838,9 @@ public class QueryMicro extends HttpServlet {
                     break;
                 case "getChecklistfinale":
                     getChecklistfinale(request, response);
+                    break;
+                case "getSIGMA":
+                    getSIGMA(request, response);
                     break;
                 default:
                     break;

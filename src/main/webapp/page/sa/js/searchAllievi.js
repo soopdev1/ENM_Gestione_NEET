@@ -81,7 +81,22 @@ var KTDatatablesDataSourceAjaxServer = function () {
                         return stato;
                     }
                 },
-
+                {data: '', className: 'text-center',
+                    render: function (data, type, row) {
+                        var quest = "";
+                        if (row.surveyin === null || !row.surveyin) {
+                            quest += "ING. KO";
+                        } else {
+                            quest += "ING. OK";
+                        }
+                        quest += " - ";
+                        if (row.surveyout === null || !row.surveyout) {
+                            quest += "USC. KO";
+                        } else {
+                            quest += "USC. OK";
+                        }
+                        return quest;
+                    }},
                 {defaultContent: ''}
             ],
             drawCallback: function () {
@@ -102,9 +117,9 @@ var KTDatatablesDataSourceAjaxServer = function () {
                                 + '   <i class="flaticon-more-1"></i>'
                                 + '</button>'
                                 + '<div class="dropdown-menu dropdown-menu-left">';
-                        if (row.stato == "I") {
+                        if (row.stato === "I") {
                             option += '<a class="dropdown-item fancyBoxAntoRef" href="' + context + '/redirect.jsp?page=page/sa/updtNEET.jsp?id=' + row.id + '" style="color:#363a90"><i class="fa fa-user-edit" style="color:#363a90"></i> Scheda Allievo</a>'
-                            option += '<a class="dropdown-item" target="_blank" href="' + context + '/OperazioniSA?type=scaricaModello1&id=' + row.id +'" style="color:#363a90"><i class="fa fa-cloud-download-alt" style="color:#363a90"></i> Scarica Modello 1</a>'
+                            option += '<a class="dropdown-item" target="_blank" href="' + context + '/OperazioniSA?type=scaricaModello1&id=' + row.id + '" style="color:#363a90"><i class="fa fa-cloud-download-alt" style="color:#363a90"></i> Scarica Modello 1</a>'
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadM1(' + row.id + ',\'[&quot;pdf&quot;]\', \'application/pdf\');" style="color:#b30000"><i class="fa fa-cloud-upload-alt" style="color:#b30000"></i> Carica Modello 1</a>';
                         }
                         option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalDocumentAllievo(' + row.id + ')"><i class="fa fa-file-alt"></i> Visualizza Documenti</a>';
@@ -115,25 +130,28 @@ var KTDatatablesDataSourceAjaxServer = function () {
 //                        option += '<a class="dropdown-item fancyBoxAntoRef" href="' + context + '/redirect.jsp?page=page/sa/updtAllievo.jsp?id=' + row.id + '"><i class="fa fa-user-edit"></i> Scheda Allievo</a>'
                         if (row.progetto !== null) {
                             prg1.set(row.progetto.id, row.progetto);
-                            option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalTableProgFormativo(' + row.progetto.id + ')"><i class="fa fa-file-alt"></i> Visualizza Progetto Formativo</a>'
+                            option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalTableProgFormativo(' 
+                                    + row.progetto.id + ')"><i class="fa fa-file-alt"></i> Visualizza Progetto Formativo</a>';
                         }
-                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMail(' + row.id + ',\'' + row.email + '\')"><i class="fa fa-envelope"></i> Modifica Email</a>'
+                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMail(' 
+                                + row.id + ',\'' + row.email + '\')"><i class="fa fa-envelope"></i> Modifica Email</a>';
                         option += '</div></div>';
                         return option;
                     }
                 },
                 {
-                    targets: 10,
+                    targets: 11,
                     className: 'text-center',
                     orderable: false,
                     render: function (data, type, row, meta) {
                         var option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io fa fa-address-card fancyDocument" style="font-size: 20px;"'
                                 + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
-                                + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' + formattedDate(new Date(row.scadenzadocid)) + '</h5>"></a>'
+                                + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' + formattedDate(new Date(row.scadenzadocid)) + '</h5>"></a>';
                         if (new Date(row.scadenzadocid) <= new Date()) {
                             option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io-n fancyDocument" style="font-size: 20px"'
                                     + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
-                                    + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' + formattedDate(new Date(row.scadenzadocid)) + '</h5>">&nbsp;<i class="fa fa-exclamation-triangle"></i></a>'
+                                    + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' 
+                                    + formattedDate(new Date(row.scadenzadocid)) + '</h5>">&nbsp;<i class="fa fa-exclamation-triangle"></i></a>';
                         }
                         return option;
                     }

@@ -22,6 +22,7 @@ import it.refill.domain.Condizione_Mercato;
 import it.refill.domain.Docenti;
 import it.refill.domain.DocumentiPrg;
 import it.refill.domain.Documenti_Allievi;
+import it.refill.domain.Email;
 import it.refill.domain.Faq;
 import it.refill.domain.FasceDocenti;
 import it.refill.domain.Formagiuridica;
@@ -53,6 +54,7 @@ import it.refill.util.FaseB;
 import it.refill.util.Lezione;
 import it.refill.util.Pdf_new;
 import static it.refill.util.Pdf_new.checkFirmaQRpdfA;
+import it.refill.util.SendMailJet;
 import it.refill.util.Utility;
 import static it.refill.util.Utility.conversionText;
 import static it.refill.util.Utility.copyR;
@@ -89,6 +91,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
 
@@ -656,7 +659,7 @@ public class OperazioniSA extends HttpServlet {
                 Long.parseLong(getRequestValue(request, "id")));
         boolean domiciliouguale = a.getIndirizzodomicilio().equalsIgnoreCase(a.getIndirizzoresidenza())
                 && a.getCivicodomicilio().equalsIgnoreCase(a.getCivicoresidenza())
-                && a.getComune_domicilio().getId() == a.getComune_residenza().getId();
+                && a.getComune_domicilio().getId().equals(a.getComune_residenza().getId());
 
         User us = (User) request.getSession().getAttribute("user");
         File downloadFile = Pdf_new.MODELLO1(e, "3", us.getUsername(), us.getSoggettoAttuatore(), a, new DateTime(), domiciliouguale, true);
@@ -989,7 +992,7 @@ public class OperazioniSA extends HttpServlet {
 //            System.out.println("it.refill.servlet.OperazioniSA.newProgettoFormativo() "+dir.getAbsolutePath());
             boolean copyfile1 = true;
             boolean copyfile2 = true;
-            Part part;
+//            Part part;
 //            if (salvataggio) {
 //                for (TipoDoc t : tipo_doc) {
 //                    part = request.getPart("doc_" + t.getId());
@@ -1845,7 +1848,7 @@ public class OperazioniSA extends HttpServlet {
         //check se il numero di alunni o le date sono state modificate
         boolean modified = false;
         //check se la modifica riguarda le date, in tal caso non va ricaricato il modello 2, ma vanno eliminate le lezioni del modello 3 (setto l'id del progetto a null)
-        boolean dates_modified = false;
+//        boolean dates_modified = false;
         try {
             ProgettiFormativi p = e.getEm().find(ProgettiFormativi.class,
                     Long.parseLong(request.getParameter("id_progetto")));
@@ -1861,8 +1864,8 @@ public class OperazioniSA extends HttpServlet {
                 String[] date = request.getParameter("date").split("-");
                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-                dates_modified = !p.getStart().equals(sdf.parse(date[0].trim()));
-                dates_modified = dates_modified ? true : !p.getEnd().equals(sdf.parse(date[1].trim()));
+//                dates_modified = !p.getStart().equals(sdf.parse(date[0].trim()));
+//                dates_modified = dates_modified ? true : !p.getEnd().equals(sdf.parse(date[1].trim()));
                 p.setStart(sdf.parse(date[0].trim()));
                 p.setEnd(sdf.parse(date[1].trim()));
             }
@@ -2622,37 +2625,6 @@ public class OperazioniSA extends HttpServlet {
         response.getWriter().close();
     }
 
-    protected void setSIGMA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
-        JsonObject resp = new JsonObject();
-        Entity e = new Entity();
-        e.begin();
-
-        try {
-            Allievi a = e.getEm().find(Allievi.class,
-                    Long.parseLong(request.getParameter("id")));
-            if (request.getParameter("sigma") != null) {
-                a.setStatopartecipazione((StatoPartecipazione) e.getEm().find(StatoPartecipazione.class,
-                        request.getParameter("sigma")));
-                e.merge(a);
-            }
-            e.commit();
-            resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA setSIGMA: " + ex.getMessage());
-            resp.addProperty("result", false);
-            resp.addProperty("message", "Errore: non &egrave; stato possibile impostare lo stato di partecipazione dell'allievo.");
-        } finally {
-            e.close();
-        }
-        response.getWriter().write(resp.toString());
-        response.getWriter().flush();
-        response.getWriter().close();
-    }
-
     protected void modifyRegistrioAula(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Entity e = new Entity();
         JsonObject resp = new JsonObject();
@@ -3017,8 +2989,8 @@ public class OperazioniSA extends HttpServlet {
             e.merge(m);
 //            int min_allievi = Integer.parseInt(e.getPath("min_allievi"));
 //            if (numallievi >= min_allievi) {
-                e.commit();
-                resp.addProperty("result", true);
+            e.commit();
+            resp.addProperty("result", true);
 //            } else {
 //                e.rollBack();
 //                prg.setStato(e.getEm().find(StatiPrg.class, "ATAE"));
@@ -3479,17 +3451,32 @@ public class OperazioniSA extends HttpServlet {
                     request.getParameter("ateco")));
 
             Part p = request.getPart("doc");
-            if (Boolean.parseBoolean(request.getParameter("domanda_ammissione")) && (p != null && p.getSubmittedFileName() != null && p.getSubmittedFileName().length() > 0)) {
-                mask.setDomanda_ammissione_presente(true);
+            if (Boolean.parseBoolean(request.getParameter("domanda_ammissione")) && (p != null
+                    && p.getSubmittedFileName() != null && p.getSubmittedFileName().length() > 0)) {
+                try {
+                    String path = e.getPath("pathDocSA_Allievi").replace("@rssa", Utility.correctName(us.getSoggettoAttuatore().getId() + "")).replace("@folder", a.getCodicefiscale());
+                    File dir = new File(path);
+                    createDir(path);
+                    String ext = p.getSubmittedFileName().substring(p.getSubmittedFileName().lastIndexOf("."));
+                    path += "domanda_ammissione_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext;
+                    File damm = new File(dir.getAbsolutePath() + File.separator + "domanda_ammissione_"
+                            + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext);
+                    p.write(damm.getPath());
+                    mask.setDomanda_ammissione_presente(true);
+                    mask.setDomanda_ammissione(path.replace("\\", "/"));
+                    
+                    Email email_txt = (Email) e.getEmail("domanda_amm");
+                    String testomail = StringUtils.replace(email_txt.getTesto(), "@nomecognome", a.getNome().toUpperCase() + " " 
+                            + a.getCognome().toUpperCase());
+                    testomail = StringUtils.replace(testomail, "@nomeprogetto", "YES I START UP NEET");
+                    testomail = StringUtils.replace(testomail, "@nomesa", a.getSoggetto().getRagionesociale().toUpperCase());
+                    SendMailJet.sendMail(e.getPath("mailsender"), new String[]{a.getEmail()}, new String[]{a.getSoggetto().getEmail()},
+                            testomail, email_txt.getOggetto(),damm);
 
-                String path = e.getPath("pathDocSA_Allievi").replace("@rssa", Utility.correctName(us.getSoggettoAttuatore().getId() + "")).replace("@folder", a.getCodicefiscale());
-                File dir = new File(path);
-                createDir(path);
-
-                String ext = p.getSubmittedFileName().substring(p.getSubmittedFileName().lastIndexOf("."));
-                path += "domanda_ammissione_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext;
-                p.write(dir.getAbsolutePath() + File.separator + "domanda_ammissione_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext);
-                mask.setDomanda_ammissione(path.replace("\\", "/"));
+                } catch (Exception ex1) {
+                    mask.setDomanda_ammissione_presente(false);
+                    e.insertTracking("System", "ERROR DOMANDA AMMISSIONE: "+Utility.estraiEccezione(ex1));
+                }
             } else {
                 mask.setDomanda_ammissione_presente(false);
             }
@@ -3593,7 +3580,7 @@ public class OperazioniSA extends HttpServlet {
             } else {
                 modello7OK = false;
             }
-            
+
             if (modello7OK) {
                 e.persist(mask);
                 e.commit();
@@ -3906,7 +3893,7 @@ public class OperazioniSA extends HttpServlet {
                     Long.parseLong(request.getParameter("id")));
             DocumentiPrg registroComplessivoPresente = pf.getDocumenti().stream().filter(dc -> dc.getDeleted() == 0 && dc.getTipo().getId() == 30L).findFirst().orElse(null);
 
-            boolean registroOK = false;
+            boolean registroOK;
             String erroreregistroOK = "REGISTRO COMPLESSIVO ERRATO. CONTROLLARE.";
 
             if (registroComplessivoPresente != null) {
@@ -4246,14 +4233,14 @@ public class OperazioniSA extends HttpServlet {
         try {
             e.begin();
             Long hh36 = new Long(129600000);
-            Long hh64 = new Long(230400000);
+//            Long hh64 = new Long(230400000);
             ProgettiFormativi p = e.getEm().find(ProgettiFormativi.class,
                     Long.parseLong(idpr));
             List<Allievi> al = e.getAllieviProgettiFormativi(p);
             List<MascheraM5> rendicontati = e.getM5Loaded_byPF(p);
             Map<Long, Long> allievi_m5 = Utility.allieviM5_loaded(rendicontati);
 
-            Map<Long, Long> oreRendicontabili = Action.OreRendicontabiliAlunni((int) (long) p.getId());
+//            Map<Long, Long> oreRendicontabili = Action.OreRendicontabiliAlunni((int) (long) p.getId());
             Map<Long, Long> oreRendicontabili_faseA = Action.OreRendicontabiliAlunni_faseA((int) (long) p.getId());
 
             if (fase.equals("1")) {
@@ -4264,7 +4251,7 @@ public class OperazioniSA extends HttpServlet {
 
                     } else {
                         if (allievi_m5.get(a.getId()) == null) {
-                            System.out.println("INSERIRE () " + a.getCognome());
+//                            System.out.println("INSERIRE () " + a.getCognome());
 
                             MascheraM5 mask = new MascheraM5();
                             mask.setAllievo(a);
@@ -4448,73 +4435,76 @@ public class OperazioniSA extends HttpServlet {
                     Lezioni_Modelli temp = Utility.lezioneFiltered(m.getLezioni(), lez.getId());
                     if (lez.isDoppia()) {
                         if (temp == null) {
+                            if (start != null) {
+                                start = start.plusDays(1);
 
-                            start = start.plusDays(1);
+                                double orastart1 = 9.0;
 
-                            double orastart1 = 9.0;
+                                double orastart2 = 16.0;
 
-                            double orastart2 = 16.0;
+                                Date giorno = start.toDate();
+                                Docenti d = m.getProgetto().getDocenti().get(0);
 
-                            Date giorno = start.toDate();
-                            Docenti d = m.getProgetto().getDocenti().get(0);
+                                double oraend1 = orastart1 + lez.getOre1();
 
-                            double oraend1 = orastart1 + lez.getOre1();
+                                BigDecimal bigDecimal1 = new BigDecimal(String.valueOf(oraend1));
 
-                            BigDecimal bigDecimal1 = new BigDecimal(String.valueOf(oraend1));
+                                int intValue1 = bigDecimal1.intValue();
+                                BigDecimal doublevalue = bigDecimal1.subtract(new BigDecimal(intValue1));
+                                String oraend1_v = String.valueOf(intValue1);
+                                if (intValue1 < 10) {
+                                    oraend1_v = "0" + oraend1_v;
+                                }
+                                if (doublevalue.doubleValue() > 0) {
+                                    oraend1_v += ":30";
+                                } else {
+                                    oraend1_v += ":00";
+                                }
 
-                            int intValue1 = bigDecimal1.intValue();
-                            BigDecimal doublevalue = bigDecimal1.subtract(new BigDecimal(intValue1));
-                            String oraend1_v = String.valueOf(intValue1);
-                            if (intValue1 < 10) {
-                                oraend1_v = "0" + oraend1_v;
-                            }
-                            if (doublevalue.doubleValue() > 0) {
-                                oraend1_v += ":30";
-                            } else {
-                                oraend1_v += ":00";
-                            }
+                                double oraend2 = orastart2 + lez.getOre2();
+                                BigDecimal bigDecimal2 = new BigDecimal(String.valueOf(oraend2));
 
-                            double oraend2 = orastart2 + lez.getOre2();
-                            BigDecimal bigDecimal2 = new BigDecimal(String.valueOf(oraend2));
+                                int intValue2 = bigDecimal2.intValue();
+                                BigDecimal doublevalue2 = bigDecimal2.subtract(new BigDecimal(intValue2));
+                                String oraend2_v = String.valueOf(intValue2);
+                                if (intValue2 < 10) {
+                                    oraend2_v = "0" + oraend2_v;
+                                }
+                                if (doublevalue2.doubleValue() > 0) {
+                                    oraend2_v += ":30";
+                                } else {
+                                    oraend2_v += ":00";
+                                }
 
-                            int intValue2 = bigDecimal2.intValue();
-                            BigDecimal doublevalue2 = bigDecimal2.subtract(new BigDecimal(intValue2));
-                            String oraend2_v = String.valueOf(intValue2);
-                            if (intValue2 < 10) {
-                                oraend2_v = "0" + oraend2_v;
-                            }
-                            if (doublevalue2.doubleValue() > 0) {
-                                oraend2_v += ":30";
-                            } else {
-                                oraend2_v += ":00";
-                            }
+                                Date orariostart1 = new SimpleDateFormat("HH:mm").parse("09:00");
+                                Date orarioend1 = new SimpleDateFormat("HH:mm").parse(oraend1_v);
+                                Date orariostart2 = new SimpleDateFormat("HH:mm").parse("16:00");
+                                Date orarioend2 = new SimpleDateFormat("HH:mm").parse(oraend2_v);
 
-                            Date orariostart1 = new SimpleDateFormat("HH:mm").parse("09:00");
-                            Date orarioend1 = new SimpleDateFormat("HH:mm").parse(oraend1_v);
-                            Date orariostart2 = new SimpleDateFormat("HH:mm").parse("16:00");
-                            Date orarioend2 = new SimpleDateFormat("HH:mm").parse(oraend2_v);
+                                Lezioni_Modelli lm1 = new Lezioni_Modelli(giorno, orariostart1, orarioend1, new Date(), m, lez, d);
+                                Lezioni_Modelli lm2 = new Lezioni_Modelli(giorno, orariostart2, orarioend2, new Date(), m, lez, d);
 
-                            Lezioni_Modelli lm1 = new Lezioni_Modelli(giorno, orariostart1, orarioend1, new Date(), m, lez, d);
-                            Lezioni_Modelli lm2 = new Lezioni_Modelli(giorno, orariostart2, orarioend2, new Date(), m, lez, d);
-
-                            e.persist(lm1);
-                            e.persist(lm2);
+                                e.persist(lm1);
+                                e.persist(lm2);
 //                            System.out.println("LEZIONE " + lez.getLezione() + " DOPPIA DA INSERIRE " + lm1.getGiorno() + " " + lm1.getOrainizio() + " - " + lm1.getOrafine());
 //                            System.out.println("LEZIONE " + lez.getLezione() + " DOPPIA DA INSERIRE " + lm2.getGiorno() + " " + lm2.getOrainizio() + " - " + lm2.getOrafine());
+                            }
                         } else {
                             start = new DateTime(temp.getGiorno().getTime());
                         }
                     } else {
                         if (temp == null) {
-                            start = start.plusDays(1);
-                            Date giorno, orariostart, orarioend;
-                            Docenti d = m.getProgetto().getDocenti().get(0);
-                            giorno = start.toDate();
-                            orariostart = new SimpleDateFormat("HH:mm").parse("09:00");
-                            orarioend = new SimpleDateFormat("HH:mm").parse("14:00");
-                            Lezioni_Modelli lm1 = new Lezioni_Modelli(giorno, orariostart, orarioend, new Date(), m, lez, d);
+                            if (start != null) {
+                                start = start.plusDays(1);
+                                Date giorno, orariostart, orarioend;
+                                Docenti d = m.getProgetto().getDocenti().get(0);
+                                giorno = start.toDate();
+                                orariostart = new SimpleDateFormat("HH:mm").parse("09:00");
+                                orarioend = new SimpleDateFormat("HH:mm").parse("14:00");
+                                Lezioni_Modelli lm1 = new Lezioni_Modelli(giorno, orariostart, orarioend, new Date(), m, lez, d);
 //                            System.out.println("LEZIONE " + lez.getLezione() + " DOPPIA DA INSERIRE " + lm1.getGiorno() + " " + lm1.getOrainizio() + " - " + lm1.getOrafine());
-                            e.persist(lm1);
+                                e.persist(lm1);
+                            }
                         } else {
                             start = new DateTime(temp.getGiorno().getTime());
                         }
@@ -4705,9 +4695,6 @@ public class OperazioniSA extends HttpServlet {
                     break;
                 case "uploadRegistrioAula":
                     uploadRegistrioAula(request, response);
-                    break;
-                case "setSIGMA":
-                    setSIGMA(request, response);
                     break;
                 case "modifyRegistrioAula":
                     modifyRegistrioAula(request, response);
