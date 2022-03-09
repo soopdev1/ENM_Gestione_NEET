@@ -154,7 +154,7 @@
                                                   action="<%=request.getContextPath()%>/OperazioniSA?type=newAllievo" 
                                                   style="padding-top: 0;"  method="post" enctype="multipart/form-data">
                                                 <input type="hidden" name="save" id="save" value="0" />
-                                                <%if(Utility.demoversion){%>
+                                                <%if (Utility.demoversion) {%>
                                                 <div class="kt-portlet__head">
                                                     <div class="kt-portlet__head-label">
                                                         <h3 class="kt-portlet__head-title">
@@ -250,8 +250,11 @@
                                                                 </div>
                                                                 <div class="form-row">
                                                                     <div class="form-group col-xl-3 col-lg-6">
-                                                                        <label>Telefono </label><label class="kt-font-danger kt-font-boldest">*</label>
-                                                                        <input type="text" class="form-control obbligatory" id="telefono" name="telefono" onkeypress="return isNumber(event);" />
+                                                                        <label>Telefono (Cellulare, senza +39) </label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                        <input type="text" class="form-control obbligatory" 
+                                                                               id="telefono" name="telefono" 
+                                                                               onkeypress="return check_mobiletel_bef(event, this);" 
+                                                                               onkeyup="return check_mobiletel_aft(event, this);"/>
                                                                     </div>
                                                                     <div class="form-group col-xl-3 col-lg-6">
                                                                         <label>Documento di identità </label><label class="kt-font-danger kt-font-boldest">*</label>
@@ -266,13 +269,13 @@
                                                                     </div>
                                                                     <div class="form-group col-xl-3 col-lg-6">
                                                                         <label>Cittadinanza</label> <i class="fa fa-info-circle" 
-                                                                                                   data-container="body" 
-                                                                                                   data-toggle="kt-popover" 
-                                                                                                   data-placement="bottom"
-                                                                                                   data-original-title="Cittadinanza"
-                                                                                                   data-content="Possono partecipare al programma Garanzia giovani, i cittadini Italiani, 
-                                                                                                   i cittadini di uno stato membro dell'Unione Europea oppure stranieri extra UE, purché con permesso di soggiorno o residenza in Italia.
-                                                                                                   In mancanza, del requisito della residenza o del permesso di soggiorno l'iscrizione al percorso YES I START UP non &#232; valida."></i><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                                       data-container="body" 
+                                                                                                       data-toggle="kt-popover" 
+                                                                                                       data-placement="bottom"
+                                                                                                       data-original-title="Cittadinanza"
+                                                                                                       data-content="Possono partecipare al programma Garanzia giovani, i cittadini Italiani, 
+                                                                                                       i cittadini di uno stato membro dell'Unione Europea oppure stranieri extra UE, purché con permesso di soggiorno o residenza in Italia.
+                                                                                                       In mancanza, del requisito della residenza o del permesso di soggiorno l'iscrizione al percorso YES I START UP non &#232; valida."></i><label class="kt-font-danger kt-font-boldest">*</label>
                                                                         <div class="dropdown bootstrap-select form-control kt-" id="cittadinanza_div" style="padding: 0;">
                                                                             <select class="form-control kt-select2-general obbligatory" id="cittadinanza" name="cittadinanza"  style="width: 100%">
                                                                                 <option value="-">Seleziona Cittadinanza</option>
@@ -284,13 +287,13 @@
                                                                     </div>
                                                                 </div>  
                                                                 <h5>Residenza <i class="fa fa-info-circle" 
-                                                                                                   data-container="body" 
-                                                                                                   data-toggle="kt-popover" 
-                                                                                                   data-placement="bottom"
-                                                                                                   data-original-title="Residenza"
-                                                                                                   data-content="Possono partecipare al programma Garanzia giovani, i cittadini Italiani, 
-                                                                                                   i cittadini di uno stato membro dell'Unione Europea oppure stranieri extra UE, purché con permesso di soggiorno o residenza in Italia.
-                                                                                                   In mancanza, del requisito della residenza o del permesso di soggiorno l'iscrizione al percorso YES I START UP non &#232; valida."></i></h5>
+                                                                                 data-container="body" 
+                                                                                 data-toggle="kt-popover" 
+                                                                                 data-placement="bottom"
+                                                                                 data-original-title="Residenza"
+                                                                                 data-content="Possono partecipare al programma Garanzia giovani, i cittadini Italiani, 
+                                                                                 i cittadini di uno stato membro dell'Unione Europea oppure stranieri extra UE, purché con permesso di soggiorno o residenza in Italia.
+                                                                                 In mancanza, del requisito della residenza o del permesso di soggiorno l'iscrizione al percorso YES I START UP non &#232; valida."></i></h5>
                                                                 <div class="kt-separator kt-separator--border kt-separator--space-xs"></div>
                                                                 <div class="form-row">
                                                                     <div class="form-group col-xl-4 col-lg-6">

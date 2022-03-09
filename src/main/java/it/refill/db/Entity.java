@@ -62,7 +62,6 @@ import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpSession;
 import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 /**
  *

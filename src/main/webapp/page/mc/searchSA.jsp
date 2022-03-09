@@ -255,6 +255,7 @@
 
         <script>
             $.getScript('<%=request.getContextPath()%>/page/partialView/partialView.js', function () {});
+            var tipouser = '<%=tipoR%>';
 
             var KTDatatablesDataSourceAjaxServer = function () {
                 var initTable1 = function () {
@@ -321,7 +322,14 @@
                                     option += '<a class="dropdown-item" href="<%=request.getContextPath()%>/redirect.jsp?page=page/mc/searchAllieviMicro.jsp&idsa=' + row.id + '" target="_blank"><i class="flaticon-users-1"></i> Allievi</a>';
                                     option += '<a class="dropdown-item" href="<%=request.getContextPath()%>/redirect.jsp?page=page/mc/searchPFMicro.jsp&idsa=' + row.id + '" target="_blank"><i class="fa fa-graduation-cap"></i> Progetti Formativi</a>';
                                     option += '</div></div>';
-                                    return option;
+
+                                    if (tipouser === "2") {
+                                        return option;
+                                    } else {
+                                        return "";
+                                    }
+
+                                    
                                 }
                             },
                             {
