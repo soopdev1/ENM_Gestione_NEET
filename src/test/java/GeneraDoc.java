@@ -22,55 +22,54 @@ import org.joda.time.DateTime;
 public class GeneraDoc {
 
     public static void main(String[] args) {
-        
-        String idpr = "300";
-        String idall = "1279";
-        String usernameSA = "CINZIA.TONIN";
-        
-        
-        
-        
-        
+
+        String idpr = "176";
+//        String idall = "1279";
+        String usernameSA = "SEGRETERIAGENERALE";
+
         Entity e = new Entity();
         e.begin();
         ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class,
-                    Long.parseLong(idpr));
+                Long.parseLong(idpr));
 //        Allievi al = e.getEm().find(Allievi.class,
 //                    Long.parseLong(idall));
-        
-        ModelliPrg m3 = Utility.filterModello3(prg.getModelli());
-        ModelliPrg m4 = Utility.filterModello4(prg.getModelli());
-        
+
+//        ModelliPrg m3 = Utility.filterModello3(prg.getModelli());
+//        ModelliPrg m4 = Utility.filterModello4(prg.getModelli());
 //        File f1 = Pdf_new.MODELLO1(e, "3", usernameSA, prg.getSoggetto(), al, new DateTime(), true, true);
 ////        System.out.println(f1.getPath());
-        
-        File f2 = Pdf_new.MODELLO2(e,
-                            "1",
-                            usernameSA, prg.getSoggetto(),
-                            prg,
-                            prg.getAllievi().stream().filter(a1-> a1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()) , new DateTime(), true);
-        
-        System.out.println(f2.getPath());
-        
-        File f3 = Pdf_new.MODELLO3(e,
-                            usernameSA,
-                            prg.getSoggetto(),
-                            prg,
-                            prg.getAllievi().stream().filter(p1 -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
-                            prg.getDocenti(), m3.getLezioni(), prg.getStaff_modelli().stream().filter(m -> m.getAttivo() == 1).collect(Collectors.toList()),
-                            new DateTime(), true);
-        System.out.println(f3.getPath());
-        
+//        File f2 = Pdf_new.MODELLO2(e,
+//                            "1",
+//                            usernameSA, prg.getSoggetto(),
+//                            prg,
+//                            prg.getAllievi().stream().filter(a1-> a1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()) , new DateTime(), true);
+//        
+//        System.out.println(f2.getPath());
+//        
+//        File f3 = Pdf_new.MODELLO3(e,
+//                            usernameSA,
+//                            prg.getSoggetto(),
+//                            prg,
+//                            prg.getAllievi().stream().filter(p1 -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
+//                            prg.getDocenti(), m3.getLezioni(), prg.getStaff_modelli().stream().filter(m -> m.getAttivo() == 1).collect(Collectors.toList()),
+//                            new DateTime(), true);
+//        System.out.println(f3.getPath());
 //        File f4 = Pdf_new.MODELLO4(e, usernameSA, prg.getSoggetto(), prg, prg.getAllievi().stream().filter(p1 -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
 //                prg.getDocenti(), m4.getLezioni(), prg.getStaff_modelli().stream().filter(m -> m.getAttivo() == 1).collect(Collectors.toList()), new DateTime(), true);
 //        
 //        System.out.println(f4.getPath());
-        
+        ModelliPrg m6 = Utility.filterModello6(prg.getModelli());
+        File f6 = Pdf_new.MODELLO6(e,
+                usernameSA,
+                prg.getSoggetto(),
+                prg, m6, new DateTime(), true);
+
+        System.out.println(f6.getPath());
         
         e.close();
 //        
 //        String o = Pdf_new.checkFirmaQRpdfA("MODELLO1", "", new File("C:\\Users\\Administrator\\Desktop\\da caricare\\INFO05_MOISE_CLAUDIASILVIA_041120211144476.M1_pdfA.pdf"), "", "20;0;60;60");
 //        System.out.println(o);
     }
-                    
+
 }

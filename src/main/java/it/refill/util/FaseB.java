@@ -5,64 +5,11 @@
  */
 package it.refill.util;
 
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.itextpdf.barcodes.BarcodeQRCode;
-import com.itextpdf.io.font.constants.StandardFonts;
-import com.itextpdf.kernel.colors.Color;
-import com.itextpdf.kernel.colors.DeviceRgb;
-import com.itextpdf.kernel.font.PdfFont;
-import com.itextpdf.kernel.font.PdfFontFactory;
-import com.itextpdf.kernel.geom.PageSize;
-import com.itextpdf.kernel.pdf.PdfDocument;
-import com.itextpdf.kernel.pdf.PdfReader;
-import com.itextpdf.kernel.pdf.PdfWriter;
-import com.itextpdf.layout.Document;
-import com.itextpdf.layout.Style;
-import com.itextpdf.layout.borders.Border;
-import com.itextpdf.layout.element.AreaBreak;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.property.AreaBreakType;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
 import it.refill.db.Database;
-import static it.refill.util.Items1.formatAction;
-import static it.refill.util.Utility.calcoladurata;
-import static it.refill.util.Utility.checkPDF;
-import static it.refill.util.Utility.convertHours;
-import static it.refill.util.Utility.convertTS_Italy;
-import static it.refill.util.Utility.createDir;
-import static it.refill.util.Utility.dtf;
-import static it.refill.util.Utility.dtfsql;
-import static it.refill.util.Utility.format;
-import static it.refill.util.Utility.formatStringtoStringDateSQL;
-import static it.refill.util.Utility.gestisciorerendicontabili;
-import static it.refill.util.Utility.getIdUser;
-import static it.refill.util.Utility.patternITA;
-import static it.refill.util.Utility.patternid;
-import static it.refill.util.Utility.printbarcode;
-import static it.refill.util.Utility.timestamp;
-import static it.refill.util.Utility.timestampITAcomplete;
-import static it.refill.util.Utility.timestampSQL;
-import java.io.File;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import static org.apache.commons.lang3.StringUtils.stripAccents;
-import org.apache.pdfbox.pdmodel.font.PDFont;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.joda.time.DateTime;
 
 /**
  *

@@ -913,8 +913,9 @@ public class Pdf_new {
                     + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M6.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
-                PdfWriter writer = new PdfWriter(pdfOut);
+            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); 
+                    PdfReader reader = new PdfReader(is); 
+                    PdfWriter writer = new PdfWriter(pdfOut)) {
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
@@ -1309,7 +1310,6 @@ public class Pdf_new {
                         + " / " + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
                 pdfDoc.close();
-                writer.close();
             }
             if (checkPDF(pdfOut)) {
                 return pdfOut;

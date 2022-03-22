@@ -23,9 +23,9 @@ import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Cell;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.property.AreaBreakType;
-import com.itextpdf.layout.property.TextAlignment;
-import com.itextpdf.layout.property.UnitValue;
+import com.itextpdf.layout.properties.AreaBreakType;
+import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import it.refill.db.Database;
 import static it.refill.util.Utility.calcoladurata;
 import static it.refill.util.Utility.checkPDF;
@@ -538,15 +538,11 @@ public class Complessivo {
 
                 String qrcontent = "ID " + idpr + " REGISTRO COMPLESSIVO- AGGIORNATO IL " + now;
                 File out1 = new File(StringUtils.replace(out0.getPath(), ".pdf", "_qr.pdf"));
-                PdfReader p2 = new PdfReader(out0);
-                PdfWriter p2w = new PdfWriter(out1);
-                PdfDocument pdfDoc1 = new PdfDocument(p2, p2w);
-                BarcodeQRCode barcode = new BarcodeQRCode(qrcontent);
-                String add = "Questo registro è stato generato automaticamente dalla piattaforma raggiungibile al link: " + linkpiattaforma;
-                printbarcode(barcode, pdfDoc1, true, add);
-                pdfDoc1.close();
-                p2w.close();
-                p2.close();
+                try (PdfReader p2 = new PdfReader(out0); PdfWriter p2w = new PdfWriter(out1); PdfDocument pdfDoc1 = new PdfDocument(p2, p2w)) {
+                    BarcodeQRCode barcode = new BarcodeQRCode(qrcontent);
+                    String add = "Questo registro è stato generato automaticamente dalla piattaforma raggiungibile al link: " + linkpiattaforma;
+                    printbarcode(barcode, pdfDoc1, true, add);
+                }
 
                 out0.deleteOnExit();
 

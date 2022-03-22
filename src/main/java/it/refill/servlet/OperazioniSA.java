@@ -772,10 +772,10 @@ public class OperazioniSA extends HttpServlet {
         ProgettiFormativi pr = e.getEm().find(ProgettiFormativi.class,
                 Long.parseLong(idpr));
 
-        //verifica se ci sono almeno 4 allievi totali
+        //verifica se ci sono almeno 4 allievi totali - almeno un allievo deve fare la fase B
         int size = pr.getAllievi().stream().filter(al1 -> al1.getGruppo_faseB() > 0).collect(Collectors.toList()).size();
-        int min_allievi = Integer.parseInt(e.getPath("min_allievi"));
-        if (size >= min_allievi) {
+//        int min_allievi = Integer.parseInt(e.getPath("min_allievi"));
+        if (size >= 1) {
             TipoDoc modello = e.getEm().find(TipoDoc.class,
                     6L);
             User us = (User) request.getSession().getAttribute("user");
