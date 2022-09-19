@@ -492,8 +492,6 @@ public class QuerySA extends HttpServlet {
                 }
             }
             
-            System.out.println("it.refill.servlet.QuerySA.checkModello4Start() "+list.size());
-            
             ObjectMapper mapper = new ObjectMapper();
             response.getWriter().write(mapper.writeValueAsString(list));
         } catch (Exception ex) {

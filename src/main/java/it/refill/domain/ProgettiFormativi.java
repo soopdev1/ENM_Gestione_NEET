@@ -144,6 +144,9 @@ public class ProgettiFormativi implements Serializable {
     
     @Column(name = "assegnazione")
     private String assegnazione;
+    
+    @Column(name = "svolgimento")
+    private String svolgimento;
 
     //ALTRI
     @Transient
@@ -164,6 +167,14 @@ public class ProgettiFormativi implements Serializable {
     int allievi_ok;
 
     public ProgettiFormativi() {
+    }
+
+    public String getSvolgimento() {
+        return svolgimento;
+    }
+
+    public void setSvolgimento(String svolgimento) {
+        this.svolgimento = svolgimento;
     }
 
     public String getPdfunico() {
@@ -190,24 +201,6 @@ public class ProgettiFormativi implements Serializable {
         this.assegnazione = assegnazione;
     }
     
-    
-
-//    public int getAllievi_total() {
-//        
-//        return allievi.size();
-//    }
-//
-//    public void setAllievi_total(int allievi_total) {
-//        this.allievi_total = this.allievi.size();
-//    }
-//
-//    public int getAllievi_ok() {
-//        return allievi.stream().filter(a1-> a1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()).size() ;
-//    }
-//
-//    public void setAllievi_ok(int allievi_ok) {
-//        this.allievi_ok = this.allievi.stream().filter(a1-> a1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()).size();
-//    }
     public int getAllievi_total() {
         return allievi_total;
     }

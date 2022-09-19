@@ -217,6 +217,7 @@
                                                         <th class="text-uppercase text-center">Azioni</th>
                                                         <th class="text-uppercase text-center">ID</th>
                                                         <th class="text-uppercase text-center">Soggetto Attuatore</th>
+                                                        <th class="text-uppercase text-center">Svolgimento</th>
                                                         <th class="text-uppercase text-center">Data Inizio</th>
                                                         <th class="text-uppercase text-center">Data Fine</th>
                                                         <th class="text-uppercase text-center">CIP</th>

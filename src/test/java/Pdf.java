@@ -22,25 +22,25 @@ public class Pdf {
 
     public static void main(String[] args) {
         
-        File downloadFile = null;
-        try {
-            Entity e = new Entity();
-            ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class,
-                    110L);
-            
-            System.out.println("Pdf.main() "+pf.getModelli());
-            
-            ModelliPrg m6 = filterModello6(pf.getModelli());
-            if (m6 != null) {
-                downloadFile = Pdf_new.MODELLO6(e,
-                        "AMMINISTRAZIONE",
-                        pf.getSoggetto(),
-                        pf, m6, new DateTime(), true);
-                System.out.println("Pdf.main() "+downloadFile.getPath());
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+//        File downloadFile = null;
+//        try {
+//            Entity e = new Entity();
+//            ProgettiFormativi pf = e.getEm().find(ProgettiFormativi.class,
+//                    110L);
+//            
+//            System.out.println("Pdf.main() "+pf.getModelli());
+//            
+//            ModelliPrg m6 = filterModello6(pf.getModelli());
+//            if (m6 != null) {
+//                downloadFile = Pdf_new.MODELLO6(e,
+//                        "AMMINISTRAZIONE",
+//                        pf.getSoggetto(),
+//                        pf, m6, new DateTime(), true);
+//                System.out.println("Pdf.main() "+downloadFile.getPath());
+//            }
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
         
         
 //        Entity e = new Entity();

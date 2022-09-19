@@ -27,10 +27,12 @@ public class Example {
     }
 
     public static void main(String[] args) {
-
-        System.out.println("it.refill.util.Utility.main() " + conversionText("ISTITUTO TECNICO\n"
-                + "COMMERCIALE E. VANONI,\n"
-                + "NARDÃ (LE)"));
+//        System.out.println(conversionText("PADOVA"));
+//        
+//        
+//        System.out.println("it.refill.util.Utility.main() " + conversionText("ISTITUTO TECNICO\n"
+//                + "COMMERCIALE E. VANONI,\n"
+//                + "NARDÃ (LE)"));
 //            File ing = new File("C:\\Users\\rcosco\\Downloads\\HistoricalStockPrice_2021 (1).pdf");
 //            File out = new File("C:\\Users\\rcosco\\Downloads\\COPIED.pdf");
 //

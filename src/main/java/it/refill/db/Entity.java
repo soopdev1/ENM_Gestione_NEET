@@ -592,7 +592,6 @@ public class Entity {
         }
         
         sql += " ORDER BY a.timestamp DESC";//ordina per ultima modifica al progetto
-        System.out.println("it.refill.db.Entity.getProgettiFormativi() " + sql);
         TypedQuery<ProgettiFormativi> q = this.em.createQuery(sql, ProgettiFormativi.class);
         if (param.isEmpty()) {
             q.setMaxResults(maxQueryResult);

@@ -95,9 +95,13 @@ function domAmm_check(id) {
     if ($('#domanda_a_' + id).is(":checked")) {
         $('#doc_' + id).removeAttr('disabled');
         $('#doc_' + id).attr('tipo', 'obbligatory');
+        $('#cont_daok_' + id).toggle(true);
+        $('#file_daok_' + id).toggle(true);
     } else {
         $('#doc_' + id).removeAttr('tipo');
         $('#doc_' + id).attr('disabled', 'disabled');
+        $('#cont_daok_' + id).toggle(false);
+        $('#file_daok_' + id).toggle(false);
     }
 }
 
@@ -270,15 +274,16 @@ function resetForm() {
     $("#kt_form").find('input[type=text]:not([id^=A_],.hidden), select, textarea').val('');
     $("#kt_form").find('input:radio, input:checkbox').removeAttr('checked').removeAttr('selected');
     $('#kt_form').find('input[type=file]').val("");
-
+    $("input[name^='domanda_a_']").prop('checked', true);
 }
 
 function ctrlForm(id) {
     var err = false;
-    err = checkObblFields_Allievo(id) ? true : err;
     if ($('#domanda_a_' + id).is(":checked")) {
+        err = checkObblFields_Allievo(id) ? true : err;
         err = !checkRequiredFileAlunno(id) ? true : err;
     }
+    err = !checkRequiredM7Alunno(id) ? true : err;
     return !err;
 }
 
@@ -313,16 +318,16 @@ function checkObblFields_Allievo(id) {
             $(this).removeClass("is-valid").removeClass("is-invalid");
         }
     });
-    $('textarea.obbligatory[id$=' + id + ']').each(function () {
-        var testo1 = tinymce.get($(this).attr('id')).getContent({ format: 'text' });
-        if (testo1 === '') {
-            err = true;
-            alert("VERIFICARE TUTTI I CAMPI DI TESTO.")
-            $(this).removeClass("is-valid").addClass("is-invalid");
-        } else {
-            $(this).removeClass("is-invalid").addClass("is-valid");
-        }
-    });
+//    $('textarea.obbligatory[id$=' + id + ']').each(function () {
+//        var testo1 = tinymce.get($(this).attr('id')).getContent({format: 'text'});
+//        if (testo1 === '') {
+//            err = true;
+//            alert("VERIFICARE TUTTI I CAMPI DI TESTO.")
+//            $(this).removeClass("is-valid").addClass("is-invalid");
+//        } else {
+//            $(this).removeClass("is-invalid").addClass("is-valid");
+//        }
+//    });
     $('select.obbligatory[id$=' + id + ']').each(function () {
         if ($(this).val() === '' || $(this).val() === '-' || $(this).val() === null) {
             err = true;
@@ -397,6 +402,18 @@ function checkRequiredFileAlunno(id) {
     return !err;
 }
 
+function checkRequiredM7Alunno(id) {
+    var err = false;
+    $('input:file[tipo=obbligatory][id=m7_' + id + ']').each(function () {
+        if ($(this)[0].files.length === 0) {
+            err = true;
+            $(this).attr("class", "custom-file-input is-invalid");
+        } else {
+            $(this).attr("class", "custom-file-input is-valid");
+        }
+    });
+    return !err;
+}
 
 function cleanCurrency(v) {
     v = v.substring(v.lastIndexOf("_") + 1);
@@ -430,18 +447,18 @@ $('a[id^=rendiconta_]').on('click', function () {
                 let formaGiuridica = $('#fg_' + idal).val();
                 let comune = $('#comune_' + idal).val();
                 let ateco = $('#ateco_' + idal).val();
-                
-                
-                
-                
-                let motivazione = $('#motivazione_' + idal).val();
-                
-                let motivazione2 = tinymce.get('motivazione_' + idal).getContent({ format: 'text' });
-                
-                let ideaImpresa = $('#ideaimpresa_' + idal).val();
-                let ideaImpresa2 = tinymce.get('ideaimpresa_' + idal).getContent({ format: 'text' });
-                
-                
+
+
+
+
+                let motivazione2 = $('#motivazione_' + idal).val();
+
+//                let motivazione2 = tinymce.get('motivazione_' + idal).getContent({format: 'text'});
+
+                let ideaImpresa2 = $('#ideaimpresa_' + idal).val();
+//                let ideaImpresa2 = tinymce.get('ideaimpresa_' + idal).getContent({format: 'text'});
+
+
                 let tff = cleanCurrency($('#tff_' + idal).val());
                 let tfra = cleanCurrency($('#tfra_' + idal).val());
 
@@ -550,7 +567,7 @@ function uploadModello5(idallievo, title) {
         title: title,
         html: '<div id="swalM5' + idallievo + '">'
                 + '<div class="custom-file">'
-                + '<input type="file" tipo="obbligatory" class="custom-file-input" accept="application/pkcs7-mime,application/pdf" name="m5_' + idallievo + '" id="m5_' + idallievo 
+                + '<input type="file" tipo="obbligatory" class="custom-file-input" accept="application/pkcs7-mime,application/pdf" name="m5_' + idallievo + '" id="m5_' + idallievo
                 + '" onchange="return checkFileExtAndDim([&quot;pdf,p7m&quot;]);">'
                 + '<label class="custom-file-label selected" id="label_' + idallievo + '" style="text-align: left;">Seleziona File</label>'
                 + '</div>'
@@ -667,7 +684,7 @@ function uploadRegistroComplessivo(pf) {
         title: 'Carica Registro complessivo presenze',
         html: '<div id="swal_regC">'
                 + '<div class="custom-file">'
-                + '<input type="file" tipo="obbligatory" class="custom-file-input" accept="application/pkcs7-mime,application/pdf" name="rcp_' 
+                + '<input type="file" tipo="obbligatory" class="custom-file-input" accept="application/pkcs7-mime,application/pdf" name="rcp_'
                 + pf + '" id="rcp_' + pf + '" onchange="return checkFileExtAndDim([&quot;pdf,p7m&quot;]);">'
                 + '<label class="custom-file-label selected" id="label_rcp_' + pf + '" style="text-align: left;">Seleziona File</label>'
                 + '</div>'

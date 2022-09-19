@@ -38,6 +38,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
                 {defaultContent: ''},
                 {data: 'id'},
                 {data: 'soggetto.ragionesociale', className: 'text-center text-uppercase'},
+                {data: 'svolgimento', className: 'text-center text-uppercase'},
                 {data: 'start'},
                 {data: 'end'},
                 {data: 'cip'},
@@ -67,6 +68,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
                         if (typeuser === "2") {
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="assegna(' + row.id + ')"><i class="fa fa-user"></i> Assegnazione</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadDocGenerico(' + row.id + ')"><i class="fa fa-upload" style="margin-top:-2px"></i>Carica Altra Documentazione</a>';
+                            option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadDocANPAL(' + row.id + ')"><i class="fa fa-upload" style="margin-top:-2px"></i>Carica PDF Allievi (ANPAL)</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="modifyDate(' + row.id + ',' + row.start + ',' + row.end + ',' + row.end_fa + ')"><i class="fa fa-calendar-alt"></i> Modifica Date</a>';
 
                         }
@@ -147,21 +149,31 @@ var KTDatatablesDataSourceAjaxServer = function () {
                         option += '</div></div>';
                         return option;
                     }
-                },
-                {
+                }, {
                     targets: 3,
                     type: 'date-it',
                     render: function (data, type, row, meta) {
-                        return formattedDate(new Date(data));
+                        if (data === 'P') {
+                            return "In Presenza";
+                        } else {
+                            return "In FAD";
+                        }
                     }
-                }, {
+                },
+                {
                     targets: 4,
                     type: 'date-it',
                     render: function (data, type, row, meta) {
                         return formattedDate(new Date(data));
                     }
                 }, {
-                    targets: 6,
+                    targets: 5,
+                    type: 'date-it',
+                    render: function (data, type, row, meta) {
+                        return formattedDate(new Date(data));
+                    }
+                }, {
+                    targets: 7,
                     render: function (data, type, row, meta) {
                         return row.allievi_ok + ' - ' + row.allievi_total;
                     }
@@ -695,6 +707,82 @@ function generateCIP(id) {
         }
     });
     return cip;
+}
+
+//UPLOAD DOC PDF PER ANPAL - 21-06-22
+function uploadDocANPAL(id) {
+    var swalDoc = getHtml("swalDoc", context).replace("@func", "checkFileExtAndDim(&quot;pdf&quot;)").replace("@mime", 'application/pdf');
+    swal.fire({
+        title: 'Carica Documenti PDF Allievi (faranno parte della documentazione inviata ad ANPAL)',
+        html: swalDoc,
+        animation: false,
+        showCancelButton: true,
+        confirmButtonText: '&nbsp;<i class="la la-check"></i>',
+        cancelButtonText: '&nbsp;<i class="la la-close"></i>',
+        cancelButtonClass: "btn btn-io-n",
+        confirmButtonClass: "btn btn-io",
+        width: '50%',
+        customClass: {
+            popup: 'animated bounceInUp'
+        },
+        onOpen: function () {
+            $('#file').change(function (e) {
+                if (e.target.files.length !== 0) {
+                    if (e.target.files[0].name.length > 30) {
+                        $('#label_doc').html(e.target.files[0].name.substring(0, 30) + "...");
+                    } else {
+                        $('#label_doc').html(e.target.files[0].name);
+                    }
+                } else {
+                    $('#label_doc').html("Seleziona File");
+                }
+            });
+        },
+        preConfirm: function () {
+            var err = false;
+            err = !checkRequiredFileContent($('#swalDoc')) ? true : err;
+            if (!err) {
+                return new Promise(function (resolve) {
+                    resolve({
+                        "file": $('#file')[0].files[0]
+                    });
+                });
+            } else {
+                return false;
+            }
+        }
+    }).then((result) => {
+        if (result.value) {
+            showLoad();
+            var fdata = new FormData();
+            fdata.append("file", result.value.file);
+            uploadndAN(id, fdata);
+        } else {
+            swal.close();
+        }
+    });
+}
+
+function uploadndAN(id, fdata) {
+    $.ajax({
+        type: "POST",
+        url: context + '/OperazioniMicro?type=caricanuovodocumentoANPAL&idpr=' + id,
+        data: fdata,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+            closeSwal();
+            var json = JSON.parse(data);
+            if (json.result) {
+                swalSuccessReload("Operazione Effettuata!", "Documento caricato con successo.");
+            } else {
+                swalError("Errore", json.message);
+            }
+        },
+        error: function () {
+            swalError("Errore", "Non è stato possibile caricare il documento.");
+        }
+    });
 }
 
 //UPLOAD DOC GENERICO - 04-10-21

@@ -45,7 +45,6 @@ public class FaseB {
                     + " AND mp.id_progettoformativo=" + idpr + " AND ud.fase = 'Fase B' ORDER BY lm.gruppo_faseB,lc.lezione,lm.orario_start";
             
             
-            System.out.println(sql1);
             try (Statement st1 = db1.getC().createStatement(); ResultSet rs1 = st1.executeQuery(sql1)) {
 
                 while (rs1.next()) {

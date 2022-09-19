@@ -6,6 +6,7 @@
 package it.refill.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.JsonObject;
 import it.refill.cf.DataPanel;
 import it.refill.db.Action;
@@ -54,6 +55,7 @@ import it.refill.util.FaseB;
 import it.refill.util.Lezione;
 import it.refill.util.Pdf_new;
 import static it.refill.util.Pdf_new.checkFirmaQRpdfA;
+import it.refill.util.Registro_completo;
 import it.refill.util.SendMailJet;
 import it.refill.util.Utility;
 import static it.refill.util.Utility.conversionText;
@@ -61,6 +63,7 @@ import static it.refill.util.Utility.copyR;
 import static it.refill.util.Utility.createDir;
 import static it.refill.util.Utility.getRequestValue;
 import static it.refill.util.Utility.getStartPath;
+import static it.refill.util.Utility.parseDouble;
 import static it.refill.util.Utility.patternComplete;
 import static it.refill.util.Utility.redirect;
 import java.io.File;
@@ -70,11 +73,13 @@ import java.io.OutputStream;
 import static java.lang.String.format;
 import java.math.BigDecimal;
 import static java.nio.file.Files.probeContentType;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -94,6 +99,9 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeComparator;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 
 /**
  *
@@ -629,7 +637,7 @@ public class OperazioniSA extends HttpServlet {
         } else {
             if (downloadFile != null && downloadFile.exists()) {
                 OutputStream outStream;
-                try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+                try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                     String mimeType = probeContentType(downloadFile.toPath());
                     if (mimeType == null) {
                         mimeType = "application/octet-stream";
@@ -667,7 +675,7 @@ public class OperazioniSA extends HttpServlet {
         e.close();
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -957,6 +965,7 @@ public class OperazioniSA extends HttpServlet {
                     "DV"));
             p.setControllable(1);
             p.setData_up(new Date());
+            p.setSvolgimento(getRequestValue(request, "svolgimento"));
             e.persist(p);
             e.flush();
 
@@ -1119,7 +1128,7 @@ public class OperazioniSA extends HttpServlet {
         } else {//MODELLO
             if (downloadFile != null && downloadFile.exists()) {
                 OutputStream outStream;
-                try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+                try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                     String mimeType = probeContentType(downloadFile.toPath());
                     if (mimeType == null) {
                         mimeType = "application/octet-stream";
@@ -1172,7 +1181,7 @@ public class OperazioniSA extends HttpServlet {
 
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -1227,7 +1236,7 @@ public class OperazioniSA extends HttpServlet {
 
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -1273,7 +1282,7 @@ public class OperazioniSA extends HttpServlet {
 
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -1344,7 +1353,7 @@ public class OperazioniSA extends HttpServlet {
 
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -1406,7 +1415,7 @@ public class OperazioniSA extends HttpServlet {
 
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -3041,7 +3050,7 @@ public class OperazioniSA extends HttpServlet {
 
             if (downloadFile != null && downloadFile.exists()) {
                 OutputStream outStream;
-                try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+                try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                     String mimeType = probeContentType(downloadFile.toPath());
                     if (mimeType == null) {
                         mimeType = "application/octet-stream";
@@ -3170,7 +3179,7 @@ public class OperazioniSA extends HttpServlet {
 
                 }
                 /*Modifica 14 06 21 - Nuovi campi ed attivita*/
-                String comune_nascita = conversionText(getRequestValue(request, "com_nas"));
+                String comune_nascita = new String(getRequestValue(request, "com_nas").getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
                 String reg_res = getRequestValue(request, "reg_res");
                 String pec = getRequestValue(request, "pecmail");
                 String cell = getRequestValue(request, "telefono");
@@ -3292,7 +3301,7 @@ public class OperazioniSA extends HttpServlet {
         } else {
             if (downloadFile != null && downloadFile.exists()) {
                 OutputStream outStream;
-                try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+                try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                     String mimeType = probeContentType(downloadFile.toPath());
                     if (mimeType == null) {
                         mimeType = "application/octet-stream";
@@ -3429,166 +3438,199 @@ public class OperazioniSA extends HttpServlet {
         JsonObject resp = new JsonObject();
         User us = (User) request.getSession().getAttribute("user");
         e.begin();
+        boolean ok = true;
 
         try {
+
+            boolean domanda = Boolean.parseBoolean(request.getParameter("domanda_ammissione"));
+
             MascheraM5 mask = new MascheraM5();
             Allievi a = e.getEm().find(Allievi.class,
                     Long.parseLong(request.getParameter("id_allievo")));
             mask.setAllievo(a);
             mask.setProgetto_formativo(a.getProgetto());
-            mask.setForma_giuridica(e.getEm().find(Formagiuridica.class,
-                    Integer.parseInt(request.getParameter("formaGiuridica"))));
-            mask.setComune_localizzazione(e.getEm().find(Comuni.class,
-                    Long.parseLong(request.getParameter("comune"))));
-            mask.setSede(request.getParameter("sede").equalsIgnoreCase("SI"));
-            mask.setColloquio(request.getParameter("colloquio").equalsIgnoreCase("SI"));
-            mask.setFabbisogno_finanziario(Double.parseDouble(request.getParameter(("tff"))));
-            mask.setFinanziamento_richiesto_agevolazione(Double.parseDouble(request.getParameter(("tfra"))));
-            mask.setRagione_sociale(conversionText(request.getParameter("ragioneSociale")));
-            mask.setIdea_impresa(conversionText(request.getParameter("ideaImpresa")));
-            mask.setMotivazione(conversionText(request.getParameter("motivazione")));
-            mask.setAteco(e.getEm().find(Ateco.class,
-                    request.getParameter("ateco")));
 
-            Part p = request.getPart("doc");
-            if (Boolean.parseBoolean(request.getParameter("domanda_ammissione")) && (p != null
-                    && p.getSubmittedFileName() != null && p.getSubmittedFileName().length() > 0)) {
-                try {
-                    String path = e.getPath("pathDocSA_Allievi").replace("@rssa", Utility.correctName(us.getSoggettoAttuatore().getId() + "")).replace("@folder", a.getCodicefiscale());
-                    File dir = new File(path);
-                    createDir(path);
-                    String ext = p.getSubmittedFileName().substring(p.getSubmittedFileName().lastIndexOf("."));
-                    path += "domanda_ammissione_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext;
-                    File damm = new File(dir.getAbsolutePath() + File.separator + "domanda_ammissione_"
-                            + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext);
-                    p.write(damm.getPath());
-                    mask.setDomanda_ammissione_presente(true);
-                    mask.setDomanda_ammissione(path.replace("\\", "/"));
-                    
-                    Email email_txt = (Email) e.getEmail("domanda_amm");
-                    String testomail = StringUtils.replace(email_txt.getTesto(), "@nomecognome", a.getNome().toUpperCase() + " " 
-                            + a.getCognome().toUpperCase());
-                    testomail = StringUtils.replace(testomail, "@nomeprogetto", "YES I START UP NEET");
-                    testomail = StringUtils.replace(testomail, "@nomesa", a.getSoggetto().getRagionesociale().toUpperCase());
-                    SendMailJet.sendMail(e.getPath("mailsender"), new String[]{a.getEmail()}, new String[]{a.getSoggetto().getEmail()},
-                            testomail, email_txt.getOggetto(),damm);
+            if (domanda) {
+                mask.setForma_giuridica(e.getEm().find(Formagiuridica.class,
+                        Integer.parseInt(request.getParameter("formaGiuridica"))));
+                mask.setComune_localizzazione(e.getEm().find(Comuni.class,
+                        Long.parseLong(request.getParameter("comune"))));
+                mask.setSede(request.getParameter("sede").equalsIgnoreCase("SI"));
+                mask.setColloquio(request.getParameter("colloquio").equalsIgnoreCase("SI"));
+                mask.setFabbisogno_finanziario(parseDouble(request.getParameter(("tff"))));
+                mask.setFinanziamento_richiesto_agevolazione(parseDouble(request.getParameter(("tfra"))));
+                mask.setRagione_sociale(conversionText(request.getParameter("ragioneSociale")));
+                mask.setIdea_impresa((request.getParameter("ideaImpresa")));
+                mask.setMotivazione((request.getParameter("motivazione")));
+                mask.setAteco(e.getEm().find(Ateco.class,
+                        request.getParameter("ateco")));
+                Part p = request.getPart("doc");
+                if (p != null
+                        && p.getSubmittedFileName() != null && p.getSubmittedFileName().length() > 0) {
+                    try {
+                        String path = e.getPath("pathDocSA_Allievi").replace("@rssa", Utility.correctName(us.getSoggettoAttuatore().getId() + "")).replace("@folder", a.getCodicefiscale());
+                        File dir = new File(path);
+                        createDir(path);
+                        String ext = p.getSubmittedFileName().substring(p.getSubmittedFileName().lastIndexOf("."));
+                        path += "domanda_ammissione_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext;
+                        File damm = new File(dir.getAbsolutePath() + File.separator + "domanda_ammissione_"
+                                + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext);
+                        p.write(damm.getPath());
+                        mask.setDomanda_ammissione_presente(true);
+                        mask.setDomanda_ammissione(path.replace("\\", "/"));
 
-                } catch (Exception ex1) {
-                    mask.setDomanda_ammissione_presente(false);
-                    e.insertTracking("System", "ERROR DOMANDA AMMISSIONE: "+Utility.estraiEccezione(ex1));
+                        Email email_txt = (Email) e.getEmail("domanda_amm");
+                        String testomail = StringUtils.replace(email_txt.getTesto(), "@nomecognome", a.getNome().toUpperCase() + " "
+                                + a.getCognome().toUpperCase());
+                        testomail = StringUtils.replace(testomail, "@nomeprogetto", "YES I START UP NEET");
+                        testomail = StringUtils.replace(testomail, "@nomesa", a.getSoggetto().getRagionesociale().toUpperCase());
+                        SendMailJet.sendMail(e.getPath("mailsender"), new String[]{a.getEmail()}, new String[]{a.getSoggetto().getEmail()},
+                                testomail, email_txt.getOggetto(), damm);
+                        if (Boolean.parseBoolean(request.getParameter("no_agevolazione"))) {
+                            mask.setNo_agevolazione(true);
+                            mask.setNo_agevolazione_opzione(request.getParameter("no_agevolazione_option"));
+                            mask.setBando_reg(false);
+                            mask.setBando_se(false);
+                            mask.setBando_sud(false);
+                        } else {
+                            mask.setNo_agevolazione(false);
+
+                            if (Boolean.parseBoolean(request.getParameter("bando_se"))) {
+                                mask.setBando_se(true);
+                                mask.setBando_se_opzione(request.getParameter("bando_se_option"));
+                            } else {
+                                mask.setBando_se(false);
+                            }
+                            if (Boolean.parseBoolean(request.getParameter("bando_sud"))) {
+                                mask.setBando_sud(true);
+                                mask.setBando_sud_opzione(request.getParameter("bando_sud_options"));
+                            } else {
+                                mask.setBando_sud(false);
+                            }
+                            if (Boolean.parseBoolean(request.getParameter("bando_reg"))) {
+                                mask.setBando_reg(true);
+                                mask.setBando_reg_nome(request.getParameter("bando_reg_option"));
+                            } else {
+                                mask.setBando_reg(false);
+                            }
+
+                        }
+                        mask.setTabella_valutazionefinale_val(request.getParameter("tab1"));
+                        mask.setTabella_valutazionefinale_punteggio(parseDouble(request.getParameter("punteggio_tab1")));
+                        mask.setTabella_valutazionefinale_totale(parseDouble(request.getParameter("valfinale_tab1")));
+                    } catch (Exception ex1) {
+                        ok = false;
+                        resp.addProperty("result", false);
+                        resp.addProperty("message", "Errore: non &egrave; stato possibile rendicontare l'allievo.");
+                        e.insertTracking("System", "ERROR DOMANDA AMMISSIONE: " + Utility.estraiEccezione(ex1));
+                    }
+
+                } else {
+                    ok = false;
+                    resp.addProperty("result", false);
+                    resp.addProperty("message", "Errore: non &egrave; stato possibile rendicontare l'allievo.");
                 }
             } else {
+                mask.setForma_giuridica(null);
+                mask.setComune_localizzazione(null);
+                mask.setSede(false);
+                mask.setColloquio(false);
+                mask.setFabbisogno_finanziario(0.0);
+                mask.setFinanziamento_richiesto_agevolazione(0.0);
+                mask.setRagione_sociale("-");
+                mask.setIdea_impresa("-");
+                mask.setMotivazione("-");
+                mask.setAteco(null);
                 mask.setDomanda_ammissione_presente(false);
-            }
-
-            if (Boolean.parseBoolean(request.getParameter("no_agevolazione"))) {
-                mask.setNo_agevolazione(true);
-                mask.setNo_agevolazione_opzione(request.getParameter("no_agevolazione_option"));
+                mask.setDomanda_ammissione(null);
+                mask.setNo_agevolazione(false);
                 mask.setBando_reg(false);
                 mask.setBando_se(false);
                 mask.setBando_sud(false);
-            } else {
-                mask.setNo_agevolazione(false);
-
-                if (Boolean.parseBoolean(request.getParameter("bando_se"))) {
-                    mask.setBando_se(true);
-                    mask.setBando_se_opzione(request.getParameter("bando_se_option"));
-                } else {
-                    mask.setBando_se(false);
-                }
-                if (Boolean.parseBoolean(request.getParameter("bando_sud"))) {
-                    mask.setBando_sud(true);
-                    mask.setBando_sud_opzione(request.getParameter("bando_sud_options"));
-                } else {
-                    mask.setBando_sud(false);
-                }
-                if (Boolean.parseBoolean(request.getParameter("bando_reg"))) {
-                    mask.setBando_reg(true);
-                    mask.setBando_reg_nome(request.getParameter("bando_reg_option"));
-                } else {
-                    mask.setBando_reg(false);
-                }
-
+                mask.setTabella_valutazionefinale_val(";");
+                mask.setTabella_valutazionefinale_punteggio(0.0);
+                mask.setTabella_valutazionefinale_totale(0.0);
             }
-            mask.setTabella_valutazionefinale_val(request.getParameter("tab1"));
-            mask.setTabella_valutazionefinale_punteggio(Double.parseDouble(request.getParameter("punteggio_tab1")));
-            mask.setTabella_valutazionefinale_totale(Double.parseDouble(request.getParameter("valfinale_tab1")));
 
             boolean modello7OK;
             String erroremodello7OK = "MODELLO 7 ERRATO. CONTROLLARE.";
 
-            //Modello 7 - Attestato di frequenza, necessario per la tabella della premialità            
-            Part p7 = request.getPart("doc_modello7");
-            if (p7 != null && p7.getSubmittedFileName() != null && p7.getSubmittedFileName().length() > 0) {
-                //Modifica 28/05/21
-                //Se il modello 7 è stato caricato ed il numero delle ore effettuate tra fase A e fase B è minimo 64, allora la tabella di premialità si popola con i dati della tabella finale
-                if (Boolean.parseBoolean(request.getParameter("hh64"))) {
-                    mask.setTabella_premialita(true);
-                    mask.setTabella_premialita_val(request.getParameter("tab1"));
-                    mask.setTabella_premialita_punteggio(Double.parseDouble(request.getParameter("punteggio_tab1")));
-                    mask.setTabella_premialita_totale(Double.parseDouble(request.getParameter("valfinale_tab1")));
-                } else {
-                    mask.setTabella_premialita(false);
-                }
-
-                TipoDoc_Allievi tipodoc_m7 = e.getEm().find(TipoDoc_Allievi.class,
-                        22L);
-                Documenti_Allievi modello7_allievo = a.getDocumenti().stream().filter(dc -> dc.getDeleted() == 0
-                        && dc.getTipo().getId().equals(tipodoc_m7.getId())).findFirst().orElse(null);
-                if (modello7_allievo != null) {
-                    File dir = new File(modello7_allievo.getPath());
-                    p7.write(dir.getAbsolutePath());
-
-                    File pdfdest = new File(dir.getAbsolutePath());
-
-                    String res = checkFirmaQRpdfA("MODELLO7", us.getUsername(),
-                            pdfdest, us.getSoggettoAttuatore().getCodicefiscale(), qrcrop);
-                    if (!res.equals("OK")) {
-                        modello7OK = false;
-                        erroremodello7OK = res;
+            if (ok) {
+                //Modello 7 - Attestato di frequenza, necessario per la tabella della premialità            
+                Part p7 = request.getPart("doc_modello7");
+                if (p7 != null && p7.getSubmittedFileName() != null && p7.getSubmittedFileName().length() > 0) {
+                    //Modifica 28/05/21
+                    //Se il modello 7 è stato caricato ed il numero delle ore effettuate tra fase A e fase B è minimo 64, allora la tabella di premialità si popola con i dati della tabella finale
+                    if (domanda && Boolean.parseBoolean(request.getParameter("hh64"))) {
+                        mask.setTabella_premialita(true);
+                        mask.setTabella_premialita_val(request.getParameter("tab1"));
+                        mask.setTabella_premialita_punteggio(Double.parseDouble(request.getParameter("punteggio_tab1")));
+                        mask.setTabella_premialita_totale(Double.parseDouble(request.getParameter("valfinale_tab1")));
                     } else {
-                        modello7OK = true;
+                        mask.setTabella_premialita(false);
                     }
 
-                } else {
+                    TipoDoc_Allievi tipodoc_m7 = e.getEm().find(TipoDoc_Allievi.class,
+                            22L);
+                    Documenti_Allievi modello7_allievo = a.getDocumenti().stream().filter(dc -> dc.getDeleted() == 0
+                            && dc.getTipo().getId().equals(tipodoc_m7.getId())).findFirst().orElse(null);
+                    if (modello7_allievo != null) {
+                        File dir = new File(modello7_allievo.getPath());
+                        p7.write(dir.getAbsolutePath());
 
-                    String path = e.getPath("pathDocSA_Allievi").replace("@rssa", Utility.correctName(us.getSoggettoAttuatore().getId() + "")).replace("@folder", Utility.correctName(a.getCodicefiscale()));
-                    File dir = new File(path);
-                    createDir(path);
-                    String ext = p7.getSubmittedFileName().substring(p7.getSubmittedFileName().lastIndexOf("."));
-                    String namefile = "Modello7_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext;
-                    path += namefile;
-                    String destpath = dir.getAbsolutePath() + File.separator + namefile;
-                    p7.write(destpath);
+                        File pdfdest = new File(dir.getAbsolutePath());
 
-                    File pdfdest = new File(destpath);
+                        String res = checkFirmaQRpdfA("MODELLO7", us.getUsername(),
+                                pdfdest, us.getSoggettoAttuatore().getCodicefiscale(), qrcrop);
+                        if (!res.equals("OK")) {
+                            modello7OK = false;
+                            erroremodello7OK = res;
+                        } else {
+                            modello7OK = true;
+                        }
 
-                    String res = checkFirmaQRpdfA("MODELLO7", us.getUsername(),
-                            pdfdest, us.getSoggettoAttuatore().getCodicefiscale(), qrcrop);
-                    if (!res.equals("OK")) {
-                        modello7OK = false;
-                        erroremodello7OK = res;
                     } else {
-                        modello7OK = true;
+
+                        String path = e.getPath("pathDocSA_Allievi").replace("@rssa", Utility.correctName(us.getSoggettoAttuatore().getId() + "")).replace("@folder", Utility.correctName(a.getCodicefiscale()));
+                        File dir = new File(path);
+                        createDir(path);
+                        String ext = p7.getSubmittedFileName().substring(p7.getSubmittedFileName().lastIndexOf("."));
+                        String namefile = "Modello7_" + new SimpleDateFormat("yyyyMMdd").format(new Date()) + "_" + a.getCodicefiscale() + ext;
+                        path += namefile;
+                        String destpath = dir.getAbsolutePath() + File.separator + namefile;
+                        p7.write(destpath);
+
+                        File pdfdest = new File(destpath);
+
+                        String res = checkFirmaQRpdfA("MODELLO7", us.getUsername(),
+                                pdfdest, us.getSoggettoAttuatore().getCodicefiscale(), qrcrop);
+                        if (!res.equals("OK")) {
+                            modello7OK = false;
+                            erroremodello7OK = res;
+                        } else {
+                            modello7OK = true;
+                        }
+
+                        Documenti_Allievi m7 = new Documenti_Allievi(path.replace("\\", "/"), tipodoc_m7, null, a);
+                        e.persist(m7);
+                        a.getDocumenti().add(m7);
                     }
-
-                    Documenti_Allievi m7 = new Documenti_Allievi(path.replace("\\", "/"), tipodoc_m7, null, a);
-                    e.persist(m7);
-                    a.getDocumenti().add(m7);
+                    e.merge(a);
+                } else {
+                    modello7OK = false;
                 }
-                e.merge(a);
-            } else {
-                modello7OK = false;
-            }
 
-            if (modello7OK) {
-                e.persist(mask);
-                e.commit();
-                resp.addProperty("result", true);
+                if (modello7OK) {
+                    e.persist(mask);
+                    e.commit();
+                    resp.addProperty("result", true);
+                } else {
+                    e.rollBack();
+                    resp.addProperty("result", false);
+                    resp.addProperty("message", erroremodello7OK);
+                }
             } else {
                 e.rollBack();
-                resp.addProperty("result", false);
-                resp.addProperty("message", erroremodello7OK);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -3858,7 +3900,7 @@ public class OperazioniSA extends HttpServlet {
 
         if (downloadFile != null && downloadFile.exists()) {
             OutputStream outStream;
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/octet-stream";
@@ -4228,8 +4270,7 @@ public class OperazioniSA extends HttpServlet {
         String idpr = getRequestValue(request, "idpr");
         String fase = getRequestValue(request, "fase");
 
-        System.out.println(idpr + " () " + fase);
-
+        
         try {
             e.begin();
             Long hh36 = new Long(129600000);
@@ -4286,7 +4327,6 @@ public class OperazioniSA extends HttpServlet {
                             TipoDoc_Allievi tipodoc_m7 = e.getEm().find(TipoDoc_Allievi.class,
                                     22L);
                             Documenti_Allievi m7 = new Documenti_Allievi("/mnt/mcn/gestione_neet/pdf-test.pdf", tipodoc_m7, null, a);
-                            System.out.println("it.refill.servlet.OperazioniSA.simulaconcludi(PERSIST)");
                             e.persist(m7);
                             a.getDocumenti().add(m7);
                             e.persist(mask);
@@ -4611,6 +4651,224 @@ public class OperazioniSA extends HttpServlet {
 
     }
 
+    protected void addregistro(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String idpr = getRequestValue(request, "idpr");
+        String datareturn = StringUtils.replace(Utility.getRequestValue(request, "data"), "-", "");
+        String giorno = getRequestValue(request, "giorno");
+        String gruppofaseb = getRequestValue(request, "gruppofaseb");
+        try {
+
+            Entity e = new Entity();
+            ProgettiFormativi p = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
+            List<Allievi> allievi = p.getAllievi().stream().filter(p1 -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList());
+            List<Docenti> docenti = p.getDocenti();
+
+            String idsa = getRequestValue(request, "idsa");
+            String cip = getRequestValue(request, "cip");
+
+            DateTime data = Utility.format(Utility.getRequestValue(request, "data"), "yyyy-MM-dd");
+
+            String fase = getRequestValue(request, "fase");
+            String start = getRequestValue(request, "start");
+
+            List<Registro_completo> user_start = new ArrayList<>();
+            List<String[]> list_utenti = new ArrayList<>();
+            List<String[]> list_start = new ArrayList<>();
+            List<String[]> list_ud = new ArrayList<>();
+            List<String> idlezioni = new ArrayList<>();
+
+            Enumeration<String> parameterNames = request.getParameterNames();
+            while (parameterNames.hasMoreElements()) {
+                String paramName = parameterNames.nextElement();
+                if (paramName.contains("_") && paramName.contains("reg")) {
+                    String iduser = paramName.split("_")[0];
+                    String idl = paramName.split("_")[2];
+                    String ruolo = paramName.contains("doc") ? "DOCENTE" : "ALLIEVO NEET";
+                    idlezioni.add(idl);
+                    list_utenti.add(new String[]{iduser, idl, String.valueOf(paramName.contains("doc")), getRequestValue(request, paramName)});
+
+                    Registro_completo r1 = new Registro_completo();
+                    r1.setId(Integer.parseInt(idl));
+                    r1.setIdutente(Integer.parseInt(iduser));
+                    r1.setRuolo(ruolo);
+                    r1.setTotaleorerendicontabili(Long.parseLong(getRequestValue(request, paramName)));
+
+                    Registro_completo verificasepresente = user_start.stream()
+                            .filter(u1 -> u1.getIdutente() == r1.getIdutente()
+                            && u1.getRuolo().equals(r1.getRuolo())).findAny().orElse(null);
+                    if (verificasepresente == null) {
+                        user_start.add(r1);
+                    } else {
+                        verificasepresente.setTotaleorerendicontabili(verificasepresente.getTotaleorerendicontabili() + r1.getTotaleorerendicontabili());
+                    }
+
+                } else if (paramName.contains("_") && paramName.contains("start")) {
+                    list_start.add(new String[]{paramName.split("_")[1], getRequestValue(request, paramName)});
+                } else if (paramName.contains("_") && paramName.contains("ud")) {
+                    list_ud.add(new String[]{paramName.split("_")[1], getRequestValue(request, paramName)});
+                }
+            }
+
+            String ud = "";
+            for (String[] ud1 : list_ud) {
+                ud += ud1[1] + "_";
+            }
+            ud = StringUtils.removeEnd(ud, "_");
+
+            AtomicInteger numpartecipanti = new AtomicInteger(0);
+            AtomicDouble orafinedocenti = new AtomicDouble(0.0);
+            idlezioni.stream().distinct().sorted().collect(Collectors.toList()).forEach(
+                    lez -> {
+                        for (String[] user : list_utenti) {
+                            if (user[1].equals(lez)) {
+                                if (Long.parseLong(user[3]) > 0) {
+                                    numpartecipanti.addAndGet(1);
+                                    if (Boolean.valueOf(user[2])) {
+                                        orafinedocenti.addAndGet(Double.parseDouble(user[3]));
+                                    }
+                                }
+                            }
+                        }
+                    }
+            );
+
+            DateTime st_data = new DateTime(2000, 1, 1, Integer.parseInt(start.split(":")[0]), Integer.parseInt(start.split(":")[1]));
+            DateTime res_data = st_data.plusMillis(orafinedocenti.intValue());
+            long durata = new Period(st_data, res_data, PeriodType.millis()).getValue(0);
+            String orafine = res_data.toString("HH:mm");
+            String nud = "GIORNO " + giorno + " - " + ud;
+            String idriunione = StringUtils.replace(cip, "_", "") + "_"
+                    + ud + "_"
+                    + data.toString("yyyyMMdd")
+                    + "_PR";
+            user_start.forEach(u1 -> {
+                u1.setIdprogetti_formativi(Integer.parseInt(idpr));
+                u1.setIdsoggetti_attuatori(Integer.parseInt(idsa));
+                u1.setCip(cip);
+                u1.setData(data);
+                u1.setIdriunione(idriunione);
+                u1.setNumpartecipanti(numpartecipanti.get());
+                u1.setORainizio(start);
+                u1.setOrafine(orafine);
+                u1.setDurata(durata);
+                u1.setNud(nud);
+                u1.setFase(fase);
+                u1.setGruppofaseb(Integer.parseInt(gruppofaseb));
+                u1.setTotaleore(u1.getTotaleorerendicontabili());
+                if (u1.getRuolo().equals("DOCENTE")) {
+                    Docenti d1 = docenti.stream().filter(dd -> dd.getId().intValue() == u1.getIdutente()).findAny().orElse(null);
+                    if (d1 != null) {
+                        u1.setCognome(d1.getCognome());
+                        u1.setNome(d1.getNome());
+                        u1.setEmail(d1.getEmail());
+
+                        u1.setOrelogin(start);
+                        for (String[] st1 : list_start) {
+                            if (st1[0].equals(String.valueOf(u1.getId()))) {
+                                u1.setOrelogin(st1[1]);
+                                break;
+                            }
+                        }
+
+                        u1.setOrelogout(new DateTime(1, 1, 1, Integer.parseInt(u1.getOrelogin().split(":")[0]),
+                                Integer.parseInt(u1.getOrelogin().split(":")[1])).plusMillis((int) u1.getTotaleorerendicontabili()).toString("HH:mm"));
+
+                    }
+                } else {
+                    Allievi d1 = allievi.stream().filter(dd -> dd.getId().intValue() == u1.getIdutente()).findAny().orElse(null);
+                    if (d1 != null) {
+                        u1.setCognome(d1.getCognome());
+                        u1.setNome(d1.getNome());
+                        u1.setEmail(d1.getEmail());
+                        u1.setOrelogin(start);
+                        u1.setOrelogout(new DateTime(1, 1, 1, Integer.parseInt(u1.getOrelogin().split(":")[0]),
+                                Integer.parseInt(u1.getOrelogin().split(":")[1])).plusMillis((int) u1.getTotaleorerendicontabili()).toString("HH:mm"));
+                    }
+
+                }
+
+                if (u1.getTotaleorerendicontabili() > 0) {
+                    Database db = new Database(false);
+                    db.insertRegistro(u1);
+                    db.closeDB();
+                }
+            });
+
+        } catch (Exception ex1) {
+            ex1.printStackTrace();
+        }
+        redirect(request, response, request.getContextPath() + "/page/sa/registroaula_edit.jsp?idpr="
+                + idpr + "&data=" + datareturn + "&giorno=" + giorno + "&gruppo=" + gruppofaseb);
+
+    }
+
+    protected void editregistro(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        List<String[]> update = new ArrayList<>();
+        Enumeration<String> parameterNames = request.getParameterNames();
+        while (parameterNames.hasMoreElements()) {
+            String paramName = parameterNames.nextElement();
+            if (paramName.contains("_") && paramName.contains("reg")) {
+                update.add(new String[]{paramName.split("_")[0],
+                    getRequestValue(request, paramName),
+                    String.valueOf(paramName.contains("doc"))});
+            }
+        }
+        String idpr = getRequestValue(request, "idpr");
+        String start = getRequestValue(request, "start");
+        String datareturn = StringUtils.replace(Utility.getRequestValue(request, "data"), "-", "");
+        String giorno = getRequestValue(request, "giorno");
+        String gruppofaseb = getRequestValue(request, "gruppofaseb");
+
+        AtomicDouble addstart = new AtomicDouble(0.0);
+
+        update.stream().filter(up1 -> up1[2].equals("true")).forEach(up1 -> {
+            try {
+                Long new_millisrend = Long.parseLong(up1[1]);
+                addstart.addAndGet(new_millisrend.doubleValue());
+            } catch (Exception ex2) {
+                ex2.printStackTrace();
+            }
+        });
+
+        DateTime st_data = new DateTime(2000, 1, 1, Integer.parseInt(start.split(":")[0]), Integer.parseInt(start.split(":")[1]));
+        DateTime res_data = st_data.plusMillis(addstart.intValue());
+        Period p = new Period(st_data, res_data, PeriodType.millis());
+        long durata = p.getValue(0);
+        String oraend = res_data.toString("HH:mm");
+
+        update.stream().forEach(up1 -> {
+            try {
+                Long new_millisrend = Long.parseLong(up1[1]);
+
+                DateTime res_datalogout = new DateTime(1, 1, 1, Integer.parseInt(start.split(":")[0]),
+                        Integer.parseInt(start.split(":")[1])).plusMillis(new_millisrend.intValue());
+
+                String upd = "UPDATE registro_completo SET totaleore='" + new_millisrend + "', totaleorerendicontabili = '" + new_millisrend
+                        + "', orainizio='" + start + "', orafine='" + oraend + "', durata = '" + durata
+                        + "', orelogin='" + start + "', orelogout='" + res_datalogout.toString("HH:mm") + "' "
+                        + "WHERE id = " + up1[0] + " AND idprogett_formativi=" + idpr;
+
+                Database db = new Database(false);
+
+                try ( Statement st = db.getC().createStatement()) {
+                    st.execute(upd);
+                }
+                db.closeDB();
+
+//                System.out.println(upd);
+
+            } catch (Exception ex1) {
+                ex1.printStackTrace();
+            }
+        });
+
+        redirect(request, response, request.getContextPath() + "/page/sa/registroaula_edit.jsp?idpr="
+                + idpr + "&data=" + datareturn + "&giorno=" + giorno + "&gruppo=" + gruppofaseb);
+
+    }
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         User us = (User) request.getSession().getAttribute("user");
@@ -4618,6 +4876,12 @@ public class OperazioniSA extends HttpServlet {
             String type = request.getParameter("type");
             response.setContentType("text/html;charset=UTF-8");
             switch (type) {
+                case "editregistro":
+                    editregistro(request, response);
+                    break;
+                case "addregistro":
+                    addregistro(request, response);
+                    break;
                 case "modifyEmail":
                     modifyEmail(request, response);
                     break;

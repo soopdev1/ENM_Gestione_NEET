@@ -2010,6 +2010,53 @@ public class OperazioniMicro extends HttpServlet {
         response.getWriter().close();
     }
 
+    protected void caricanuovodocumentoANPAL(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/plain");
+        response.setCharacterEncoding("UTF-8");
+        String idpr = getRequestValue(request, "idpr");
+        JsonObject resp = new JsonObject();
+        Entity e = new Entity();
+        try {
+            e.begin();
+            Part part = request.getPart("file");
+            if (part != null && part.getSubmittedFileName() != null && part.getSubmittedFileName().length() > 0) {
+                ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class, Long.parseLong(idpr));
+                TipoDoc tipo = e.getEm().find(TipoDoc.class, 5L);
+                //creao il path
+                String path = e.getPath("pathDocSA_Prg").replace("@rssa",
+                        prg.getSoggetto().getId().toString()).replace("@folder", prg.getId().toString());
+                File dir = new File(path);
+                createDir(path);
+                String file_path;
+                String today = new SimpleDateFormat("yyyyMMddHHssSSS").format(new Date());
+                //scrivo il file su disco
+                file_path = dir.getAbsolutePath() + File.separator + tipo.getDescrizione() + "_"
+                        + today + part.getSubmittedFileName().substring(part.getSubmittedFileName().lastIndexOf("."));
+                part.write(file_path);
+                DocumentiPrg doc = new DocumentiPrg();
+                doc.setPath(file_path);
+                doc.setTipo(tipo);
+                doc.setProgetto(prg);
+                e.persist(doc);
+                e.commit();
+                resp.addProperty("result", true);
+            } else {
+                resp.addProperty("result", false);
+                resp.addProperty("message", "Errore: file corrotto o non conforme.");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            e.rollBack();
+            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro caricanuovodocumento: " + ex.getMessage());
+            resp.addProperty("result", false);
+            resp.addProperty("message", "Errore: non &egrave; stato possibile caricare il documento selezionato.");
+        } finally {
+            e.close();
+        }
+        response.getWriter().write(resp.toString());
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
     protected void caricanuovodocumento(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/plain");
         response.setCharacterEncoding("UTF-8");
@@ -2614,6 +2661,9 @@ public class OperazioniMicro extends HttpServlet {
                     break;
                 case "caricanuovodocumento":
                     caricanuovodocumento(request, response);
+                    break;
+                case "caricanuovodocumentoANPAL":
+                    caricanuovodocumentoANPAL(request, response);
                     break;
                 case "assegnaPrg":
                     assegnaPrg(request, response);

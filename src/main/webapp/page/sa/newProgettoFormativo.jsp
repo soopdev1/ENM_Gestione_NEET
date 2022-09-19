@@ -218,7 +218,7 @@
                                                                 <div class="kt-wizard-v1__form" style="color: #6c7293; min-height: 40vh">
                                                                     <div class="form-group row">
                                                                         <div class="col-lg-12">
-                                                                            <label>Nome</label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                            <label>Nome</label><label class="kt-font-danger kt-font-boldest"> *</label>
                                                                             <div class="dropdown bootstrap-select form-control kt- paddig_0" id="nome_pf_div">
                                                                                 <select class="form-control kt-select2-general obbligatory" id="nome_pf" name="nome_pf">
                                                                                     <option value="-">Seleziona Nome</option>
@@ -231,6 +231,15 @@
                                                                             <!--                                                                            <label>Nome</label><label class="kt-font-danger kt-font-boldest">*</label>
                                                                                                                                                         <input type="text" class="form-control obbligatory" name="nome_pf" id="nome_pf" placeholder="Nome Progetto Formativo">-->
                                                                         </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label>Modalità di svolgimento</label><label class="kt-font-danger kt-font-boldest"> *</label>
+                                                                        <div class="dropdown bootstrap-select form-control kt-" id="svolgimento_div" style="padding: 0;">
+                                                                                <select class="form-control kt-select2-general obbligatory" id="svolgimento" name="svolgimento" style="width: 100%">
+                                                                                    <option value="F">In FAD</option>
+                                                                                    <!--<option value="P">In Presenza</option>-->
+                                                                                </select>
+                                                                            </div>
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <label>Descrizione</label>
@@ -375,6 +384,9 @@
                                                                                 <h5>Nome Progetto:&nbsp;</h5><label id="label_titolo" style="color:#000;"></label>
                                                                             </div>
                                                                             <div class="row">
+                                                                                <h5>Modalità di svolgimento:&nbsp;</h5><label id="label_svolgimento" style="color:#000;"></label>
+                                                                            </div>
+                                                                            <div class="row">
                                                                                 <h5>Descrizione:&nbsp;</h5><label id="label_descrizione" style="color:#000;"></label>
                                                                             </div>
                                                                             <div class="row">
@@ -506,6 +518,9 @@
             });
             $("#sede").change(function (e) {
                 $("#label_aula").html("<b>" + $("#" + this.id + " option[value='" + $(this).val() + "']").text() + "</b>");
+            });
+            $("#svolgimento").change(function (e) {
+                $("#label_svolgimento").html("<b>" + $("#" + this.id + " option[value='" + $(this).val() + "']").text() + "</b>");
             });
             $("#allievi").change(function (e) {
                 var allievi = "";

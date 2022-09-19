@@ -290,15 +290,15 @@
                                                                                         <div class="col-3">
                                                                                             <span class="kt-switch kt-switch--lg kt-switch--icon">
                                                                                                 <label>
-                                                                                                    <input type="checkbox" id="domanda_a_<%=a.getId()%>" name="domanda_a_<%=a.getId()%>" onchange="domAmm_check(<%=a.getId()%>)">
+                                                                                                    <input type="checkbox" checked id="domanda_a_<%=a.getId()%>" name="domanda_a_<%=a.getId()%>" onchange="domAmm_check(<%=a.getId()%>)">
                                                                                                     <span></span>
-                                                                                                </label>
+                                                                                                </label> 
                                                                                             </span>
                                                                                         </div>
-                                                                                        <div class="col-6">
+                                                                                        <div class="col-6" id="file_daok_<%=a.getId()%>">
                                                                                             <div class="custom-file">
                                                                                                 <input type="file" <%=doc_allievo.getObbligatorio() == 1 ? "tipo='obbligatory'" : ""%> 
-                                                                                                       class="custom-file-input" id="doc_<%=a.getId()%>" disabled="disabled"
+                                                                                                       class="custom-file-input" id="doc_<%=a.getId()%>"
                                                                                                        accept="<%=doc_allievo.getMimetype()%>" name="doc_<%=a.getId()%>" 
                                                                                                        onchange="return checkFileExtAndDim('<%=doc_allievo.getEstensione()%>');">
                                                                                                 <label class="custom-file-label selected" 
@@ -306,14 +306,15 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
+                                                                                    <div id="cont_daok_<%=a.getId()%>">
                                                                                     <h5 style="color:#b9003d; font-weight: 800;">PROGETTO D'IMPRESA</h5>
                                                                                     <br>
                                                                                     <div class="form-group">
-                                                                                        <label for="rs_<%=a.getId()%>"><b>Ragione Sociale iniziativa proposta</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                        <label for="rs_<%=a.getId()%>"><b>Ragione Sociale iniziativa proposta</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                         <input type="text" class="form-control obbligatory" name="rs_<%=a.getId()%>" id="rs_<%=a.getId()%>" placeholder="Ragione Sociale iniziativa proposta">
                                                                                     </div>
                                                                                     <div class="form-group">
-                                                                                        <label for="fg_<%=a.getId()%>"><b>Forma giuridica</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                        <label for="fg_<%=a.getId()%>"><b>Forma giuridica</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                         <div class="dropdown bootstrap-select form-control kt-" id="fg_<%=a.getId()%>_div" style="padding: 0;">
                                                                                             <select class="form-control kt-select2-general obbligatory" id="fg_<%=a.getId()%>" name="fg_<%=a.getId()%>"  style="width: 100%">
                                                                                                 <option selected value="-">Seleziona forma giuridica</option>
@@ -325,7 +326,7 @@
                                                                                     </div>
                                                                                     <div class="form-group row">
                                                                                         <div class="col-6">
-                                                                                            <label for="check_sede_<%=a.getId()%>"><b>Sede individuata?</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                            <label for="check_sede_<%=a.getId()%>"><b>Sede individuata?</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                             <div class="kt-radio-inline radioGroup_<%=a.getId()%>">
                                                                                                 <label class="kt-radio" name="check_sede_<%=a.getId()%>">
                                                                                                     <input type="radio" name="check_sede_<%=a.getId()%>" value="SI"> SI
@@ -338,7 +339,7 @@
                                                                                             </div>
                                                                                         </div>  
                                                                                         <div class="col-6">
-                                                                                            <label for="check_colloquio_<%=a.getId()%>"><b>Disponibile a colloquio di approfondimento?</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                            <label for="check_colloquio_<%=a.getId()%>"><b>Disponibile a colloquio di approfondimento?</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                             <div class="kt-radio-inline radioGroup_<%=a.getId()%>">
                                                                                                 <label class="kt-radio"  name="check_colloquio_<%=a.getId()%>">
                                                                                                     <input type="radio"  name="check_colloquio_<%=a.getId()%>" value="SI"> SI
@@ -350,14 +351,12 @@
                                                                                                 </label>
                                                                                             </div>
                                                                                         </div>                  
-                                                                                    </div>    
-                                                                                    <div class="form-group">
-                                                                                        <label for="ideaimpresa_<%=a.getId()%>"><b>Idea d'impresa</b></label><label class="kt-font-danger kt-font-boldest">*</label>
-                                                                                        <textarea class="form-control obbligatory tinyta" maxlenght="600" id="ideaimpresa_<%=a.getId()%>" name="ideaimpresa_<%=a.getId()%>" placeholder="Descrizione Idea d'impresa" rows="5"></textarea>
                                                                                     </div>
+                                                                                    <input type="hidden" id="ideaimpresa_<%=a.getId()%>" name="ideaimpresa_<%=a.getId()%>" value="Presente sulla domanda"/>
+                                                                                    <input type="hidden" id="motivazione_<%=a.getId()%>" name="motivazione_<%=a.getId()%>" value="Presente sulla domanda"/>
                                                                                     <div class="form-group row">
                                                                                         <div class="form-group col-12">
-                                                                                            <label for="ateco_<%=a.getId()%>"><b>Codice Ateco</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                            <label for="ateco_<%=a.getId()%>"><b>Codice Ateco</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                             <div class="dropdown bootstrap-select form-control kt-" id="ateco_<%=a.getId()%>_div" style="padding: 0;">
                                                                                                 <select class="form-control kt-select2-general obbligatory" id="ateco_<%=a.getId()%>" name="ateco_<%=a.getId()%>"  style="width: 100%">
                                                                                                     <option selected value="-">Seleziona Codice Ateco</option>
@@ -370,7 +369,7 @@
                                                                                     </div>
                                                                                     <div class="form-group row">
                                                                                         <div class="form-group col-4">
-                                                                                            <label for="regione_<%=a.getId()%>"><b>Regione di localizzazione</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                            <label for="regione_<%=a.getId()%>"><b>Regione di localizzazione</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                             <div class="dropdown bootstrap-select form-control kt-" id="regione_<%=a.getId()%>_div" style="padding: 0;">
                                                                                                 <select class="form-control kt-select2-general obbligatory" id="regione_<%=a.getId()%>" name="regione_<%=a.getId()%>"  style="width: 100%">
                                                                                                     <option selected value="-">Seleziona Regione</option>
@@ -381,7 +380,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="form-group col-4">
-                                                                                            <label for="provincia_<%=a.getId()%>"><b>Provincia di localizzazione</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                            <label for="provincia_<%=a.getId()%>"><b>Provincia di localizzazione</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                             <div class="dropdown bootstrap-select form-control kt-" id="provincia_<%=a.getId()%>_div" style="padding: 0;">
                                                                                                 <select class="form-control kt-select2-general obbligatory" id="provincia_<%=a.getId()%>" name="provincia_<%=a.getId()%>"  style="width: 100%;">
                                                                                                     <option value="-">Seleziona Provincia</option>
@@ -389,7 +388,7 @@
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="form-group col-4">
-                                                                                            <label for="comune_<%=a.getId()%>"><b>Comune di localizzazione</b></label><label class="kt-font-danger kt-font-boldest">*</label>
+                                                                                            <label for="comune_<%=a.getId()%>"><b>Comune di localizzazione</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label>
                                                                                             <div class="dropdown bootstrap-select form-control kt-" id="comune_<%=a.getId()%>_div" style="padding: 0;">
                                                                                                 <select class="form-control kt-select2-general obbligatory" id="comune_<%=a.getId()%>" name="comune_<%=a.getId()%>"  style="width: 100%;">
                                                                                                     <option value="-">Seleziona Comune</option>
@@ -397,20 +396,15 @@
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>    
-                                                                                    <div class="form-group">
-                                                                                        <label for="motivazione_<%=a.getId()%>"><b>Motivazione</b></label><label class="kt-font-danger kt-font-boldest">*</label>
-                                                                                        <textarea class="form-control obbligatory tinyta" maxlenght="300" id="motivazione_<%=a.getId()%>" name="motivazione_<%=a.getId()%>" placeholder="Perchè questa attività?" rows="3"></textarea>
-                                                                                    </div>
-
                                                                                     <div class="form-group row">
                                                                                         <div class="col-6">
-                                                                                            <label><b>Totale fabbisogno finanziario</b></label><label class="kt-font-danger kt-font-boldest">*</label> <i class="fa fa-info-circle kt-font-io-n" data-container="body" data-toggle="kt-popover" data-placement="top" data-original-title="Formato" data-content="€ ___.__1.234,56"></i>
+                                                                                            <label><b>Totale fabbisogno finanziario</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label> <i class="fa fa-info-circle kt-font-io-n" data-container="body" data-toggle="kt-popover" data-placement="top" data-original-title="Formato" data-content="€ ___.__1.234,56"></i>
                                                                                             <div>
                                                                                                 <input class="form-control col-lg-6 currencymask obbligatory" name="tff_<%=a.getId()%>" id="tff_<%=a.getId()%>" data-inputmask="'removeMaskOnSubmit': true" type="text"/>
                                                                                             </div>
                                                                                         </div>
                                                                                         <div class="col-6">
-                                                                                            <label><b>Totale finanziamento richiesto ad agevolazione</b></label><label class="kt-font-danger kt-font-boldest">*</label> <i class="fa fa-info-circle  kt-font-io-n" data-container="body" data-toggle="kt-popover" data-placement="top" data-original-title="Formato" data-content="€ ___.__1.234,56"></i>
+                                                                                            <label><b>Totale finanziamento richiesto ad agevolazione</b></label><label class="kt-font-danger kt-font-boldest valobbl_<%=a.getId()%>">*</label> <i class="fa fa-info-circle  kt-font-io-n" data-container="body" data-toggle="kt-popover" data-placement="top" data-original-title="Formato" data-content="€ ___.__1.234,56"></i>
                                                                                             <div>
                                                                                                 <input class="form-control col-lg-6 currencymask obbligatory" name="tfra_<%=a.getId()%>" id="tfra_<%=a.getId()%>" data-inputmask="'removeMaskOnSubmit': true" type="text"/>
                                                                                             </div>
@@ -521,13 +515,14 @@
                                                                                     <div class="hh64_<%=a.getId()%>"></div>
                                                                                     <%}%>
 
+                                                                                </div>
                                                                                     <div class="form-group row">
                                                                                         <div class="col-6">
                                                                                             <a href="<%=request.getContextPath()%>/OperazioniSA?type=scaricaModello7&iduser=<%=a.getId()%>&orerendicontabili=<%=oreRendicontabili.get(a.getId())%>" target="_blank" class="btn btn-success"><i class="fa fa-user-graduate" style='position: absolute; right: 5rem'></i>&nbsp; Scarica attestato di frequenza (Modello 7)</a>
                                                                                         </div>
                                                                                         <div class="col-6">
                                                                                             <div class="custom-file">
-                                                                                                <input type="file" <%=modello7.getObbligatorio() == 1 ? "tipo='obbligatory'" : ""%> 
+                                                                                                <input type="file" tipo='obbligatory' 
                                                                                                        class="custom-file-input" id="m7_<%=a.getId()%>" 
                                                                                                        accept="<%=modello7.getMimetype()%>" name="m7_<%=a.getId()%>" 
                                                                                                        onchange="return checkFileExtAndDim('<%=modello7.getEstensione()%>');">
@@ -588,15 +583,16 @@
                                                             <div class="kt-form__section kt-form__section--first">
                                                                 <div class="kt-wizard-v1__form" style="color: #6c7293;">
                                                                     <div class="accordion  accordion-toggle-arrow">
+                                                                        <%if (p.getSvolgimento().equals("F")) {%>
                                                                         <div class="card" style="border-radius: 17px; margin-block: 20px; color: #363a90;">
                                                                             <div class="card-header">
                                                                                 <div class="card-title loaded">
                                                                                     <i class="fa fa-file-pdf kt-font-success"></i>&nbsp;<i class="fa fa-users kt-font-success"></i> REGISTRO COMPLESSIVO PRESENZE
                                                                                     <a href="<%=request.getContextPath()%>/OperazioniSA?type=scaricaregistrotemp&idpr=<%=p.getId()%>" target="_blank" class="btn"><i class="fa fa-file-download kt-font-success" style='position: absolute; right: 1rem' data-container="body" data-html="true" data-toggle="kt-tooltip" data-placement="top" title="<h5>Scarica il registro complessivo delle presenze</h5>"></i></a>
-
                                                                                 </div>
                                                                             </div>
                                                                         </div>
+                                                                        <%}%>
                                                                     </div>
                                                                     <div class="kt-section__content kt-section__content--solid text-center" style="margin-top: 3rem; margin-bottom: 2rem;">
                                                                         <%if (registro_complessivo == null) {%>
@@ -612,36 +608,10 @@
                                                                         <label style="display: flex; margin-top:0.5rem;" class="kt-font-danger kt-font-bold"><font size="2" >Per poter proseguire è necessario caricare il registro complessivo delle presenze firmato digitalmente - 1/1</font></label>
                                                                             <%}%>
                                                                     </div>
-                                                                    <!--                                                                    <div class="form-group col">
-                                                                                                                                            <div class="row">
-                                                                                                                                                <div class="form-group col-xl-12 col-lg-12">
-                                                                    
-                                                                                                                                                    <div class="row">
-                                                                                                                                                        <a class="btn btn-io btn-md btn-tall btn-wide kt-font-bold kt-font-transform-u" 
-                                                                                                                                                           target="_blank"
-                                                                                                                                                           href="<%=request.getContextPath()%>/OperazioniSA?type=scaricaregistrotemp&idpr=<%=p.getId()%>"
-                                                                                                                                                           >
-                                                                                                                                                            Scarica
-                                                                                                                                                        </a>
-                                                                                                                                                        <label style="text-align: left; margin-inline:30px">Scaricare il registro complessivo delle presenze generata dal sistema per poi caricarlo,
-                                                                                                                                                            firmato digitalmente, nel campo sottostante.</label>
-                                                                                                                                                    </div>
-                                                                                                                                                    <br>
-                                                                                                                                                    <br>
-                                                                                                                                                    <label><%=complessivo.getDescrizione()%></label><%=complessivo.getObbligatorio() == 1 ? "<label class='kt-font-danger kt-font-boldest'>*</label>" : ""%>
-                                                                                                                                                    <input type="hidden" class="hidden" name="modello" id="modello_<%=complessivo.getId()%>" value="0"/>
-                                                                                                                                                    <div class="custom-file">
-                                                                                                                                                        <input type="file" <%=complessivo.getObbligatorio() == 1 ? "tipo='obbligatory'" : ""%> 
-                                                                                                                                                               class="custom-file-input" 
-                                                                                                                                                               accept="<%=complessivo.getMimetype()%>" name="doc_step2_<%=complessivo.getId()%>" id="doc_step2_<%=complessivo.getId()%>" 
-                                                                                                                                                               onchange="return checkFileExtAndDim('<%=complessivo.getEstensione()%>');">
-                                                                                                                                                        <label class="custom-file-label selected" 
-                                                                                                                                                               style="color: #a7abc3; text-align: left;">Scegli File</label>
-                                                                                                                                                    </div>
-                                                                                                                                                    <br>
-                                                                                                                                                </div>
-                                                                                                                                            </div>
-                                                                                                                                        </div>-->
+
+
+
+
                                                                 </div>
                                                             </div>
                                                         </div>

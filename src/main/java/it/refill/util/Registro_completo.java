@@ -28,6 +28,9 @@ public class Registro_completo {
     long totaleore, totaleorerendicontabili;
     int idutente;
 
+    public Registro_completo() {
+    }
+
     public Registro_completo(int id, int idprogetti_formativi, int idsoggetti_attuatori, String cip, DateTime data, String idriunione, int numpartecipanti, String orainizio, String orafine, long durata, String nud, String fase, int gruppofaseb, String ruolo, String cognome, String nome, String email, String orelogin, String orelogout, long totaleore, long totaleorerendicontabili,int idutente) {
         this.id = id;
         this.idprogetti_formativi = idprogetti_formativi;

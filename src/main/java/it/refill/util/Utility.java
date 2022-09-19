@@ -116,6 +116,7 @@ import org.joda.time.DateTimeComparator;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.format.DateTimeFormat;
 import static org.joda.time.format.DateTimeFormat.forPattern;
 import org.json.JSONArray;
@@ -127,10 +128,10 @@ import org.json.JSONObject;
  */
 public class Utility {
 
-    public static boolean demoversion = false;
+    public static boolean demoversion = true;
 
     // TEST //
-    public static boolean test = false;
+    public static boolean test = true;
     public static boolean dbsviluppo = false;
     //////////
 
@@ -166,10 +167,9 @@ public class Utility {
     public static final DateTimeFormatter dtfh = DateTimeFormat.forPattern(patternHmin);
     public static final DateTimeFormatter dtfsql = DateTimeFormat.forPattern(timestampSQL);
 
-    
     public static final String APP = "ENM_NEET";
     public static final Logger LOGAPP = Logger.getLogger(APP);
-    
+
     //END RAF
     public static void redirect(HttpServletRequest request, HttpServletResponse response, String destination) throws ServletException, IOException {
         if (response.isCommitted()) {
@@ -469,7 +469,7 @@ public class Utility {
         if (pdffile.exists()) {
             try {
                 int pag;
-                try (InputStream is = new FileInputStream(pdffile); PdfReader pdfReader = new PdfReader(is)) {
+                try ( InputStream is = new FileInputStream(pdffile);  PdfReader pdfReader = new PdfReader(is)) {
                     PdfDocument pd = new PdfDocument(pdfReader);
                     pag = pd.getNumberOfPages();
                     pd.close();
@@ -573,7 +573,6 @@ public class Utility {
             JsonParser parser = new JsonParser();
             JsonElement tradeElement = parser.parse(json_s);
             jMembers.add("aaData", tradeElement.getAsJsonArray());
-            System.out.println(jMembers.toString());
             return jMembers.toString();
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -985,7 +984,6 @@ public class Utility {
             bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
             return bigDecimal.doubleValue();
         } catch (Exception e) {
-            e.printStackTrace();
         }
         return 0.0;
 
@@ -995,7 +993,7 @@ public class Utility {
         boolean es;
         try {
             long byteing = source.length();
-            try (OutputStream out = new FileOutputStream(dest)) {
+            try ( OutputStream out = new FileOutputStream(dest)) {
                 long contenuto = FileUtils.copyFile(source, out);
                 es = byteing == contenuto;
             }
@@ -1202,7 +1200,7 @@ public class Utility {
     private static int getIdAllievo(Database db, String nome, String cognome, int idpr) {
         try {
             String sql = "SELECT idallievi FROM allievi WHERE nome = ? AND cognome = ? AND idprogetti_formativi = ? AND id_statopartecipazione = ? ORDER BY idallievi DESC LIMIT 1";
-            try (PreparedStatement ps = db.getC().prepareStatement(sql)) {
+            try ( PreparedStatement ps = db.getC().prepareStatement(sql)) {
                 ps.setString(1, nome);
                 ps.setString(2, cognome);
                 ps.setInt(3, idpr);
@@ -1221,7 +1219,7 @@ public class Utility {
     private static int getIdDocente(Database db, String nome, String cognome, int idsa) {
         try {
             String sql = "SELECT iddocenti FROM docenti WHERE nome = ? AND cognome = ? AND idsoggetti_attuatori = ? AND stato = ? ORDER BY iddocenti DESC LIMIT 1";
-            try (PreparedStatement ps = db.getC().prepareStatement(sql)) {
+            try ( PreparedStatement ps = db.getC().prepareStatement(sql)) {
                 ps.setString(1, nome);
                 ps.setString(2, cognome);
                 ps.setInt(3, idsa);
@@ -1277,6 +1275,34 @@ public class Utility {
         Matcher matcher = pattern.matcher(s);
         String number = matcher.replaceAll("");
         return number;
+    }
+
+    public static String convertSvolgimento(String ing) {
+        if (ing == null) {
+            return "In FAD";
+        } else {
+            switch (ing) {
+                case "":
+                case "F":
+                    return "In FAD";
+                case "P":
+                    return "In Presenza";
+                default:
+                    return "In FAD";
+            }
+        }
+    }
+
+    public static long calcolaintervallomillis(String orastart, String oraend) {
+        try {
+            DateTime st_data1 = new DateTime(2000, 1, 1, Integer.parseInt(orastart.split(":")[0]), Integer.parseInt(orastart.split(":")[1]));
+            DateTime st_data2 = new DateTime(2000, 1, 1, Integer.parseInt(oraend.split(":")[0]), Integer.parseInt(oraend.split(":")[1]));
+            Period p = new Period(st_data1, st_data2, PeriodType.millis());
+            return p.getValue(0);
+        } catch (Exception e) {
+            return 0L;
+        }
+
     }
 
 }

@@ -37,7 +37,7 @@ var KTDatatablesDataSourceAjaxServer = function () {
             columns: [
                 {defaultContent: ''},
                 {data: 'id'},
-                {data: 'descrizione', className: 'text-center text-uppercase'},
+                {data: 'svolgimento', className: 'text-center text-uppercase'},
                 {data: 'start'},
                 {data: 'end'},
                 {data: 'cip'},
@@ -98,7 +98,6 @@ var KTDatatablesDataSourceAjaxServer = function () {
 
                             //TEST modello 4
                             if (row.stato.id === "ATA" || row.stato.id === "SOB") {
-
                                 if (demoversion === 'true') {
                                     option += '<a class="dropdown-item kt-font-dark" href="javascript:void(0);" onclick="simulafaseA(' + row.id +
                                             ')"> SIMULA lezioni Fase A &nbsp;<i class="fa fa-angle-double-right kt-font-dark" style="margin-top:-2px"></i></a>';
@@ -117,11 +116,20 @@ var KTDatatablesDataSourceAjaxServer = function () {
                                             ')"> SIMULA lezioni Fase B &nbsp;<i class="fa fa-angle-double-right kt-font-dark" style="margin-top:-2px"></i></a>';
                                 }
                             
-                            
                             } else if (row.stato.id === "F") {
                                 option += '<a class="dropdown-item fancyBoxFullReload" href="modello4.jsp?id=' + row.id + '"><i class="fa fa-calendar-check"></i> Visualizza Calendario Modello 4</a>';
                                 option += '<a class="dropdown-item" href="concludiPrg.jsp?id=' + row.id + '"><i class="fa fa-angle-double-right"></i> Concludi Progetto</a>';
                             }
+                            
+                            
+                           // if (row.svolgimento === 'P'
+//                                    &&
+//                                    (row.stato.id === "ATA" || row.stato.id === "SOA" 
+//                                    || row.stato.id === "ATB" || row.stato.id === "SOB")
+                                  //  ) {
+                              //  option += '<a class="dropdown-item fancyBoxFullReload" href="registroaula.jsp?id=' 
+                              //          + row.id + '"><i class="flaticon2-calendar-6"></i> Registro Aula</a>';
+                            //}
 
                         }
 
@@ -150,6 +158,17 @@ var KTDatatablesDataSourceAjaxServer = function () {
                     }
                 }
                 , {
+                    targets: 2,
+                    type: 'date-it',
+                    render: function (data, type, row, meta) {
+                        if(data ==='P'){
+                            return "In Presenza";
+                        }else{
+                            return "In FAD";
+                        }
+                    }
+                },
+                {
                     targets: 3,
                     type: 'date-it',
                     render: function (data, type, row, meta) {

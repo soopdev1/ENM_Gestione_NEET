@@ -369,4 +369,27 @@ public class Action {
         return listuser.toLowerCase().contains(listuser.toLowerCase());
     }
 
+    public static List<Registro_completo> registro_modello6(String idpr) {
+        Database db = new Database(false);
+        List<Registro_completo> rc = db.registro_modello6(idpr);
+        db.closeDB();
+        return rc;
+    }
+
+    public static List<String[]> ore_rendicontabili() {
+        List<String[]> out = new ArrayList<>();
+        out.add(new String[]{"0", "0h"});
+        out.add(new String[]{"1800000", "0h 30m"});
+        out.add(new String[]{"3600000", "1h"});
+        out.add(new String[]{"5400000", "1h 30m"});
+        out.add(new String[]{"7200000", "2h"});
+        out.add(new String[]{"9000000", "2h 30m"});
+        out.add(new String[]{"10800000", "3h"});
+        out.add(new String[]{"12600000", "3h 30m"});
+        out.add(new String[]{"14400000", "4h"});
+        out.add(new String[]{"16200000", "4h 30m"});
+        out.add(new String[]{"18000000", "5h"});
+        return out;
+    }
+
 }

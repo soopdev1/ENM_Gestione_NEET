@@ -22,7 +22,7 @@ public class DataPanel {
             if (fiscalCode.length() == 16) {
                 return fiscalCode;
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             System.out.println("Error in calcListener");
         }
 

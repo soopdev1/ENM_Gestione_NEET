@@ -33,6 +33,7 @@ import it.refill.db.Database;
 import it.refill.db.Entity;
 import it.refill.db.Registro_completo;
 import it.refill.domain.Allievi;
+import it.refill.domain.Comuni;
 import it.refill.domain.Docenti;
 import it.refill.domain.Lezioni_Modelli;
 import it.refill.domain.MascheraM5;
@@ -339,8 +340,7 @@ public class Pdf_new {
             db.closeDB();
             List<Item> um = Utility.unitamisura();
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
-                PdfWriter writer = new PdfWriter(pdfOut);
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut)) {
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
@@ -426,7 +426,6 @@ public class Pdf_new {
                         + " / " + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
                 pdfDoc.close();
-                writer.close();
             }
             if (checkPDF(pdfOut)) {
                 return pdfOut;
@@ -462,7 +461,7 @@ public class Pdf_new {
                     + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".EV.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is)) {
                 PdfWriter writer = new PdfWriter(pdfOut);
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
@@ -595,7 +594,7 @@ public class Pdf_new {
                     + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".CL_FIN.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is); PdfWriter writer = new PdfWriter(pdfOut)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut)) {
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
@@ -783,7 +782,7 @@ public class Pdf_new {
                     + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".AssenzaINPS.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is)) {
                 PdfWriter writer = new PdfWriter(pdfOut);
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
@@ -843,7 +842,7 @@ public class Pdf_new {
             createDir(pathtemp);
             File pdfOut = new File(pathtemp + username + "_" + StringUtils.deleteWhitespace(al.getCognome() + "_" + al.getNome()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M7.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is)) {
                 PdfWriter writer = new PdfWriter(pdfOut);
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
@@ -913,9 +912,7 @@ public class Pdf_new {
                     + getOnlyStrings(sa.getRagionesociale()) + "_"
                     + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M6.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); 
-                    PdfReader reader = new PdfReader(is); 
-                    PdfWriter writer = new PdfWriter(pdfOut)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut)) {
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
@@ -1103,7 +1100,7 @@ public class Pdf_new {
                                 .toString("dd/MM/yyyy")).distinct()
                                 .collect(Collectors.toCollection(LinkedList::new));
                         if (lezioniB.isEmpty()) {
-                            System.out.println("B) GRUPPO " + i + " VUOTO");
+//                            System.out.println("B) GRUPPO " + i + " VUOTO");
                         } else {
                             String DATAINIZIOFASEB = lezioniB.getFirst();
                             String DATAFINEFASEB = lezioniB.getLast();
@@ -1338,9 +1335,7 @@ public class Pdf_new {
             createDir(pathtemp);
             File pdfOut = new File(pathtemp + username + "_" + StringUtils.deleteWhitespace(al.getCognome() + "_" + al.getNome()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M5.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
-                PdfWriter writer = new PdfWriter(pdfOut);
-                PdfDocument pdfDoc = new PdfDocument(reader, writer);
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut); PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getFormFields();
@@ -1390,13 +1385,22 @@ public class Pdf_new {
                 });
                 setFieldsValue(form, fields, "ELENCODOCENTI", listadocenti.toString());
                 setFieldsValue(form, fields, "RAGIONESOCIALE", m5.getRagione_sociale().toUpperCase());
-                setFieldsValue(form, fields, "FORMAGIURIDICA", m5.getForma_giuridica().getDescrizione().toUpperCase());
+                if (m5.getForma_giuridica() != null) {
+                    setFieldsValue(form, fields, "FORMAGIURIDICA", m5.getForma_giuridica().getDescrizione().toUpperCase());
+                }
                 setFieldsValue(form, fields, "SEDEINDIVIDUATA", Utility.convertbooleantostring(m5.isSede()));
                 setFieldsValue(form, fields, "COLLOQUIO", Utility.convertbooleantostring(m5.isColloquio()));
+
                 setFieldsValue(form, fields, "IDEAIMPRESA", m5.getIdea_impresa().toUpperCase());
-                setFieldsValue(form, fields, "ATECO", m5.getAteco().getId());
-                setFieldsValue(form, fields, "COMUNE_NUOVO", m5.getComune_localizzazione().getNome().toUpperCase());
-                setFieldsValue(form, fields, "REGIONE_NUOVO", m5.getComune_localizzazione().getRegione().toUpperCase());
+                if (m5.getAteco() != null) {
+                    setFieldsValue(form, fields, "ATECO", m5.getAteco().getId());
+                }
+
+                if (m5.getComune_localizzazione() != null) {
+                    setFieldsValue(form, fields, "COMUNE_NUOVO", m5.getComune_localizzazione().getNome().toUpperCase());
+                    setFieldsValue(form, fields, "REGIONE_NUOVO", m5.getComune_localizzazione().getRegione().toUpperCase());
+                }
+
                 setFieldsValue(form, fields, "MOTIVAZIONEATTIVITA", m5.getMotivazione().toUpperCase());
                 setFieldsValue(form, fields, "FABBISOGNO", Utility.numITA.format(m5.getFabbisogno_finanziario()));
                 setFieldsValue(form, fields, "RICHIESTO", Utility.numITA.format(m5.getFinanziamento_richiesto_agevolazione()));
@@ -1567,13 +1571,12 @@ public class Pdf_new {
                         + StringUtils.deleteWhitespace(al.getCognome() + "_" + al.getNome())
                         + " / " + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
-                pdfDoc.close();
-                writer.close();
             }
             if (checkPDF(pdfOut)) {
                 return pdfOut;
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -1601,7 +1604,7 @@ public class Pdf_new {
 
             File pdfOut = new File(pathtemp + username + "_" + getOnlyStrings(sa.getRagionesociale()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M4.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is)) {
                 PdfWriter writer = new PdfWriter(pdfOut);
                 PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
@@ -1610,12 +1613,6 @@ public class Pdf_new {
 
                 String NOMESA = sa.getRagionesociale();
                 String DD = sa.getDd();
-                String PRESENZA = "NO";
-                String FAD = "SI";
-                String REGIONESEDE = "";
-                String COMUNESEDE = "";
-                String PROVINCIASEDE = "";
-                String INDIRIZZOSEDE = "";
                 String COGNOME = sa.getCognome_referente();
                 String NOME = sa.getNome_refente();
                 String CARICA = sa.getCarica();
@@ -1626,10 +1623,6 @@ public class Pdf_new {
 
                 setFieldsValue(form, fields, "NOMESA", NOMESA);
                 setFieldsValue(form, fields, "DD", DD);
-                setFieldsValue(form, fields, "REGIONESEDE", REGIONESEDE);
-                setFieldsValue(form, fields, "COMUNESEDE", COMUNESEDE);
-                setFieldsValue(form, fields, "PROVINCIASEDE", PROVINCIASEDE);
-                setFieldsValue(form, fields, "INDIRIZZOSEDE", INDIRIZZOSEDE);
                 setFieldsValue(form, fields, "COGNOME", COGNOME);
                 setFieldsValue(form, fields, "NOME", NOME);
                 setFieldsValue(form, fields, "CARICA", CARICA);
@@ -1714,18 +1707,31 @@ public class Pdf_new {
                     }
                 });
 
+                String PRESENZA = pf.getSvolgimento().equals("P") ? "SI" : "NO";
+                String FAD = pf.getSvolgimento().equals("P") ? "NO" : "SI";
+
                 fields.forEach((KEY, VALUE) -> {
                     boolean checkbox = asList(VALUE.getAppearanceStates()).size() > 0;
                     if (checkbox) {
                         if (KEY.equalsIgnoreCase("PRESENZA")) {
                             if (PRESENZA.equals("SI")) {
                                 setFieldsValue(form, fields, KEY, "On");
+                                Comuni c_s = pf.getSede().getComune();
+                                setFieldsValue(form, fields, "REGIONESEDE", c_s.getRegione());
+                                setFieldsValue(form, fields, "COMUNESEDE", c_s.getNome());
+                                setFieldsValue(form, fields, "PROVINCIASEDE", c_s.getCod_provincia());
+                                setFieldsValue(form, fields, "INDIRIZZOSEDE", pf.getSede().getIndirizzo());
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
                         } else if (KEY.equalsIgnoreCase("FAD")) {
                             if (FAD.equals("SI")) {
                                 setFieldsValue(form, fields, KEY, "On");
+                                setFieldsValue(form, fields, "REGIONESEDE", "");
+                                setFieldsValue(form, fields, "COMUNESEDE", "");
+                                setFieldsValue(form, fields, "PROVINCIASEDE", "");
+                                setFieldsValue(form, fields, "INDIRIZZOSEDE", "");
+
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
@@ -1767,7 +1773,9 @@ public class Pdf_new {
             Entity e,
             String username,
             SoggettiAttuatori sa,
-            ProgettiFormativi pf, List<Allievi> allievi, List<Docenti> docenti, List<Lezioni_Modelli> lezioni,
+            ProgettiFormativi pf, List<Allievi> allievi,
+            List<Docenti> docenti,
+            List<Lezioni_Modelli> lezioni,
             List<StaffModelli> staff,
             DateTime dataconsegna,
             boolean flatten) {
@@ -1781,39 +1789,22 @@ public class Pdf_new {
 
             File pdfOut = new File(pathtemp + username + "_"
                     + getOnlyStrings(sa.getRagionesociale()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M3.pdf");
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
-                PdfWriter writer = new PdfWriter(pdfOut);
-                PdfDocument pdfDoc = new PdfDocument(reader, writer);
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut);  PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getFormFields();
 
                 String NOMESA = sa.getRagionesociale();
                 String DD = sa.getDd();
-                String PRESENZA = "NO";
-                String FAD = "SI";
-                String REGIONESEDE = "";
-                String COMUNESEDE = "";
-                String PROVINCIASEDE = "";
-                String INDIRIZZOSEDE = "";
+
                 String COGNOME = sa.getCognome_referente();
                 String NOME = sa.getNome_refente();
                 String CARICA = sa.getCarica();
-
-//                String DATAINIZIO = sdfITA.format(pf.getStart());
-//                Date primaLezM3 = Utility.getPrimoGiornoLezioneM3(pf);
-//                if (primaLezM3 != null) {
-//                    DATAINIZIO = sdfITA.format(primaLezM3);
-//                }
                 String DATAINIZIO = sdfITA.format(pf.getStart());
                 String DATAFINE = sdfITA.format(pf.getEnd());
 
                 setFieldsValue(form, fields, "NOMESA", NOMESA);
                 setFieldsValue(form, fields, "DD", DD);
-                setFieldsValue(form, fields, "REGIONESEDE", REGIONESEDE);
-                setFieldsValue(form, fields, "COMUNESEDE", COMUNESEDE);
-                setFieldsValue(form, fields, "PROVINCIASEDE", PROVINCIASEDE);
-                setFieldsValue(form, fields, "INDIRIZZOSEDE", INDIRIZZOSEDE);
                 setFieldsValue(form, fields, "COGNOME", COGNOME);
                 setFieldsValue(form, fields, "NOME", NOME);
                 setFieldsValue(form, fields, "CARICA", CARICA);
@@ -1943,18 +1934,30 @@ public class Pdf_new {
                     }
                 });
 
+                String PRESENZA = pf.getSvolgimento().equals("P") ? "SI" : "NO";
+                String FAD = pf.getSvolgimento().equals("P") ? "NO" : "SI";
+
                 fields.forEach((KEY, VALUE) -> {
                     boolean checkbox = asList(VALUE.getAppearanceStates()).size() > 0;
                     if (checkbox) {
                         if (KEY.equalsIgnoreCase("PRESENZA")) {
                             if (PRESENZA.equals("SI")) {
                                 setFieldsValue(form, fields, KEY, "On");
+                                Comuni c_s = pf.getSede().getComune();
+                                setFieldsValue(form, fields, "REGIONESEDE", c_s.getRegione());
+                                setFieldsValue(form, fields, "COMUNESEDE", c_s.getNome());
+                                setFieldsValue(form, fields, "PROVINCIASEDE", c_s.getCod_provincia());
+                                setFieldsValue(form, fields, "INDIRIZZOSEDE", pf.getSede().getIndirizzo());
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
                         } else if (KEY.equalsIgnoreCase("FAD")) {
                             if (FAD.equals("SI")) {
                                 setFieldsValue(form, fields, KEY, "On");
+                                setFieldsValue(form, fields, "REGIONESEDE", "");
+                                setFieldsValue(form, fields, "COMUNESEDE", "");
+                                setFieldsValue(form, fields, "PROVINCIASEDE", "");
+                                setFieldsValue(form, fields, "INDIRIZZOSEDE", "");
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
@@ -1976,8 +1979,6 @@ public class Pdf_new {
                         + StringUtils.deleteWhitespace(sa.getRagionesociale())
                         + " / " + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
-                pdfDoc.close();
-                writer.close();
 
             }
 
@@ -2005,28 +2006,20 @@ public class Pdf_new {
 
             File pdfOut = new File(pathtemp + username + "_" + StringUtils.deleteWhitespace(al.getCognome() + "_" + al.getNome()) + "_" + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M1.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
-                PdfWriter writer = new PdfWriter(pdfOut);
-                PdfDocument pdfDoc = new PdfDocument(reader, writer);
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut);  PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getFormFields();
 
                 String NOMESA = sa.getRagionesociale();
                 String DD = sa.getDd();
-                String PRESENZA = "NO";
-                String FAD = "SI";
-                String REGIONESEDE = "";
-                String COMUNESEDE = "";
-                String PROVINCIASEDE = "";
-                String INDIRIZZOSEDE = "";
 
                 setFieldsValue(form, fields, "NOMESA", NOMESA);
                 setFieldsValue(form, fields, "DD", DD);
-                setFieldsValue(form, fields, "REGIONESEDE", REGIONESEDE);
-                setFieldsValue(form, fields, "COMUNESEDE", COMUNESEDE);
-                setFieldsValue(form, fields, "PROVINCIASEDE", PROVINCIASEDE);
-                setFieldsValue(form, fields, "INDIRIZZOSEDE", INDIRIZZOSEDE);
+                setFieldsValue(form, fields, "REGIONESEDE", "");
+                setFieldsValue(form, fields, "COMUNESEDE", "");
+                setFieldsValue(form, fields, "PROVINCIASEDE", "");
+                setFieldsValue(form, fields, "INDIRIZZOSEDE", "");
 
                 setFieldsValue(form, fields, "cognome", al.getCognome().toUpperCase());
                 setFieldsValue(form, fields, "nome", al.getNome().toUpperCase());
@@ -2085,31 +2078,6 @@ public class Pdf_new {
                 setFieldsValue(form, fields, "privacy3" + al.getPrivacy3(), "On");
                 setFieldsValue(form, fields, "data", dataconsegna.toString(patternITA));
 
-                fields.forEach((KEY, VALUE) -> {
-                    boolean checkbox = asList(VALUE.getAppearanceStates()).size() > 0;
-                    if (checkbox) {
-                        if (KEY.equalsIgnoreCase("PRESENZA")) {
-                            if (PRESENZA.equals("SI")) {
-                                setFieldsValue(form, fields, KEY, "On");
-                            } else {
-                                form.partialFormFlattening(KEY);
-                            }
-                        } else if (KEY.equalsIgnoreCase("FAD")) {
-                            if (FAD.equals("SI")) {
-                                setFieldsValue(form, fields, KEY, "On");
-                            } else {
-                                form.partialFormFlattening(KEY);
-                            }
-                        } else {
-                            form.partialFormFlattening(KEY);
-                        }
-                    } else {
-
-                        form.partialFormFlattening(KEY);
-
-                    }
-                });
-
                 if (flatten) {
                     form.flattenFields();
                     form.flush();
@@ -2119,8 +2087,6 @@ public class Pdf_new {
                         + StringUtils.deleteWhitespace(al.getCognome() + "_" + al.getNome())
                         + " / " + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
-                pdfDoc.close();
-                writer.close();
 
             }
             if (checkPDF(pdfOut)) {
@@ -2147,22 +2113,18 @@ public class Pdf_new {
 
             File pdfOut = new File(pathtemp + username + dataconsegna.toString("ddMMyyyyHHmmSSS") + ".M2.pdf");
 
-            try (InputStream is = new ByteArrayInputStream(decodeBase64(contentb64)); PdfReader reader = new PdfReader(is)) {
+            try ( InputStream is = new ByteArrayInputStream(decodeBase64(contentb64));  PdfReader reader = new PdfReader(is);  PdfWriter writer = new PdfWriter(pdfOut);  PdfDocument pdfDoc = new PdfDocument(reader, writer)) {
 
-                PdfWriter writer = new PdfWriter(pdfOut);
-                PdfDocument pdfDoc = new PdfDocument(reader, writer);
                 PdfAcroForm form = getAcroForm(pdfDoc, true);
                 form.setGenerateAppearance(true);
                 Map<String, PdfFormField> fields = form.getFormFields();
 
                 String NOMESA = sa.getRagionesociale();
                 String DD = sa.getDd();
-                String PRESENZA = "NO";
-                String FAD = "SI";
-                String REGIONESEDE = "";
-                String COMUNESEDE = "";
-                String PROVINCIASEDE = "";
-                String INDIRIZZOSEDE = "";
+
+                String PRESENZA = pf.getSvolgimento().equals("P") ? "SI" : "NO";
+                String FAD = pf.getSvolgimento().equals("P") ? "NO" : "SI";
+
                 String COGNOME = sa.getCognome_referente();
                 String NOME = sa.getNome_refente();
                 String CARICA = sa.getCarica();
@@ -2172,10 +2134,6 @@ public class Pdf_new {
 
                 setFieldsValue(form, fields, "NOMESA", NOMESA);
                 setFieldsValue(form, fields, "DD", DD);
-                setFieldsValue(form, fields, "REGIONESEDE", REGIONESEDE);
-                setFieldsValue(form, fields, "COMUNESEDE", COMUNESEDE);
-                setFieldsValue(form, fields, "PROVINCIASEDE", PROVINCIASEDE);
-                setFieldsValue(form, fields, "INDIRIZZOSEDE", INDIRIZZOSEDE);
                 setFieldsValue(form, fields, "COGNOME", COGNOME);
                 setFieldsValue(form, fields, "NOME", NOME);
                 setFieldsValue(form, fields, "CARICA", CARICA);
@@ -2201,12 +2159,21 @@ public class Pdf_new {
                         if (KEY.equalsIgnoreCase("PRESENZA")) {
                             if (PRESENZA.equals("SI")) {
                                 setFieldsValue(form, fields, KEY, "On");
+                                Comuni c_s = pf.getSede().getComune();
+                                setFieldsValue(form, fields, "REGIONESEDE", c_s.getRegione());
+                                setFieldsValue(form, fields, "COMUNESEDE", c_s.getNome());
+                                setFieldsValue(form, fields, "PROVINCIASEDE", c_s.getCod_provincia());
+                                setFieldsValue(form, fields, "INDIRIZZOSEDE", pf.getSede().getIndirizzo());
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
                         } else if (KEY.equalsIgnoreCase("FAD")) {
                             if (FAD.equals("SI")) {
                                 setFieldsValue(form, fields, KEY, "On");
+                                setFieldsValue(form, fields, "REGIONESEDE", "");
+                                setFieldsValue(form, fields, "COMUNESEDE", "");
+                                setFieldsValue(form, fields, "PROVINCIASEDE", "");
+                                setFieldsValue(form, fields, "INDIRIZZOSEDE", "");
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
@@ -2214,9 +2181,7 @@ public class Pdf_new {
                             form.partialFormFlattening(KEY);
                         }
                     } else {
-
                         form.partialFormFlattening(KEY);
-
                     }
                 });
 
@@ -2226,8 +2191,6 @@ public class Pdf_new {
                 BarcodeQRCode barcode = new BarcodeQRCode(username + " / MODELLO2 / "
                         + dataconsegna.toString("ddMMyyyyHHmmSSS"));
                 printbarcode(barcode, pdfDoc);
-                pdfDoc.close();
-                writer.close();
             }
             if (checkPDF(pdfOut)) {
                 return pdfOut;
@@ -2245,9 +2208,9 @@ public class Pdf_new {
         }
         try {
             File pdfOutA = new File(replace(pdf_ing.getPath(), ".pdf", "_pdfA.pdf"));
-            try (FileInputStream in = new FileInputStream(pdf_ing)) {
+            try ( FileInputStream in = new FileInputStream(pdf_ing)) {
                 setProperty("sun.java2d.cmm", "sun.java2d.cmm.kcms.KcmsServiceProvider");
-                try (PDDocument doc = PDDocument.load(pdf_ing)) {
+                try ( PDDocument doc = PDDocument.load(pdf_ing)) {
                     int numPageTOT = 0;
                     Iterator<PDPage> it1 = doc.getPages().iterator();
                     while (it1.hasNext()) {
@@ -2256,7 +2219,7 @@ public class Pdf_new {
                     }
                     PDPage page = new PDPage();
                     doc.setVersion(1.7f);
-                    try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
+                    try ( PDPageContentStream contents = new PDPageContentStream(doc, page)) {
                         PDDocument docSource = PDDocument.load(in);
                         PDFRenderer pdfRenderer = new PDFRenderer(docSource);
                         for (int i = 0; i < numPageTOT; i++) {
@@ -2370,7 +2333,7 @@ public class Pdf_new {
             if (!allCerts.isEmpty()) {
                 X509CertificateHolder x509h = allCerts.iterator().next();
                 CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-                try (InputStream in = new ByteArrayInputStream(x509h.getEncoded())) {
+                try ( InputStream in = new ByteArrayInputStream(x509h.getEncoded())) {
                     X509Certificate cert = (X509Certificate) certFactory.generateCertificate(in);
                     Principal principal = cert.getSubjectDN();
                     try {
@@ -2406,7 +2369,7 @@ public class Pdf_new {
         try {
             BouncyCastleProvider provider = new BouncyCastleProvider();
             addProvider(provider);
-            try (InputStream is = new ByteArrayInputStream(pdf_bytes)) {
+            try ( InputStream is = new ByteArrayInputStream(pdf_bytes)) {
                 PdfReader read = new PdfReader(is);
                 PdfDocument pdfDoc = new PdfDocument(read);
                 AtomicInteger error = new AtomicInteger(0);
