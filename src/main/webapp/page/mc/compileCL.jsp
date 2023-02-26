@@ -500,7 +500,7 @@
                                                                         <%for (Allievi al : allievi_faseA) {
 
                                                                                 String orerend = "0.00";
-
+                                                                                System.out.println(al.getId()+" className.methodName() " + oreRendicontabili_faseA.get(al.getId()));
                                                                                 if (oreRendicontabili_faseA.get(al.getId()) != null) {
                                                                                     orerend = Utility.convertToHours_R(oreRendicontabili_faseA.get(al.getId()));
                                                                                 }
@@ -879,11 +879,11 @@
         <div id="kt_scrolltop" class="kt-scrolltop">
             <i class="fa fa-arrow-up"></i>
         </div>
-        <script src="<%=src%>/assets/vendors/general/jquery/dist/jquery.js" type="text/javascript"></script>
+        <script src="<%=src%>/assets/refill/js/jquery-3.6.1.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/popper.js/dist/umd/popper.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/js-cookie/src/js.cookie.js" type="text/javascript"></script>
-        <script src="<%=src%>/assets/vendors/general/moment/min/moment.min.js" type="text/javascript"></script>
+        <script src="<%=src%>/assets/refill/js/moment.min.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/tooltip.js/dist/umd/tooltip.min.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/perfect-scrollbar/dist/perfect-scrollbar.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/sticky-js/dist/sticky.min.js" type="text/javascript"></script>

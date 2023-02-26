@@ -6,9 +6,11 @@
 package it.refill.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import static it.refill.db.Action.insertTR;
 import it.refill.util.Utility;
 import it.refill.db.Entity;
 import it.refill.domain.User;
+import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.redirect;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,7 +91,7 @@ public class ExternalLogin extends HttpServlet {
             e.close();
             
             // Request parameters and other properties.
-            List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+            List<NameValuePair> params = new ArrayList<>(2);
             params.add(new BasicNameValuePair("type", "getUserToken"));
             params.add(new BasicNameValuePair("username", request.getParameter("username")));
             httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
@@ -107,8 +109,8 @@ public class ExternalLogin extends HttpServlet {
                     }
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex){
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return null;
     }

@@ -402,11 +402,11 @@
 <div id="kt_scrolltop" class="kt-scrolltop">
     <i class="fa fa-arrow-up"></i>
 </div>
-<script src="<%=src%>/assets/vendors/general/jquery/dist/jquery.js" type="text/javascript"></script>
+<script src="<%=src%>/assets/refill/js/jquery-3.6.1.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/popper.js/dist/umd/popper.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/js-cookie/src/js.cookie.js" type="text/javascript"></script>
-<script src="<%=src%>/assets/vendors/general/moment/min/moment.min.js" type="text/javascript"></script>
+<script src="<%=src%>/assets/refill/js/moment.min.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/tooltip.js/dist/umd/tooltip.min.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/sticky-js/dist/sticky.min.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/demo/default/base/scripts.bundle.js" type="text/javascript"></script>
@@ -425,8 +425,8 @@
 <script src="<%=src%>/assets/app/custom/general/crud/forms/widgets/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/bootstrap-datepicker/dist/js/bootstrap-datepicker.js" type="text/javascript"></script>
 <script src="<%=src%>/assets/vendors/general/inputmask/dist/inputmask/inputmask.js" type="text/javascript"></script>
-<link href="<%=src%>/assets/refill/css/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="<%=src%>/assets/refill/js/jquery.fancybox.js?v=2.1.5"></script>
+<link href="<%=src%>/assets/refill/css/jquery.fancybox.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="<%=src%>/assets/refill/js/jquery.fancybox.min.js"></script>
 <script type="text/javascript" src="<%=src%>/assets/refill/js/fancy.js"></script>
 <input type="hidden" id="systemtype" value="<%=Utility.iswindows()%>" />
 <script type="text/javascript">

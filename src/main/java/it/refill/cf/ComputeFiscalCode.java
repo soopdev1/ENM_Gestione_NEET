@@ -10,6 +10,8 @@ import static it.refill.cf.NameAndSurnameComputations.pickFirstThirdAndFourthCon
 import static it.refill.cf.NameAndSurnameComputations.pickFirstThreeConsonants;
 import static it.refill.cf.NameAndSurnameComputations.pickFirstThreeVowels;
 import static it.refill.cf.NameAndSurnameComputations.pickFirstTwoConsonantsAndFirstVowel;
+import static it.refill.db.Action.insertTR;
+import static it.refill.util.Utility.estraiEccezione;
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -182,8 +184,8 @@ public class ComputeFiscalCode {
                             break;
                         }
                     }
-                } catch (NumberFormatException e) {
-                    System.out.println("Check numeric input.");
+                } catch (Exception ex) {
+                    insertTR("E", "SERVICE", estraiEccezione(ex));
                 }
                 return result;
             } else {

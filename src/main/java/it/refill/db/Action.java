@@ -10,6 +10,8 @@ import it.refill.domain.ProgettiFormativi;
 import it.refill.domain.SoggettiAttuatori;
 import it.refill.domain.User;
 import it.refill.entity.FadCalendar;
+import it.refill.util.Utility;
+import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.pregresso;
 import java.io.File;
 import java.util.ArrayList;
@@ -27,6 +29,15 @@ import static org.apache.commons.io.FilenameUtils.separatorsToSystem;
  */
 public class Action {
 
+    public static void insertTR(String type, String user, String descr) {
+        try {
+            Database db = new Database(false);
+            db.insertTR(type, user, descr);
+            db.closeDB();
+        } catch (Exception e) {
+        }
+   }
+    
     public static File createFile_R(String path) {
         try {
             File out = new File(separatorsToSystem(path));
@@ -108,7 +119,7 @@ public class Action {
 
         AtomicInteger out_0 = new AtomicInteger(0);
         AtomicInteger out_1 = new AtomicInteger(0);
-        Long hh36 = new Long(129600000);
+        Long hh36 = Long.valueOf(129600000);
 
         Entity e = new Entity();
         e.begin();
@@ -293,7 +304,7 @@ public class Action {
             });
 
         } catch (Exception ex) {
-            //ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
 
         out[0] = String.valueOf(out_0.get());

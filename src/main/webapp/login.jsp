@@ -1,16 +1,16 @@
 <%-- 
     Document   : login1
     Created on : 15-ott-2019, 10.42.32
-    Author     : dolivo
 --%>
 <%@page import="it.refill.db.Entity"%>
 <%@page import="it.refill.util.Utility"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <html>
-    <%  Entity e = new Entity();
+    <%  
+        response.addHeader("X-Frame-Options", "SAMEORIGIN");
+        Entity e = new Entity();
         String mantenance = e.getPath("mantenance");
-        String manuale = e.getPath("manualeSA");
-
+        //String manuale = e.getPath("manualeSA");
         e.close();
         if (mantenance.equals("Y")) {
             Utility.redirect(request, response, "noService.jsp");
@@ -21,7 +21,9 @@
         <title>YES I Start Up - NEET</title>
         <meta name="description" content="Login page example">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+        <meta name="_csrf" content="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/>
+        <meta name="_csrf_header" content="X-CSRF-TOKEN"/>
+        <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'">
         <!--begin::Fonts -->
         <script src="resource/webfont.js"></script>
         <script>
@@ -91,7 +93,10 @@
                                     <%}%>
                                     <div class="kt-login__title">Accedi</div>
                                 </div>
-                                <form action="Login?type=login" id="kt-form" class="kt-form" onsubmit="return ctrlForm();" accept-charset="ISO-8859-1" method="post">
+                                <form action="Login?type=login" id="kt-form" class="kt-form" htmlEscape="true" onsubmit="return ctrlForm();" accept-charset="ISO-8859-1" method="post">
+                                    <input type="hidden"
+                                           name="_csrf"
+                                           value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/>
                                     <div class="form-group">
                                         <input class="form-control" type="text" placeholder="Username" name="username" id="user" autocomplete="off">
                                     </div>
@@ -112,14 +117,16 @@
                                         <button id="kt_login_signin_submit" type="submit" class="btn btn-io kt-login__btn-primary">Login</button>
                                     </div>
                                 </form>
-                                <%if (!manuale.equals("")) {%>
-                                <form id="manform" target="_blank"
-                                      action="<%=request.getContextPath()%>/OperazioniGeneral" method="POST">
+                                <form id="manform" target="_blank" htmlEscape="true"
+                                      action="<%=request.getContextPath()%>/OperazioniGeneral" 
+                                      method="POST">
+                                    <input type="hidden"
+                                           name="_csrf"
+                                           value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/>
                                     <input type="hidden" name="type"
-                                           value="onlyDownload">
+                                           value="onlyDownloadnew">
                                     <input type="hidden" name="path"
-                                           value="<%=manuale.replaceAll("\\\\", "/")%>">
-
+                                           value="<%="manualeSA"%>">
                                 </form>
                                 <div class="row kt-login__extra">
                                     <div class="col-12 text-center" 
@@ -140,21 +147,24 @@
                                 <script type="text/javascript">
                                     var img = document.getElementById('blinking_image');
                                     var interval = window.setInterval(function () {
-                                        if (img.style.visibility == 'hidden') {
+                                        if (img.style.visibility === 'hidden') {
                                             img.style.visibility = 'visible';
                                         } else {
                                             img.style.visibility = 'hidden';
                                         }
                                     }, 500);
                                 </script>
-                                <%}%>
+
                             </div>
                             <div class="kt-login__forgot">
                                 <div class="kt-login__head">
                                     <h3 class="kt-login__title">Password dimenticata ?</h3>
                                     <div class="kt-login__desc">Inserisci il tuo username per effettuare il reset password:</div>
                                 </div>
-                                <form class="kt-form" id="kt_form_pwd" action="Login?type=forgotPwd">
+                                <form class="kt-form" id="kt_form_pwd" action="Login?type=forgotPwd" htmlEscape="true">
+                                    <input type="hidden"
+                                           name="_csrf"
+                                           value="4bfd1575-3ad1-4d21-96c7-4ef2d9f86721"/>
                                     <div class="input-group">
                                         <input class="form-control" type="text" placeholder="Username o Email" name="email" id="email" autocomplete="off">
                                     </div>
@@ -183,7 +193,7 @@
         </div>
 
         <!-- end:: Page -->
-        <script type="text/javascript" src="assets/refill/js/jquery-1.10.1.min.js"></script>
+        <script type="text/javascript" src="assets/refill/js/jquery-3.6.1.min.js"></script>
         <!--begin:: Global Mandatory Vendors -->
         <script src="assets/refill/js/utility.js" type="text/javascript"></script>
         <script>
@@ -198,7 +208,7 @@
                                             err = true;
                                         }
                                         if (err) {
-                                            $("#drop_login").trigger('click')
+                                            $("#drop_login").trigger('click');
                                             return false;
                                         }
                                         swal.fire({
@@ -234,13 +244,13 @@
         </script>
 
 
-        <script type="text/javascript" src="assets/refill/js/jquery.fancybox.js?v=2.1.5"></script>
+        <script type="text/javascript" src="assets/refill/js/jquery.fancybox.min.js"></script>
         <script type="text/javascript" src="assets/refill/js/fancy.js"></script>
-        <script src="assets/vendors/general/jquery/dist/jquery.js" type="text/javascript"></script>
+        <script src="assets/refill/js/jquery-3.6.1.js" type="text/javascript"></script>
         <script src="assets/vendors/general/popper.js/dist/umd/popper.js" type="text/javascript"></script>
         <script src="assets/vendors/general/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="assets/vendors/general/js-cookie/src/js.cookie.js" type="text/javascript"></script>
-        <script src="assets/vendors/general/moment/min/moment.min.js" type="text/javascript"></script>
+        <script src="assets/refill/js/moment.min.js" type="text/javascript"></script>
         <script src="assets/vendors/general/tooltip.js/dist/umd/tooltip.min.js" type="text/javascript"></script>
         <script src="assets/vendors/general/jquery-form/dist/jquery.form.min.js" type="text/javascript"></script>
         <script src="assets/vendors/general/perfect-scrollbar/dist/perfect-scrollbar.js" type="text/javascript"></script>
@@ -263,7 +273,7 @@
 
             $("#submit_pwd").on('click', function () {
                 if (ctrlEmail()) {
-                    showLoad()
+                    showLoad();
                     $('#kt_form_pwd').ajaxSubmit({
                         error: function () {
                             closeSwal();
@@ -272,21 +282,21 @@
                                 "text": "Riprovare, se l'errore persiste contattare il servizio clienti",
                                 "type": "error",
                                 cancelButtonColor: "#3a2c7a",
-                                cancelButtonClass: "btn btn-io-n",
+                                cancelButtonClass: "btn btn-io-n"
                             });
                         },
                         success: function (resp) {
                             var json = JSON.parse(resp);
                             closeSwal();
                             if (json.result) {
-                                swalSuccessReload("Password cambiata con successo!", "Hai ricevuto una mail al tuo indirizzo contenente la nuova password da modificare al prossimo accesso")
+                                swalSuccessReload("Password cambiata con successo!", "Hai ricevuto una mail al tuo indirizzo contenente la nuova password da modificare al prossimo accesso");
                             } else {
                                 $('#email').attr("class", "form-control is-invalid");
                                 swal.fire({
                                     "title": '<h3><b>Errore!</b></h3>',
                                     "html": "<h5>" + json.messagge + "</h5>",
                                     "type": "error",
-                                    cancelButtonClass: "btn btn-io-n",
+                                    cancelButtonClass: "btn btn-io-n"
                                 });
                             }
                         }
@@ -304,13 +314,13 @@
             swal.fire({
                 type: 'error',
                 title: 'Credenziali errate',
-                confirmButtonColor: '#363a90',
+                confirmButtonColor: '#363a90'
             });
             <%} else if (esito.equals("banned")) {%>
             swal.fire({
                 type: 'error',
                 title: 'Utenza bloccata',
-                confirmButtonColor: '#363a90',
+                confirmButtonColor: '#363a90'
             });
             <%}%>
 
@@ -329,7 +339,15 @@
                 a.click();
                 a.remove();
             }
+
+
+
+
+
         </script>
+
+
+
     </body>
 
     <!-- end::Body -->

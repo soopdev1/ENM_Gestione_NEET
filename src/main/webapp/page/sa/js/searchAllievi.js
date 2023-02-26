@@ -133,8 +133,8 @@ var KTDatatablesDataSourceAjaxServer = function () {
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalTableProgFormativo(' 
                                     + row.progetto.id + ')"><i class="fa fa-file-alt"></i> Visualizza Progetto Formativo</a>';
                         }
-                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMail(' 
-                                + row.id + ',\'' + row.email + '\')"><i class="fa fa-envelope"></i> Modifica Email</a>';
+//                        option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalMail(' 
+//                                + row.id + ',\'' + row.email + '\')"><i class="fa fa-envelope"></i> Modifica Email</a>';
                         option += '</div></div>';
                         return option;
                     }

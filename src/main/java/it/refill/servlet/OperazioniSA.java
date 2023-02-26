@@ -10,6 +10,7 @@ import com.google.common.util.concurrent.AtomicDouble;
 import com.google.gson.JsonObject;
 import it.refill.cf.DataPanel;
 import it.refill.db.Action;
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Database;
 import it.refill.db.Entity;
 import it.refill.domain.Allievi;
@@ -61,6 +62,7 @@ import it.refill.util.Utility;
 import static it.refill.util.Utility.conversionText;
 import static it.refill.util.Utility.copyR;
 import static it.refill.util.Utility.createDir;
+import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.getRequestValue;
 import static it.refill.util.Utility.getStartPath;
 import static it.refill.util.Utility.parseDouble;
@@ -166,8 +168,8 @@ public class OperazioniSA extends HttpServlet {
                 }
                 resp.addProperty("message", "Errore: non &egrave; stato possibile registrarsi.<br>CF o P.IVA gi&agrave; presente");
             }
-        } catch (IOException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare le informazioni del profilo.<br>Riprovare, se l'errore persiste contattare l'assistenza");
         } finally {
@@ -228,7 +230,7 @@ public class OperazioniSA extends HttpServlet {
                 });
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.commit();
             e.close();
@@ -308,7 +310,7 @@ public class OperazioniSA extends HttpServlet {
             }
 
         } catch (Exception ex1) {
-            ex1.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex1));
         } finally {
             e.commit();
             e.close();
@@ -391,12 +393,12 @@ public class OperazioniSA extends HttpServlet {
                     e.merge(a);
 
                 } else {
-                    System.out.println(codicefiscale + " it.refill.servlet.OperazioniSA.generaterandomAllievi() " + e.getAllievoCF(codicefiscale));
+                    insertTR("E", "SERVICE", codicefiscale + " it.refill.servlet.OperazioniSA.generaterandomAllievi() " + e.getAllievoCF(codicefiscale));
                 }
             }
 
         } catch (Exception ex1) {
-            ex1.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex1));
         } finally {
             e.commit();
             e.close();
@@ -570,7 +572,7 @@ public class OperazioniSA extends HttpServlet {
                                 modello1OK = true;
                             }
                         } catch (Exception ex) {
-                            ex.printStackTrace();
+                            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
                             modello1OK = false;
                             erroremodello1OK = "MODELLO 1 ERRATO. " + ex.getMessage() + ". CONTROLLARE.";
                         }
@@ -589,7 +591,7 @@ public class OperazioniSA extends HttpServlet {
                                     pa.write(destpath);
                                     documenti.add(new Documenti_Allievi(destpath, t, null, a));
                                 } catch (Exception ex) {
-                                    ex.printStackTrace();
+                                    insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
                                 }
                             }
                         }
@@ -618,8 +620,7 @@ public class OperazioniSA extends HttpServlet {
                 resp.addProperty("result", false);
                 resp.addProperty("message", "Errore: non &egrave; stato possibile aggiungere l'allievo.<br>Il seguente codice fiscale gi&agrave; presente");
             }
-        } catch (ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(null, "newAllievo Errore: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiungere l'allievo.<br>Riprovare, se l'errore persiste contattare l'assistenza");
@@ -739,7 +740,6 @@ public class OperazioniSA extends HttpServlet {
                 erroremodello1OK = res;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             erroremodello1OK = "MODELLO 1 ERRATO. " + ex.getMessage() + ". CONTROLLARE.";
             e.insertTracking(us.getUsername(), "uploadModello1: " + erroremodello1OK + " (allievo " + a.getId() + ")");
             resp.addProperty("result", false);
@@ -1079,7 +1079,7 @@ public class OperazioniSA extends HttpServlet {
                         modello2OK = true;
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
                     modello2OK = false;
                     erroremodello2OK = "MODELLO 2 ERRATO. " + ex.getMessage() + ". CONTROLLARE.";
                 }
@@ -1112,8 +1112,7 @@ public class OperazioniSA extends HttpServlet {
             }
         } catch (PersistenceException | ParseException ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA newProgettoFormativo: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile salvare il progetto formativo.");
         } finally {
@@ -1176,7 +1175,7 @@ public class OperazioniSA extends HttpServlet {
             }
             e.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         }
 
         if (downloadFile != null && downloadFile.exists()) {
@@ -1230,7 +1229,7 @@ public class OperazioniSA extends HttpServlet {
                 }
                 e.close();
             } catch (Exception ex) {
-                ex.printStackTrace();
+                insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             }
         }
 
@@ -1277,7 +1276,7 @@ public class OperazioniSA extends HttpServlet {
                         pf, m6, new DateTime(), true);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         }
 
         if (downloadFile != null && downloadFile.exists()) {
@@ -1348,7 +1347,7 @@ public class OperazioniSA extends HttpServlet {
             e.close();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         }
 
         if (downloadFile != null && downloadFile.exists()) {
@@ -1410,7 +1409,7 @@ public class OperazioniSA extends HttpServlet {
             }
             e.close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         }
 
         if (downloadFile != null && downloadFile.exists()) {
@@ -1544,8 +1543,7 @@ public class OperazioniSA extends HttpServlet {
                 resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare le informazioni dell'allievo.<br>Il seguente codice fiscale gi&agrave; già presente");
             }
 
-        } catch (ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(null, "updateAllievo Errore: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare le informazioni dell'allievo.<br>Riprovare, se l'errore persiste contattare l'assistenza");
@@ -1575,8 +1573,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA updtCartaId: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il documento d'identità.");
@@ -1602,8 +1599,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
             resp.addProperty("message", "Operazione effettuata con successo.");
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(us.getId()), "OperazioniSA updtCartaIdAd: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il documento d'identità.");
@@ -1639,8 +1635,7 @@ public class OperazioniSA extends HttpServlet {
             resp.addProperty("result", true);
             resp.addProperty("path", path);
             resp.addProperty("scadenza", d.getScadenza_doc().getTime());
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadDocIdDocente: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il documento d'identità.");
@@ -1675,8 +1670,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
             resp.addProperty("path", path);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadCurriculumDocente: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il documento d'identità.");
@@ -1713,8 +1707,7 @@ public class OperazioniSA extends HttpServlet {
 
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadCurriculumDocente: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il documento d'identità.");
@@ -1830,10 +1823,9 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
 
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.rollBack();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadDocPrg: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile caricare il documento.");
         } finally {
@@ -1937,10 +1929,9 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException | ParseException ex) {
+        } catch (Exception ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA modifyPrg: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile modificare il progetto formativo.");
         } finally {
@@ -2034,8 +2025,7 @@ public class OperazioniSA extends HttpServlet {
             }
         } catch (Exception ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA modifyDocenti: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato modificare i docenti del progetto formativo.");
         } finally {
@@ -2089,8 +2079,7 @@ public class OperazioniSA extends HttpServlet {
             }
         } catch (PersistenceException ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA goNext: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato modificare i docenti del progetto formativo.");
         } finally {
@@ -2117,10 +2106,9 @@ public class OperazioniSA extends HttpServlet {
             //e.persist(new Storico_Prg("Inviato a controllo", new Date(), p, p.getStato()));//storico progetto
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
+        } catch (Exception ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA setEsitoAllievo: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile modificare l'esito dell'allievo.");
         } finally {
@@ -2235,10 +2223,9 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
 
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.rollBack();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadRegistro: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile caricare il registro.");
         } finally {
@@ -2333,10 +2320,9 @@ public class OperazioniSA extends HttpServlet {
             }
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.rollBack();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA modifyRegistro: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile modificare il registro.");
         } finally {
@@ -2450,10 +2436,9 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
 
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.rollBack();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadDocPrg_FaseB: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile caricare il documento.");
         } finally {
@@ -2493,8 +2478,7 @@ public class OperazioniSA extends HttpServlet {
 
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA modifyDocPrg_FaseB: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il documento.");
@@ -2532,8 +2516,8 @@ public class OperazioniSA extends HttpServlet {
             resp.addProperty("today", today);
             resp.addProperty("totale", totale);
             response.getWriter().write(resp.toString());
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.close();
         }
@@ -2620,8 +2604,7 @@ public class OperazioniSA extends HttpServlet {
 
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadRegistrioAula: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile caricare il registro.");
@@ -2681,8 +2664,7 @@ public class OperazioniSA extends HttpServlet {
             e.merge(prg);
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException | ParseException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA modifyRegistrioAula: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile modificare il registro.");
@@ -2738,8 +2720,7 @@ public class OperazioniSA extends HttpServlet {
             e.persist(p);
             e.commit();
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA modifyRegistrioAula: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile modificare il registro.");
@@ -2772,7 +2753,6 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA sendAsk: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile inviare il messaggio.");
@@ -2890,8 +2870,7 @@ public class OperazioniSA extends HttpServlet {
             }
         } catch (Exception ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadLezione: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare la lezione.");
         } finally {
@@ -2960,8 +2939,7 @@ public class OperazioniSA extends HttpServlet {
             resp.addProperty("result", true);
         } catch (Exception ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA updateLezione: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare la lezione.");
         } finally {
@@ -3016,8 +2994,7 @@ public class OperazioniSA extends HttpServlet {
 //            }
         } catch (Exception ex) {
             e.rollBack();
-            ex.printStackTrace();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA creaGruppi: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
             resp.addProperty("message", "ERRORE DURANTE LA CREAZIONE DEI GRUPPI.");
         } finally {
@@ -3102,8 +3079,7 @@ public class OperazioniSA extends HttpServlet {
                 resp.addProperty("result", true);
             } catch (PersistenceException ex) {
                 e.rollBack();
-                ex.printStackTrace();
-                e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA updateM2: " + ex.getMessage());
+                insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
                 resp.addProperty("result", false);
                 resp.addProperty("message", "Errore: non &egrave; stato possibile aggiornare il modello 2.");
             } finally {
@@ -3225,7 +3201,7 @@ public class OperazioniSA extends HttpServlet {
                     e.rollBack();
                     resp.addProperty("result", false);
                     resp.addProperty("message", "RICHIESTA ACCREDITAMENTO DOCENTE ERRATA ERRORE NELLE ATTIVITA'. " + ex.getMessage() + ". CONTROLLARE.");
-                    ex.printStackTrace();
+                    insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
                 }
 
                 //CREA DOCUMENTO
@@ -3269,7 +3245,7 @@ public class OperazioniSA extends HttpServlet {
                         e.rollBack();
                         resp.addProperty("result", false);
                         resp.addProperty("message", "RICHIESTA ACCREDITAMENTO DOCENTE ERRATA. " + ex.getMessage() + ". CONTROLLARE.");
-                        ex.printStackTrace();
+                        insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
                     }
                 } else {
                     String richiesta_accr = dir.getAbsolutePath() + File.separator + "RICH_ACCR_"
@@ -3279,7 +3255,6 @@ public class OperazioniSA extends HttpServlet {
                     resp.addProperty("result", true);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
                 e.insertTracking(String.valueOf(us.getId()), "OperazioniSA addDocente: " + ex.getMessage());
                 resp.addProperty("result", false);
                 resp.addProperty("message", "Errore: non &egrave; stato possibile aggiungere il docente.");
@@ -3387,7 +3362,6 @@ public class OperazioniSA extends HttpServlet {
             resp.addProperty("title", title);
             resp.addProperty("message", "Operazione effettuata con successo");
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA manageMembriStaff: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("title", "Errore");
@@ -3419,7 +3393,6 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniMicro deleteMembroStaff: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile procedere con l'operazione.");
@@ -3633,7 +3606,6 @@ public class OperazioniSA extends HttpServlet {
                 e.rollBack();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA rendicontaAllievo: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile rendicontare l'allievo.");
@@ -3697,9 +3669,8 @@ public class OperazioniSA extends HttpServlet {
                 resp.addProperty("message", res);
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.rollBack();
-            e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA concludiPrg: " + ex.getMessage());
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             resp.addProperty("result", false);
         } finally {
             e.close();
@@ -3778,7 +3749,6 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
         } catch (PersistenceException ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA deleteModello5Alunno: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -3858,8 +3828,7 @@ public class OperazioniSA extends HttpServlet {
                 resp.addProperty("result", false);
                 resp.addProperty("message", erroremodello5OK);
             }
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadM5Alunno: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibilecaricare il modello 5.");
@@ -3889,13 +3858,13 @@ public class OperazioniSA extends HttpServlet {
             Entity e = new Entity();
             e.begin();
             Allievi a = e.getEm().find(Allievi.class,
-                    Long.parseLong(idallievo));
+                    Long.valueOf(idallievo));
             downloadFile = Pdf_new.MODELLO7(e, us.getUsername(), a, orerendicontabili,
                     new DateTime(), true);
             e.close();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         }
 
         if (downloadFile != null && downloadFile.exists()) {
@@ -3999,8 +3968,7 @@ public class OperazioniSA extends HttpServlet {
                 resp.addProperty("message", erroreregistroOK);
             }
 
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadRegistroComplessivo: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("message", "Errore: non &egrave; stato possibile caricare il registro complessivo.");
@@ -4054,7 +4022,6 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA uploadDichiarazioneM6: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4085,8 +4052,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA abilitaModificaCalendarM3: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4116,8 +4082,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA abilitaModificaCalendarM4: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4162,8 +4127,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA deleteAllLessons: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4203,8 +4167,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA abilitaModificaCalendarM3: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4250,8 +4213,7 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
 
             resp.addProperty("result", true);
-        } catch (PersistenceException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA abilitaModificaCalendarM3: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4270,7 +4232,6 @@ public class OperazioniSA extends HttpServlet {
         String idpr = getRequestValue(request, "idpr");
         String fase = getRequestValue(request, "fase");
 
-        
         try {
             e.begin();
             Long hh36 = new Long(129600000);
@@ -4343,8 +4304,8 @@ public class OperazioniSA extends HttpServlet {
 
             }
             e.commit();
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.close();
         }
@@ -4380,7 +4341,6 @@ public class OperazioniSA extends HttpServlet {
             e.commit();
             resp.addProperty("result", true);
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA abilitaModificaCalendarM3: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4436,7 +4396,6 @@ public class OperazioniSA extends HttpServlet {
             resp.addProperty("result", true);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking(String.valueOf(((User) request.getSession().getAttribute("user")).getId()), "OperazioniSA abilitaModificaCalendarM3: " + ex.getMessage());
             resp.addProperty("result", false);
         } finally {
@@ -4641,8 +4600,8 @@ public class OperazioniSA extends HttpServlet {
                 e.commit();
             }
 
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.close();
         }
@@ -4795,8 +4754,8 @@ public class OperazioniSA extends HttpServlet {
                 }
             });
 
-        } catch (Exception ex1) {
-            ex1.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         }
         redirect(request, response, request.getContextPath() + "/page/sa/registroaula_edit.jsp?idpr="
                 + idpr + "&data=" + datareturn + "&giorno=" + giorno + "&gruppo=" + gruppofaseb);
@@ -4827,8 +4786,8 @@ public class OperazioniSA extends HttpServlet {
             try {
                 Long new_millisrend = Long.parseLong(up1[1]);
                 addstart.addAndGet(new_millisrend.doubleValue());
-            } catch (Exception ex2) {
-                ex2.printStackTrace();
+            } catch (Exception ex) {
+                insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             }
         });
 
@@ -4858,9 +4817,8 @@ public class OperazioniSA extends HttpServlet {
                 db.closeDB();
 
 //                System.out.println(upd);
-
-            } catch (Exception ex1) {
-                ex1.printStackTrace();
+            } catch (Exception ex) {
+                insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
             }
         });
 

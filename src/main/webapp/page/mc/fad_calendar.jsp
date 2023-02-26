@@ -68,9 +68,9 @@
         <link href="<%=src%>/assets/vendors/general/bootstrap-datepicker/dist/css/bootstrap-datepicker3.css" rel="stylesheet" type="text/css" />
         <link href="<%=src%>/assets/vendors/general/bootstrap-timepicker/css/bootstrap-timepicker.css" rel="stylesheet" type="text/css" />
         <!--fancy-->
-        <link href="<%=src%>/assets/refill/css/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
-        <script type="text/javascript" src="<%=src%>/assets/refill/js/jquery-1.10.1.min.js"></script>
-        <script type="text/javascript" src="<%=src%>/assets/refill/js/jquery.fancybox.js?v=2.1.5"></script>
+        <link href="<%=src%>/assets/refill/css/jquery.fancybox.min.css" rel="stylesheet" type="text/css"/>
+        <script type="text/javascript" src="<%=src%>/assets/refill/js/jquery-3.6.1.min.js"></script>
+        <script type="text/javascript" src="<%=src%>/assets/refill/js/jquery.fancybox.min.js"></script>
         <script type="text/javascript" src="<%=src%>/assets/refill/js/fancy.js"></script>
     </head>
     <body class="kt-header--fixed kt-header-mobile--fixed kt-subheader--fixed kt-subheader--enabled kt-subheader--solid kt-aside--enabled kt-aside--fixed">
@@ -251,11 +251,11 @@
         <div id="kt_scrolltop" class="kt-scrolltop">
             <i class="fa fa-arrow-up"></i>
         </div>
-        <script src="<%=src%>/assets/vendors/general/jquery/dist/jquery.js" type="text/javascript"></script>
+        <script src="<%=src%>/assets/refill/js/jquery-3.6.1.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/popper.js/dist/umd/popper.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/bootstrap/dist/js/bootstrap.min.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/js-cookie/src/js.cookie.js" type="text/javascript"></script>
-        <script src="<%=src%>/assets/vendors/general/moment/min/moment.min.js" type="text/javascript"></script>
+        <script src="<%=src%>/assets/refill/js/moment.min.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/tooltip.js/dist/umd/tooltip.min.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/perfect-scrollbar/dist/perfect-scrollbar.js" type="text/javascript"></script>
         <script src="<%=src%>/assets/vendors/general/sticky-js/dist/sticky.min.js" type="text/javascript"></script>

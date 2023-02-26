@@ -1,5 +1,7 @@
 package it.refill.cf;
 
+import static it.refill.db.Action.insertTR;
+import static it.refill.util.Utility.estraiEccezione;
 import org.joda.time.DateTime;
 
 public class DataPanel {
@@ -22,8 +24,8 @@ public class DataPanel {
             if (fiscalCode.length() == 16) {
                 return fiscalCode;
             }
-        } catch (Exception e) {
-            System.out.println("Error in calcListener");
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
 
         return "";

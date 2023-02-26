@@ -9,9 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Entity;
 import it.refill.domain.Cad;
 import it.refill.domain.User;
+import static it.refill.util.Utility.estraiEccezione;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -48,7 +50,7 @@ public class QueryCi extends HttpServlet {
             response.getWriter().print(mapper.writeValueAsString(d));
             response.getWriter().close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.close();
         }
@@ -100,7 +102,7 @@ public class QueryCi extends HttpServlet {
             response.getWriter().flush();
             response.getWriter().close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.close();
         }
@@ -109,7 +111,7 @@ public class QueryCi extends HttpServlet {
     protected void getSingleCad(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Entity e = new Entity();
         try {
-            Cad cad = e.getEm().find(Cad.class, Long.parseLong(request.getParameter("id")));
+            Cad cad = e.getEm().find(Cad.class, Long.valueOf(request.getParameter("id")));
             //aggiungo 2 parametri al json
             StringWriter sw = new StringWriter();
             ObjectMapper mapper = new ObjectMapper();
@@ -121,7 +123,7 @@ public class QueryCi extends HttpServlet {
             response.getWriter().print(jMembers.toString());
             response.getWriter().close();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", String.valueOf(((User) request.getSession().getAttribute("user")).getId()), estraiEccezione(ex));
         } finally {
             e.close();
         }

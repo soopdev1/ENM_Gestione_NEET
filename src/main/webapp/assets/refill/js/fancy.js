@@ -1,5 +1,100 @@
 $('.fancybox').fancybox();
 
+jQuery(document).ready(function ($) {
+    $().fancybox({
+        selector: '.fancybox'
+    });
+
+    $().fancybox({
+        selector: '.fancyBoxNoRef',
+        arrows: false,
+        infobar: false,
+        closeBtn: true,
+        type: 'iframe',
+        autoSize: false,
+        fitToView: false,
+        height: "90%",
+        width: "80%",
+        centerOnScroll: true,
+        overlayOpacity: 0,
+        overlayShow: true,
+        slideShow: false,
+        touch: false
+    });
+    $().fancybox({
+        selector: '.fancyBoxRaf',
+        arrows: false,
+        infobar: false,
+        closeBtn: true,
+        type: 'iframe',
+        autoSize: false,
+        fitToView: false,
+        height: "90%",
+        width: "80%",
+        centerOnScroll: true,
+        overlayOpacity: 0,
+        overlayShow: true,
+        slideShow: false,
+        touch: false
+    });
+    $().fancybox({
+        selector: '.fancyProfileNoRef',
+        arrows: false,
+        infobar: false,
+        closeBtn: true,
+        type: 'iframe',
+        autoSize: false,
+        fitToView: false,
+        height: "90%",
+        width: "80%",
+        centerOnScroll: true,
+        overlayOpacity: 0,
+        overlayShow: true,
+        slideShow: false,
+        touch: false
+    });
+    $().fancybox({
+        selector: '.fancyBoxReload',
+        arrows: false,
+        infobar: false,
+        closeBtn: true,
+        type: 'iframe',
+        autoSize: false,
+        fitToView: false,
+        height: "90%",
+        width: "80%",
+        centerOnScroll: true,
+        overlayOpacity: 0,
+        overlayShow: true,
+        slideShow: false,
+        touch: false,
+        afterClose: function () {
+            reload();
+        }
+    });
+    $().fancybox({
+        selector: '.fancyProfile',
+        arrows: false,
+        infobar: false,
+        closeBtn: true,
+        type: 'iframe',
+        autoSize: false,
+        fitToView: false,
+        height: "90%",
+        width: "80%",
+        centerOnScroll: true,
+        overlayOpacity: 0,
+        overlayShow: true,
+        slideShow: false,
+        touch: false,
+        afterClose: function () {
+            reload();
+        }
+    });
+
+
+});
+
 $("a.fancyBoxRaf").fancybox({
     prevEffect: 'none',
     nextEffect: 'none',
@@ -11,7 +106,7 @@ $("a.fancyBoxRaf").fancybox({
     width: 1200,
     centerOnScroll: true,
     overlayOpacity: 0,
-    overlayShow: true,
+    overlayShow: true
 });
 
 $("a.fancyBoxReload").fancybox({
@@ -313,7 +408,7 @@ $("a.fancyBoxNoRef").fancybox({
     width: "80%",
     centerOnScroll: true,
     overlayOpacity: 0,
-    overlayShow: true,
+    overlayShow: true
 });
 
 $("a.fancyBoxFull").fancybox({
@@ -327,5 +422,5 @@ $("a.fancyBoxFull").fancybox({
     height: '100%',
     centerOnScroll: true,
     overlayOpacity: 0,
-    overlayShow: true,
+    overlayShow: true
 });

@@ -7,6 +7,7 @@ package it.refill.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Entity;
 import it.refill.domain.SoggettiAttuatori;
 import it.refill.domain.User;
@@ -15,6 +16,7 @@ import it.refill.entity.Item;
 import it.refill.util.GoogleRecaptcha;
 import it.refill.util.SendMailJet;
 import it.refill.util.Utility;
+import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.redirect;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -179,8 +181,7 @@ public class Login extends HttpServlet {
                 resp.addProperty("result", false);
                 resp.addProperty("messagge", "<b>" + username + "</b><br/> non è associato a nessun account.");
             }
-        } catch (Exception | Error ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(null, "forgotPwd Errore: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("messagge", "Errore durante il recupero password. Se l'errore persiste contattare il servizio assistenza.");
@@ -226,8 +227,7 @@ public class Login extends HttpServlet {
                     resp.addProperty("messagge", "La password nuova non coincide.");
                 }
             }
-        } catch (Exception | Error ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
             e.insertTracking(null, "changePwd Errore: " + ex.getMessage());
             resp.addProperty("result", false);
             resp.addProperty("messagge", "Errore durante il cambio password. Se l'errore persiste contattare il servizio assistenza.");
@@ -248,7 +248,7 @@ public class Login extends HttpServlet {
             result.put("result", GoogleRecaptcha.isValid(request.getParameter("g-recaptcha-response")));
         } catch (Exception ex) {
             result.put("result", false);
-            ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         response.getWriter().write(result.toString());
         response.getWriter().flush();

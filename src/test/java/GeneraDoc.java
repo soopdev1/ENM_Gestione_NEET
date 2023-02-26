@@ -1,14 +1,11 @@
 
-import it.refill.db.Action;
 import it.refill.db.Entity;
-import it.refill.domain.MascheraM5;
 import it.refill.domain.ModelliPrg;
 import it.refill.domain.ProgettiFormativi;
-import it.refill.domain.TipoDoc_Allievi;
 import it.refill.util.Pdf_new;
 import it.refill.util.Utility;
 import java.io.File;
-import java.util.Map;
+import java.util.Collections;
 import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 
@@ -26,20 +23,20 @@ public class GeneraDoc {
 
     public static void main(String[] args) {
 
-        String idpr = "610";
-//        String idall = "1040";
-        String usernameSA = "FORMALINECONTRACT";
+        String idpr = "858";
+//        String idall = "1412";
+        String usernameSA = "FINDALE";
 
         Entity e = new Entity();
         e.begin();
         ProgettiFormativi prg = e.getEm().find(ProgettiFormativi.class,
-                Long.parseLong(idpr));
+                Long.valueOf(idpr));
 //        Allievi al = e.getEm().find(Allievi.class,
-//                Long.parseLong(idall));
+//                Long.valueOf(idall));
 
-        ModelliPrg m3 = Utility.filterModello3(prg.getModelli());
-//        ModelliPrg m4 = Utility.filterModello4(prg.getModelli());
-////        File f1 = Pdf_new.MODELLO1(e, "3", usernameSA, prg.getSoggetto(), al, new DateTime(), true, true);
+//        ModelliPrg m3 = Utility.filterModello3(prg.getModelli());
+        ModelliPrg m4 = Utility.filterModello4(prg.getModelli());
+//        File f1 = Pdf_new.MODELLO1(e, "3", usernameSA, prg.getSoggetto(), al, new DateTime(), true, true);
 //        System.out.println(f1.getPath());
 //        File f2 = Pdf_new.MODELLO2(e,
 //                            "1",
@@ -48,23 +45,26 @@ public class GeneraDoc {
 //                            prg.getAllievi().stream().filter(a1-> a1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()) , new DateTime(), true);
 //        
 //        System.out.println(f2.getPath());
-        
-        File f3 = Pdf_new.MODELLO3(e,
-                            usernameSA,
-                            prg.getSoggetto(),
-                            prg,
-                            prg.getAllievi().stream().filter(p1 -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
-                            prg.getDocenti(), m3.getLezioni(), prg.getStaff_modelli().stream().filter(m -> m.getAttivo() == 1).collect(Collectors.toList()),
-                            new DateTime(), true);        
-//        System.out.println(f3.getPath());
 
-//        File f4 = Pdf_new.MODELLO4(e, usernameSA, prg.getSoggetto(), prg, prg.getAllievi().stream().filter(p1 ->
-//                p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
-//                prg.getDocenti(), m4.getLezioni(), prg.getStaff_modelli().stream().filter(m -> 
-//                        m.getAttivo() == 1).collect(Collectors.toList()), new DateTime(), true);
-//        
-//        System.out.println(f4.getPath());
-        
+//        File f3 = Pdf_new.MODELLO3(e,
+//                            usernameSA,
+//                            prg.getSoggetto(),
+//                            prg,
+//                            prg.getAllievi().stream().filter(p1 -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
+//                            prg.getDocenti(), m3.getLezioni(), prg.getStaff_modelli().stream().filter(m -> m.getAttivo() == 1).collect(Collectors.toList()),
+//                            new DateTime(), true);        
+//        System.out.println(f3.getPath());
+//        Collections.sort(m4.getLezioni(), (emp1, emp2) -> emp1.getGiorno().compareTo(emp2.getGiorno()));
+
+        File f4 = Pdf_new.MODELLO4(e, usernameSA, prg.getSoggetto(), prg, prg.getAllievi().stream().filter(p1
+                -> p1.getStatopartecipazione().getId().equals("01")).collect(Collectors.toList()),
+                prg.getDocenti(),
+                m4.getLezioni(),
+                prg.getStaff_modelli().stream().filter(m
+                -> m.getAttivo() == 1).collect(Collectors.toList()), new DateTime(), true);
+
+        System.out.println(f4.getPath());
+
 //        Map<Long, Long> allievi_m5 = Utility.allieviM5_loaded(e.getM5Loaded_byPF(prg));
 //        prg.getAllievi().stream().filter(al1 -> al1.getStatopartecipazione().getId().equals("01")).forEach(al -> {
 //
@@ -96,7 +96,6 @@ public class GeneraDoc {
 //            }
 //
 //        });
-
 //        ModelliPrg m6 = Utility.filterModello6(prg.getModelli());
 //        if (m6 != null) {
 //            File f6 = Pdf_new.MODELLO6(e,

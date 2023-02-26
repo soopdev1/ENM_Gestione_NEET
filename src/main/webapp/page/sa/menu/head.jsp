@@ -93,7 +93,7 @@
     <!-- end:: Header Topbar -->
 </div>
 <!-- end:: Header -->
-<link href="<%=src%>/assets/refill/css/jquery.fancybox.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="<%=src%>/assets/refill/js/jquery-1.10.1.min.js"></script>
-<script type="text/javascript" src="<%=src%>/assets/refill/js/jquery.fancybox.js?v=2.1.5"></script>
+<link href="<%=src%>/assets/refill/css/jquery.fancybox.min.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="<%=src%>/assets/refill/js/jquery-3.6.1.min.js"></script>
+<script type="text/javascript" src="<%=src%>/assets/refill/js/jquery.fancybox.min.js"></script>
 <script type="text/javascript" src="<%=src%>/assets/refill/js/fancy.js"></script>

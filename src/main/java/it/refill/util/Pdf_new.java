@@ -29,6 +29,7 @@ import com.itextpdf.layout.element.Image;
 import com.itextpdf.signatures.PdfPKCS7;
 import com.itextpdf.signatures.SignatureUtil;
 import it.refill.db.Action;
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Database;
 import it.refill.db.Entity;
 import it.refill.db.Registro_completo;
@@ -552,7 +553,6 @@ public class Pdf_new {
             }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -757,7 +757,6 @@ public class Pdf_new {
             }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -1313,7 +1312,6 @@ public class Pdf_new {
             }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -1576,7 +1574,6 @@ public class Pdf_new {
                 return pdfOut;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -1731,7 +1728,6 @@ public class Pdf_new {
                                 setFieldsValue(form, fields, "COMUNESEDE", "");
                                 setFieldsValue(form, fields, "PROVINCIASEDE", "");
                                 setFieldsValue(form, fields, "INDIRIZZOSEDE", "");
-
                             } else {
                                 form.partialFormFlattening(KEY);
                             }
@@ -1762,7 +1758,6 @@ public class Pdf_new {
                 return pdfOut;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -1986,7 +1981,6 @@ public class Pdf_new {
                 return pdfOut;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             e.insertTracking("ERROR SYSTEM ", estraiEccezione(ex));
         }
         return null;
@@ -2274,7 +2268,7 @@ public class Pdf_new {
             }
             return pdfOutA;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return null;
     }
@@ -2291,8 +2285,8 @@ public class Pdf_new {
             for (int i = 1; i <= pdfDoc.getNumberOfPages(); i++) {
                 new Canvas(pdfDoc.getPage(i), pdfDoc.getDefaultPageSize()).add(bCodeImage);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
     }
 
@@ -2309,8 +2303,8 @@ public class Pdf_new {
                 fields_list.get(field_name).setValue(field_value);
                 form.partialFormFlattening(field_name);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
     }
 
@@ -2439,7 +2433,6 @@ public class Pdf_new {
 //            }
 //        } catch (Exception e) {
 //            out = "ERRORE NEL FILE - " + e.getMessage();
-//            e.printStackTrace();
 //        }
 //
 //        return out;
@@ -2485,10 +2478,10 @@ public class Pdf_new {
             String qr = result.getText().toUpperCase();
             return qr;
         } catch (Exception ex) {
-            ex.printStackTrace();
             if (ex.getMessage() == null) {
                 return estraiResult(doc, qrcrop, pag + 1);
             }
+            insertTR("E", "SERVICE", estraiEccezione(ex));
             return null;
         }
     }
@@ -2535,11 +2528,10 @@ public class Pdf_new {
                         }
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     if (ex.getMessage() == null) {
                         out = "ERRORE - QR CODE ILLEGGIBILE";
                     } else {
-                        ex.printStackTrace();
+                        insertTR("E", "SERVICE", estraiEccezione(ex));
                         out = "ERRORE NEL FILE - " + ex.getMessage();
                     }
                 }

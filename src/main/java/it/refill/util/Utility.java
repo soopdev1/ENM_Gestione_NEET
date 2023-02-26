@@ -27,6 +27,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.TextAlignment;
 import it.refill.db.Action;
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Database;
 import it.refill.db.FileDownload;
 import it.refill.domain.Allievi;
@@ -58,7 +59,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -78,7 +78,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.RequestContext;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
@@ -128,10 +127,10 @@ import org.json.JSONObject;
  */
 public class Utility {
 
-    public static boolean demoversion = true;
+    public static boolean demoversion = false;
 
     // TEST //
-    public static boolean test = true;
+    public static boolean test = false;
     public static boolean dbsviluppo = false;
     //////////
 
@@ -159,7 +158,7 @@ public class Utility {
     public static final String timestampFAD = "yyyy-MM-dd HH:mm:ss.SSSSSS";
     public static final String timestampSQLZONE = "yyyy-MM-dd HH:mm:ss Z";
     public static final String timestampSQL = "yyyy-MM-dd HH:mm:ss";
-    public static final String timestampITA = "dd/MM/yyyy HH:mm:ss";
+    public static final String timestampITA = "dd/MM/yyyy HH:mm:ss";    
     public static final String timestampITAcomplete = "dd/MM/yyyy HH:mm:ss.SSS";
     public static final SimpleDateFormat sd0 = new SimpleDateFormat(timestampSQL);
     public static final DateTimeFormatter dtf = DateTimeFormat.forPattern(patternSql);
@@ -208,8 +207,8 @@ public class Utility {
                         System.out.println("MULTIPART FILE - " + fieldName + " : " + fieldValue);
                     }
                 }
-            } catch (FileUploadException ex) {
-                ex.printStackTrace();
+            } catch (Exception ex) {
+                insertTR("E", "SERVICE", estraiEccezione(ex));
             }
         }
     }
@@ -248,8 +247,8 @@ public class Utility {
                 sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
             }
             return sb.toString().trim();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
             return "-";
         }
     }
@@ -400,8 +399,8 @@ public class Utility {
             response.setHeader("Content-Type", "application/json");
             response.getWriter().print(jMembers.toString());
             response.getWriter().close();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
     }
 
@@ -430,8 +429,8 @@ public class Utility {
                 DateTime dtout = fmt.parseDateTime(dat);
                 return dtout.toString(pattern2, ITALY);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return "DATA ERRATA";
     }
@@ -475,8 +474,8 @@ public class Utility {
                     pd.close();
                 }
                 return pag > 0;
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                insertTR("E", "SERVICE", estraiEccezione(ex));
             }
         }
         return false;
@@ -575,7 +574,7 @@ public class Utility {
             jMembers.add("aaData", tradeElement.getAsJsonArray());
             return jMembers.toString();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
             return "";
         }
     }
@@ -803,8 +802,8 @@ public class Utility {
                 bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
                 return numITA.format(bigDecimal).replaceAll("[^0123456789.,()-]", "").trim();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return "0";
 
@@ -815,8 +814,8 @@ public class Utility {
             BigDecimal bigDecimal = new BigDecimal(Double.toString(f));
             bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
             return numITA.format(bigDecimal).replaceAll("[^0123456789.,()-]", "").trim();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return "0";
 
@@ -887,7 +886,7 @@ public class Utility {
     public static List<Allievi> allievi_fa(long idp, List<Allievi> l) {
         Long hh36 = new Long(129600000);
         Map<Long, Long> oreRendicontabili_faseA = Action.OreRendicontabiliAlunni_faseA((int) (long) idp);
-        return l.stream().filter(a -> oreRendicontabili_faseA.get(a.getId()) != null && oreRendicontabili_faseA.get(a.getId()).compareTo(hh36) > 0).collect(Collectors.toList());
+        return l.stream().filter(a -> oreRendicontabili_faseA.get(a.getId()) != null && oreRendicontabili_faseA.get(a.getId()).compareTo(hh36) >= 0).collect(Collectors.toList());
     }
 
     public static List<Allievi> allievi_fb(long idp, List<Allievi> l) {
@@ -916,6 +915,7 @@ public class Utility {
             bigDecimal = bigDecimal.setScale(2, RoundingMode.HALF_EVEN);
             return bigDecimal.toString();
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return "0.00";
     }
@@ -1008,8 +1008,8 @@ public class Utility {
             CharsetDetector detector = new CharsetDetector();
             detector.setText(ing.getBytes());
             return new String(ing.getBytes(detector.detect().getName()), Charset.forName("utf-8"));
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return ing;
     }
@@ -1035,7 +1035,7 @@ public class Utility {
             }
             return DateTimeFormat.forPattern(pattern).parseDateTime(ing);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return null;
     }
@@ -1092,8 +1092,8 @@ public class Utility {
 
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
     }
 
@@ -1183,8 +1183,8 @@ public class Utility {
                     docente.setMillistotaleorerendicontabili(millis_rendicontabili_DOCENTE.get());
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
     }
 
@@ -1210,8 +1210,8 @@ public class Utility {
                     return rs.getInt(1);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return 0;
     }
@@ -1229,8 +1229,8 @@ public class Utility {
                     return rs.getInt(1);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return 0;
     }

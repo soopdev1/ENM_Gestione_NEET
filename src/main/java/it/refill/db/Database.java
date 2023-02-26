@@ -31,6 +31,7 @@ import static it.refill.util.Utility.patternSql;
 import static it.refill.util.Utility.preparefilefordownload;
 import static it.refill.util.Utility.sdfSQL;
 import static it.refill.util.Utility.test;
+import static it.refill.util.Utility.timestampSQL;
 import java.io.File;
 import static java.lang.Class.forName;
 import java.math.BigDecimal;
@@ -141,6 +142,30 @@ public class Database {
         this.c = c;
     }
 
+    public String getNow() {
+        try {
+            String sql = "SELECT now()";
+            PreparedStatement ps = this.c.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getString(1);
+            }
+        } catch (Exception ex) {
+        }
+        return new DateTime().toString(timestampSQL);
+    }
+    
+    public void insertTR(String type, String user, String descr) {
+        try {
+            PreparedStatement ps = this.c.prepareStatement("INSERT INTO tracking (azione,iduser,timestamp) VALUES (?,?,?)");
+            ps.setString(1, descr);
+            ps.setString(2, user);
+            ps.setString(3, getNow());
+            ps.execute();
+        } catch (SQLException ex) {
+        }
+    }
+    
     public int countPregresso() {
         int count = 0;
         String sql = "SELECT COUNT(idallievi_pregresso) FROM allievi_pregresso";
@@ -799,9 +824,9 @@ public class Database {
             } else {
                 String sql = "SELECT sum(totaleorerendicontabili) as totOre,idutente FROM registro_completo WHERE fase = 'A' AND ruolo LIKE 'ALLIEVO%' "
                         + "AND idprogetti_formativi = ? GROUP BY idutente";
-                try ( PreparedStatement ps = this.c.prepareStatement(sql)) {
+                try (PreparedStatement ps = this.c.prepareStatement(sql)) {
                     ps.setInt(1, pf);
-                    try ( ResultSet rs = ps.executeQuery()) {
+                    try (ResultSet rs = ps.executeQuery()) {
                         while (rs.next()) {
                             result.put(rs.getLong("idutente"), rs.getLong("totOre"));
                         }

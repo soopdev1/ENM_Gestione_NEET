@@ -39,28 +39,55 @@ import org.apache.commons.io.FileUtils;
  */
 public class OperazioniGeneral extends HttpServlet {
 
+    protected void onlyDownloadnew(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String path = request.getParameter("path");
+        try {
+            Entity e = new Entity();
+            String manuale = e.getPath(path);
+            e.close();
+            if (manuale == null || manuale.equals("")) {
+                response.sendRedirect("login.jsp");
+            } else {
+                File downloadFile = createFile_R(manuale);
+                if (downloadFile != null
+                        && downloadFile.exists()) {
+                    String mimeType = Files.probeContentType(downloadFile.toPath());
+                    if (mimeType == null) {
+                        mimeType = "application/pdf";
+                    }
+                    response.setContentType(mimeType);
+                    String headerKey = "Content-Disposition";
+                    String headerValue = format("attach; filename=\"%s\"", downloadFile.getName());
+                    response.setHeader(headerKey, headerValue);
+                    response.setContentLength(-1);
+                    try ( OutputStream outStream = response.getOutputStream()) {
+                        outStream.write(FileUtils.readFileToByteArray(downloadFile));
+                    }
+                } else {
+                    response.sendRedirect("login.jsp");
+                }
+            }
+        } catch (Exception ex1) {
+            response.sendRedirect("login.jsp");
+        }
+    }
+
     protected void onlyDownload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String path = request.getParameter("path");
         File downloadFile = createFile_R(path);
-        if (
-                downloadFile != null 
-                && 
-                downloadFile.exists()
-                ) {
-
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
-                String mimeType = Files.probeContentType(downloadFile.toPath());
-                if (mimeType == null) {
-                    mimeType = "application/pdf";
-                }
-                response.setContentType(mimeType);
-                String headerKey = "Content-Disposition";
-                String headerValue = format("attach; filename=\"%s\"", downloadFile.getName());
-                response.setHeader(headerKey, headerValue);
-                response.setContentLength(-1);
-                try (OutputStream outStream = response.getOutputStream()) {
-                    outStream.write(FileUtils.readFileToByteArray(downloadFile));
-                }
+        if (downloadFile != null
+                && downloadFile.exists()) {
+            String mimeType = Files.probeContentType(downloadFile.toPath());
+            if (mimeType == null) {
+                mimeType = "application/pdf";
+            }
+            response.setContentType(mimeType);
+            String headerKey = "Content-Disposition";
+            String headerValue = format("attach; filename=\"%s\"", downloadFile.getName());
+            response.setHeader(headerKey, headerValue);
+            response.setContentLength(-1);
+            try ( OutputStream outStream = response.getOutputStream()) {
+                outStream.write(FileUtils.readFileToByteArray(downloadFile));
             }
         } else {
             response.sendRedirect("404.jsp");
@@ -72,15 +99,16 @@ public class OperazioniGeneral extends HttpServlet {
         String path = request.getParameter("path");
         File downloadFile = createFile_R(path);
         if (downloadFile != null && downloadFile.exists()) {
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = Files.probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/pdf";
-                }   response.setContentType(mimeType);
+                }
+                response.setContentType(mimeType);
                 String headerKey = "Content-Disposition";
                 String headerValue = String.format("inline; filename=\"%s\"", downloadFile.getName());
                 response.setHeader(headerKey, headerValue);
-                try (OutputStream outStream = response.getOutputStream()) {
+                try ( OutputStream outStream = response.getOutputStream()) {
                     byte[] buffer = new byte[4096 * 4096];
                     int bytesRead;
                     while ((bytesRead = inStream.read(buffer)) != -1) {
@@ -88,7 +116,7 @@ public class OperazioniGeneral extends HttpServlet {
                     }
                 }
             }
-            
+
         } else {
             User us = (User) request.getSession().getAttribute("user");
             String page = "page/";
@@ -112,7 +140,7 @@ public class OperazioniGeneral extends HttpServlet {
         File downloadFile = createFile_R(path);
 
         if (downloadFile.exists()) {
-            try (FileInputStream inStream = new FileInputStream(downloadFile)) {
+            try ( FileInputStream inStream = new FileInputStream(downloadFile)) {
                 String mimeType = Files.probeContentType(downloadFile.toPath());
                 if (mimeType == null) {
                     mimeType = "application/pdf";
@@ -121,7 +149,7 @@ public class OperazioniGeneral extends HttpServlet {
                 String headerKey = "Content-Disposition";
                 String headerValue = String.format("attach; filename=\"%s\"", downloadFile.getName());
                 response.setHeader(headerKey, headerValue);
-                try (OutputStream outStream = response.getOutputStream()) {
+                try ( OutputStream outStream = response.getOutputStream()) {
                     byte[] buffer = new byte[4096 * 4096];
                     int bytesRead;
                     while ((bytesRead = inStream.read(buffer)) != -1) {
@@ -129,7 +157,7 @@ public class OperazioniGeneral extends HttpServlet {
                     }
                 }
             }
-            
+
         } else {
             User us = (User) request.getSession().getAttribute("user");
             String page = "page/";
@@ -261,8 +289,8 @@ public class OperazioniGeneral extends HttpServlet {
                     case "showDoc":
                         showDoc(request, response);
                         break;
-                    case "onlyDownload":
-                        onlyDownload(request, response);
+                    case "onlyDownloadnew":
+                        onlyDownloadnew(request, response);
                         break;
                     default:
                         break;

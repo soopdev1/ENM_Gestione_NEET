@@ -5,7 +5,9 @@
  */
 package it.refill.util;
 
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Database;
+import static it.refill.util.Utility.estraiEccezione;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -108,7 +110,7 @@ public class FaseB {
             }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         return calendar;
     }

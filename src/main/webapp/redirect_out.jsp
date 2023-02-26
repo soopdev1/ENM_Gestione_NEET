@@ -27,7 +27,7 @@
                 }%>
         </form>
     </body>
-    <script src="assets/vendors/general/jquery/dist/jquery.js" type="text/javascript"></script>
+    <script src="assets/refill/js/jquery-3.6.1.js" type="text/javascript"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             document.getElementById("form").submit();

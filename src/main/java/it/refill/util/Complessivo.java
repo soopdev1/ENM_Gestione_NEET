@@ -26,9 +26,12 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.AreaBreakType;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import static it.refill.db.Action.insertTR;
 import it.refill.db.Database;
+import it.refill.domain.User;
 import static it.refill.util.Utility.calcoladurata;
 import static it.refill.util.Utility.checkPDF;
+import static it.refill.util.Utility.estraiEccezione;
 import static it.refill.util.Utility.formatStringtoStringDateSQL;
 import static it.refill.util.Utility.patternITA;
 import static it.refill.util.Utility.patternid;
@@ -302,7 +305,7 @@ public class Complessivo {
                         table.addCell(cell);
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    insertTR("E", "SERVICE", estraiEccezione(ex));
                 }
                 doc.add(table);
                 if (indice.get() < fa.size()) {
@@ -518,7 +521,7 @@ public class Complessivo {
                         table.addCell(cell);
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    insertTR("E", "SERVICE", estraiEccezione(ex));
                 }
                 doc.add(table);
                 if (indice1.get() < fb.size()) {
@@ -577,8 +580,8 @@ public class Complessivo {
 
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
 
         return null;
@@ -600,22 +603,22 @@ public class Complessivo {
                 }
             }
 
-            PdfDocument pdf = new PdfDocument(new PdfWriter("C:\\mnt\\mcn\\yisu_neet\\SoggettiAttuatori\\36\\Progetti\\82\\testing.pdf"));
-            PdfMerger merger = new PdfMerger(pdf);
-            temp.forEach(f1 -> {
-                try {
-                    PdfDocument firstSourcePdf = new PdfDocument(new PdfReader(f1.getPath()));
-                    merger.merge(firstSourcePdf, 1, firstSourcePdf.getNumberOfPages());
-                    firstSourcePdf.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            });
-            pdf.close();
+            try (PdfDocument pdf = new PdfDocument(new PdfWriter("C:\\mnt\\mcn\\yisu_neet\\SoggettiAttuatori\\36\\Progetti\\82\\testing.pdf"))) {
+                PdfMerger merger = new PdfMerger(pdf);
+                temp.forEach(f1 -> {
+                    try {
+                        try (PdfDocument firstSourcePdf = new PdfDocument(new PdfReader(f1.getPath()))) {
+                            merger.merge(firstSourcePdf, 1, firstSourcePdf.getNumberOfPages());
+                        }
+                    } catch (Exception ex) {
+                        insertTR("E", "SERVICE", estraiEccezione(ex));
+                    }
+                    
+                });
+            }
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            insertTR("E", "SERVICE", estraiEccezione(ex));
         }
         db.closeDB();
         return null;
