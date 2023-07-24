@@ -72,17 +72,14 @@ public class Allievi implements Serializable {
     private String protocollo;
     @Column(name = "esito")
     private String esito = "-";
-
     @Column(name = "esclusione_prg")
     private String esclusione_prg;
-
     @Temporal(TemporalType.DATE)
     @Column(name = "iscrizionegg")
     private Date iscrizionegg;
     @Column(name = "datacpi")
     @Temporal(TemporalType.DATE)
     private Date datacpi;
-
     @Column(name = "neet")
     private String neet;
     @Column(name = "docid")
@@ -102,11 +99,9 @@ public class Allievi implements Serializable {
     private String telefono;
     @Column(name = "importo")
     private double importo;
-
     @Temporal(TemporalType.DATE)
     @Column(name = "data_up")
     private Date data_up;
-
     @ManyToOne
     @JoinColumn(name = "cittadinanza")
     private Nazioni_rc cittadinanza;
