@@ -42,12 +42,12 @@ function ctrlFormNF() {
     err = checkObblFieldsContentVisible($('#kt_form')) ? true : err;
     if (checkCF($('#cf'))) {
         err = checkinfoCF_simplified() ? true : err;
-        err = Docente_CheckCF() ? true : err;
+  //      err = Docente_CheckCF() ? true : err;
     } else {
         err = true;
     }
     if (!checkEmail($('#email'))) {
-        err = Docente_CheckEmail() ? true : err;
+   //     err = Docente_CheckEmail() ? true : err;
     } else {
         err = true;
     }
