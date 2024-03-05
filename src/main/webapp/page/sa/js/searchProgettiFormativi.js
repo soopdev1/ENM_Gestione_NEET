@@ -232,7 +232,9 @@ var DatatablesAllievi = function () {
                 {data: 'cognome'},
                 {data: 'codicefiscale'},
                 {data: 'statopartecipazione.descrizione'},
-                {data: 'esclusione_prg'}
+                {data: 'esclusione_prg'},
+                                {defaultContent: ''}
+
             ],
             drawCallback: function () {
                 $('[data-toggle="kt-tooltip"]').tooltip();
@@ -253,7 +255,25 @@ var DatatablesAllievi = function () {
                         option += '</div></div>';
                         return option;
                     }
-                }]
+                },
+                {
+                    targets: 6,
+                    className: 'text-center',
+                    orderable: false,
+                    render: function (data, type, row, meta) {
+                        var option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io fa fa-address-card fancyDocument" style="font-size: 20px;"'
+                                + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
+                                + 'data-placement="top" title="<h6>Scadenza:</h6><h5>' + formattedDate(new Date(row.scadenzadocid)) + '</h5>"></a>';
+                        if (new Date(row.scadenzadocid) <= new Date()) {
+                            option = '<a href="' + context + '/OperazioniGeneral?type=showDoc&path=' + row.docid + '" class="btn btn-io-n fancyDocument" style="font-size: 20px"'
+                                    + 'data-container="body" data-html="true" data-toggle="kt-tooltip"'
+                                    + 'data-placement="top" title="<h6>Scadenza:</h6><h5>'
+                                    + formattedDate(new Date(row.scadenzadocid)) + '</h5>">&nbsp;<i class="fa fa-exclamation-triangle"></i></a>';
+                        }
+                        return option;
+                    }
+                }
+            ]
         });
     };
     return {

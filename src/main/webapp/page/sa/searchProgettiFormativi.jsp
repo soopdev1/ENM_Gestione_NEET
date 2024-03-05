@@ -218,6 +218,7 @@
                                         <th class="text-uppercase text-center">Codice Fiscale</th>
                                         <th class="text-uppercase text-center">Stato</th>
                                         <th class="text-uppercase text-center">Motivazione</th>
+                                        <th class="text-uppercase text-center">Documento d'identità</th>
                                     </tr>
                                 </thead>
                             </table>

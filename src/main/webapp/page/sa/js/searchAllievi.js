@@ -117,11 +117,13 @@ var KTDatatablesDataSourceAjaxServer = function () {
                                 + '   <i class="flaticon-more-1"></i>'
                                 + '</button>'
                                 + '<div class="dropdown-menu dropdown-menu-left">';
+                        
                         if (row.stato === "I") {
-                            option += '<a class="dropdown-item fancyBoxAntoRef" href="' + context + '/redirect.jsp?page=page/sa/updtNEET.jsp?id=' + row.id + '" style="color:#363a90"><i class="fa fa-user-edit" style="color:#363a90"></i> Scheda Allievo</a>'
-                            option += '<a class="dropdown-item" target="_blank" href="' + context + '/OperazioniSA?type=scaricaModello1&id=' + row.id + '" style="color:#363a90"><i class="fa fa-cloud-download-alt" style="color:#363a90"></i> Scarica Modello 1</a>'
+                            option += '<a class="dropdown-item fancyBoxAntoRef" href="' + context + '/redirect.jsp?page=page/sa/updtNEET.jsp?id=' + row.id + '" style="color:#363a90"><i class="fa fa-user-edit" style="color:#363a90"></i> Scheda Allievo</a>';
+                            option += '<a class="dropdown-item" target="_blank" href="' + context + '/OperazioniSA?type=scaricaModello1&id=' + row.id + '" style="color:#363a90"><i class="fa fa-cloud-download-alt" style="color:#363a90"></i> Scarica Modello 1</a>';
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="uploadM1(' + row.id + ',\'[&quot;pdf&quot;]\', \'application/pdf\');" style="color:#b30000"><i class="fa fa-cloud-upload-alt" style="color:#b30000"></i> Carica Modello 1</a>';
                         }
+                        
                         option += '<a class="dropdown-item" href="javascript:void(0);" onclick="swalDocumentAllievo(' + row.id + ')"><i class="fa fa-file-alt"></i> Visualizza Documenti</a>';
                         if (new Date(row.scadenzadocid) <= new Date()) {
                             option += '<a class="dropdown-item" href="javascript:void(0);" onclick="rinnovoCartaID(' + row.id + ');">' +
